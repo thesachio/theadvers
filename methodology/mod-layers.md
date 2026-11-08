@@ -7,7 +7,7 @@ Kontrak ekstensi: lapis baru = append satu blok di bawah; core tidak disentuh.
 **Pertanyaan**: di mana uangnya SEKARANG, dan bagaimana konfigurasi hidupnya?
 
 - Enumerate semua kontrak ter-deploy × chain × token besar × native.
-- Baca **lewat proxy** (bukan impl — impl storage kosong; pelajaran Base SpokePool).
+- Baca **lewat proxy** (bukan impl — storage impl kosong; pelajaran empiris dari run sebelumnya).
 - Konfigurasi live yang wajib dicensus: owner/admin/crossDomainAdmin, whitelist token,
   messenger OFT/CCTP, pause flags, fee params, role holders (hasRole per role).
 - Output: `notes/money-ledger.md` — EV terurut + status pot.

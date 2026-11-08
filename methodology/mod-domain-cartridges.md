@@ -11,7 +11,8 @@ Format blok: Domain | Siklus aliran (L-PATH) | Invarian senyap | Cartridge POV |
 - **Siklus**: deposit → fill → worker bundle → propose(bond) → jendela dispute → execute →
   relay roots → refund leaf → bridge-back.
 - **Invarian senyap**: "leaf tak pernah membayar melebihi pot"; "msg.value dipakai ATAU dikembalikan";
-  "slot root identik antar-chain adalah desain"; "handler selalu kosong di antara fill".
+  "slot root identik antar-chain adalah desain"; "handler selalu kosong di antara fill"
+  (invarian generik bridge — verifikasi ulang terhadap desain protokol yang diaudit).
 - **POV**: M-009 (in-flight), POV-TON-01 (async), POV-CALL-02; kelas transient-holder (MulticallHandler).
 - **Off-chain**: data worker (bundle), disputer (jendela 2 jam — kelas "ketiadaan aksi"), relayer (pricing).
 

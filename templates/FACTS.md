@@ -6,8 +6,8 @@ Bukan hipotesis, bukan status deployment, bukan catatan aktivitas.
 > **Mengapa file ini ada.** `00-project-map.md` ditulis di Fase 1, sebelum ada yang benar-benar
 > memahami proyek. Pemahaman terdalam muncul saat membedah unit di Fase 2 — dan dulu hilang
 > bersama konteks. Akibatnya Fase 3 merancang harness dari peta basi.
-> Bukti: di Across `02-state-and-var-matrix.md` terakhir disentuh 09:20, eksplorasi berjalan
-> sampai 15:01 (5 jam 41 menit) tanpa satu pun pembaruan pemahaman.
+> Bukti empiris dari run sebelumnya: `02-state-and-var-matrix.md` terakhir disentuh 09:20,
+> eksplorasi berjalan sampai 15:01 (5 jam 41 menit) tanpa satu pun pembaruan pemahaman.
 
 ---
 
@@ -35,25 +35,20 @@ Bukan hipotesis, bukan status deployment, bukan catatan aktivitas.
 ## BENTUK BLOK (7 komponen wajib)
 
 ```markdown
-## D3: chain-adapters
-BERKAS    : contracts/chain-adapters/*.sol, contracts/hub-pool/HubPool.sol (delegatecall)
-MEKANISME : adapter dipanggil HubPool via delegatecall; alamat adapter dibaca dari
-            storage HubPool, bukan parameter → HubPool.sol:678
-CHAINING  : deposit(SpokePool.sol:812) → fill → proposeRootBundle(:560)
-            → executeRootBundle(:612) → adapter.bridge
-            state bertahan lintas-hop:
-              unclaimedPoolRebalanceLeafCount  HubPool.sol:653
-              claimedBitMap                    HubPool.sol:650
-DATA      : amount uint256 (desimal token asal) · relayerFeePct int64
-            quoteTimestamp uint32 — SATUAN: DETIK, bukan ms · recipient bytes32
-            sentinel sah: amount=0, feePct=±int64.max, timestamp=0
-INVARIAN  : tiap leaf dieksekusi sekali — ditegakkan _setClaimed1D HubPool.sol:650
-INVARIAN  : total bridged ≤ pooledTokens — TIDAK ditegakkan
+## D1: <nama-domain>
+BERKAS    : <path/ke/*.sol yang memuat domain ini — kunci pencarian>
+MEKANISME : <bagaimana domain bekerja, 1-3 baris> → <File:Baris penopang>
+CHAINING  : <hop1> → <hop2> → <hop3>   (state yang bertahan lintas-hop)
+              <namaVariabel>  <File:Baris>
+              <namaVariabel>  <File:Baris>
+DATA      : <tipe & satuan> · <tipe & satuan — SATUAN eksplisit, mis. DETIK bukan ms>
+            sentinel sah: <nilai batas yang sah dan tidak boleh dianggap error>
+INVARIAN  : <invarian> — ditegakkan <fungsi File:Baris>
+INVARIAN  : <invarian> — TIDAK ditegakkan
 LINGKUNGAN:
-  [ETH:0x5c7B..35C5] proxy admin = EOA (bukan kontrak) | cast code → 0x | @19.2M | VERIFIED
-  [ETH:0x5c7B..35C5] paused = false | paused() → false | @19.2M | VERIFIED
-  [ARB:0xD1..aa] proxy admin = 3-of-5 multisig | threshold() → 3 | @521M | VERIFIED
-ASUMSI    : [A] desimal semua token 6 atau 18 — BELUM diverifikasi
+  [<CHAIN>:<0xAlamat>] <peran> = <nilai> | <perintah> → <keluaran> | @<blok> | VERIFIED
+  [<CHAIN>:<0xAlamat>] <flag> = <nilai> | <perintah> → <keluaran> | @<blok> | VERIFIED
+ASUMSI    : [A] <asumsi yang dipegang> — BELUM diverifikasi
 ```
 
 **`BERKAS` wajib** — ini satu-satunya kunci yang membuat Fase 3 bisa menemukan blok dari

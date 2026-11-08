@@ -1,66 +1,64 @@
-# TARGET PIN — across-protocol/contracts
+# TARGET PIN — <org>/<repo>
 
 Berkas ini mengunci **apa yang diaudit**. Tanpa pin, temuan tidak bisa direproduksi
-dan tidak bisa dibandingkan dengan run sebelumnya.
+dan tidak bisa dibandingkan lintas run.
 
 ## Commit teraudit
 
 | Field | Nilai |
 |---|---|
-| Repo | `https://github.com/across-protocol/contracts` |
-| Branch | `master` |
-| Commit | `d0725ea001ca119a529065c22134298ec353941c` |
-| Commit subject | `chore(deps): bump ethers to 5.8.0 (#1597)` |
-| Diverifikasi | `git rev-parse HEAD` + `git rev-parse origin/master` = identik, `rev-list --count HEAD..origin/master` = **0** (2026-11-08) |
+| Repo | `https://github.com/<org>/<repo>` |
+| Branch | `<branch>` |
+| Commit | `<40-char hash>` |
+| Commit subject | `<subject>` |
+| Diverifikasi | `<perintah>` → `<keluaran>` (`YYYY-MM-DD`) |
 
-**Catatan penting:** commit ini **identik** dengan yang dipakai run `across2`.
-Konsekuensi metodologis:
-
-- Kode target tidak berubah → run 3 **bukan** audit kode baru.
-- Nilai run 3 sepenuhnya bergantung pada **perbedaan metode**, bukan perbedaan kode.
-- Klaim "temuan baru" wajib dibuktikan sebagai *false negative yang terlewat metode lama*,
-  bukan sekadar lead yang sama dengan nama berbeda.
-
-## Perubahan kode sejak run 1
+## Riwayat run (isi bila ini audit ulang)
 
 | Run | Commit | Selisih |
 |---|---|---|
-| `across` (run 1) | `b1c4e862` (`fix(ci): use Node 22.23.4`) | baseline |
-| `across2` (run 2) | `d0725ea0` (`chore(deps): bump ethers`) | +4 commit (deps/CI, bukan logika kontrak) |
-| `theadvers` (run 3) | `d0725ea0` (sama dengan run 2) | **0** |
+| run 1 | `<hash>` | baseline |
+| run 2 | `<hash>` | `<n> commit — <sifat perubahan>` |
+| run 3 | `<hash>` | `<n>` |
+
+Bila commit identik dengan run sebelumnya, baca `audit/METHODOLOGY-DELTA.md`:
+run ulang pada kode identik **bukan** audit kode baru, dan klaim temuan baru wajib
+dibuktikan sebagai false negative run lama.
 
 ## Cara menurunkan ulang (reproducible checkout)
 
 ```bash
-# 1. Clone source asli (jangan modifikasi)
-git clone https://github.com/across-protocol/contracts.git /path/to/contracts
-cd /path/to/contracts
-git checkout d0725ea001ca119a529065c22134298ec353941c
-git submodule update --init --recursive      # lib/forge-std, lib/sp1-contracts, lib/murky
+# 1. Clone source asli (JANGAN modifikasi — kode target read-only)
+git clone https://github.com/<org>/<repo>.git /path/to/target
+cd /path/to/target
+git checkout <commit>
+git submodule update --init --recursive   # bila ada .gitmodules
 
 # 2. Verifikasi pin
-git rev-parse HEAD                           # wajib: d0725ea001ca119a529065c22134298ec353941c
+git rev-parse HEAD                        # wajib sama dengan tabel di atas
 
-# 3. Build (WAJIB single-job; build penuh OOM di VPS ini)
-source .env.audit 2>/dev/null || export FOUNDRY_JOBS=1
-FOUNDRY_JOBS=1 forge build contracts/
+# 3. Build (selalu single-job di mesin terbatas; build penuh bisa OOM)
+export FOUNDRY_JOBS=1
+forge build contracts/                    # atau path spesifik, bukan seluruh repo
 ```
 
-## Kawasan yang TIDAK berubah tapi wajib dicatat
+Aturan build per rantai ada di `methodology/mod-chain-cartridges.md`
+(`CARGO_BUILD_JOBS=1` untuk Rust, `RAYON_NUM_THREADS=1`).
 
-Folder repo yang **bukan** kontrak utama namun masuk scope bounty Across
-("most of the code within the `across-protocol` repository"):
+## Kawasan di luar kontrak utama yang wajib dicatat
 
-- `programs/` — Solana/Anchor (SVM spoke, sponsored CCTP program)
-- `script/` — Foundry deploy + operational tasks
-- `deployments/`, `broadcast/deployed-addresses.json` — peta alamat live
+Folder repo yang bukan kontrak utama namun sering masuk scope bounty:
+
+- `script/` — deploy + operational tasks
+- `deployments/`, `broadcast/` — peta alamat live
 - `generated/`, `idls/` — artefak ABI/IDL
+- `<isi sendiri: programs/, packages/, dst.>`
 
-Folder repo penunjang (bukan `across-protocol/contracts`):
+## Repo / kanal pendukung (Tahap E — offchain)
 
-- `exclusive-relayer-configs` @ `add8b51`
-- `relayer-registration-repository` @ `94a3b74`
-- `v5-token-pricing` @ `5812579`
+| Repo / kanal | URL | Commit | Status bedah |
+|---|---|---|---|
+| `-` | `-` | `-` | belum |
 
-Ketiga repo ini **kanal off-chain** (Tahap E). Status di run 1-2: belum dibedah
-(`grep -rc "L-OFFCHAIN" audit/notes/*.md` = 0 hasil di `across2`).
+Cek dulu apakah scope bounty target memang mencakup off-chain
+(`methodology/mod-offchain.md` §Pemicu). Bila tidak, kolom ini boleh kosong.

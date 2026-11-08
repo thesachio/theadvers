@@ -1,7 +1,7 @@
 # PROJECT INTELLIGENCE BRIEF (Fase 0 — Tahap A0)
 
 **Status: KOSONG — wajib diisi ulang di Tahap A0.**
-DILARANG menyalin dari `across2/audit/INTEL.md` tanpa verifikasi ulang: alamat, saldo, dan
+DILARANG menyalin dari audit run sebelumnya tanpa verifikasi ulang: alamat, saldo, dan
 konfigurasi live sudah bergerak sejak 2026-11-06. Yang boleh dibawa hanya **URL statis**
 (repo, docs, bounty) setelah dicek status HTTP-nya.
 

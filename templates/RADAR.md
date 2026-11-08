@@ -46,17 +46,18 @@ adalah sinyal.
 ## Lapis 1 — Observasi (ditulis SEKALI, tidak pernah disentuh)
 
 ```markdown
-## [R-012] Seam tanpa penjaga antar-modul
-Lokasi   : WormholeAdapter.sol:340 -> HubPool.sol:918
-Domain   : D3 chain-adapters
-Tujuan   : S-14, S-22, S-31
-Asimetri : payload divalidasi di HubPool.sol, di adapter hanya didekode
-Pemicu   : jika ada jalur memanggil HubPool.sol:918 sebelum transfer masuk
-Unit Asal: S-08
+## [R-012] <asimetri satu baris>
+Lokasi   : <BerkasA.sol:340> -> <BerkasB.sol:918>
+Domain   : <D-nama>
+Tujuan   : <unit/stage yang memakai sinyal ini>
+Asimetri : <validasi ada di X, tidak ada di Y>
+Pemicu   : <kondisi konkret yang membuatnya relevan>
+Unit Asal: <unit tempat sinyal ditemukan>
 ```
 
 - `Lokasi` — **wajib** `File:Baris` dengan **nama berkas lengkap ber-ekstensi pada SETIAP hop**.
-  `HubPool:918` **DILARANG** — hanya `HubPool.sol:918` yang bisa ditemukan oleh grep berbasis path.
+  `<Berkas>:918` (tanpa ekstensi) **DILARANG** — hanya `<Berkas>.sol:918` yang bisa ditemukan
+  oleh grep berbasis path.
   Ini bukan soal gaya: grep path adalah satu-satunya jalur penarikan yang dijamin (lihat "Cara Membaca").
   Bila rantai lebih dari dua hop, tulis semuanya: `A.sol:12 -> B.sol:88 -> C.sol:340`.
 - `Domain` — domain tempat sinyal ditemukan (bukan domain tujuan).
@@ -79,8 +80,8 @@ grep -c "NamaBerkas.sol" audit/RADAR.md     # harus >= 1 untuk SETIAP berkas di 
 [R-012/S-14] PROMOTED -> L-19
 [R-012/S-14] RESOLVED-REFUTED L-19 -> guard _requireAdminSender ternyata menutup jalur
 [R-012/S-22] PROMOTED -> L-31
-[R-012/+S-40] TARGET-ADDED lokasi S-40 juga menyentuh HubPool.sol:918
-[R-012/S-14] REOPENED -> L-27 pemicu-baru: jalur refund S-31 memanggil HubPool:918 lebih dulu
+[R-012/+S-40] TARGET-ADDED lokasi S-40 juga menyentuh <BerkasB.sol:918>
+[R-012/S-14] REOPENED -> L-27 pemicu-baru: jalur refund S-31 memanggil <BerkasB.sol:918> lebih dulu
 ```
 
 | Kejadian | Kapan |

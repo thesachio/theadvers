@@ -28,7 +28,7 @@ Kegagalan alat (compile, import, checksum, ABI) **bukan** strike.
 - BUKTI_SIMULASI:
   $ forge test --match-test test_LEADNNN -vv
   # <keluaran asli, tempel dari log>
-- Duplikat di run lama? <hasil grep ke across2/audit/06>
+- Duplikat di run lama? <hasil grep ke <run-lama>/audit/06>
 ```
 
 ---

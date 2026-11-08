@@ -2,7 +2,7 @@
 
 Dokumen ini adalah **standar hukum tertinggi** pada dua jalur:
 
-1. **Jalur Audit Mandiri** (Fase 4 — `sc-phase4-report`): mengadili setiap kandidat yang lolos PoC Fase 3 sebelum diizinkan bertahan di `audit/09-confirmed-findings.md`.
+1. **Jalur Audit Mandiri** (Tahap F): mengadili setiap kandidat yang lolos PoC Tahap D sebelum diizinkan bertahan di `audit/09-confirmed-findings.md`.
 2. **Jalur Verifikasi Inbox** (`verify/ingest.py`): mengadili klaim dari `.verify/queue.json` yang sudah lolos saringan mekanis.
 
 Penilai **tidak** menyisir kode untuk mencari bug baru — itu tugas hulu. Tugas Penilai murni **mengadili bukti**, memisahkan pelanggaran mutlak dari temuan berbatas toleransi, dan menempatkannya ke wadah yang tepat: `06`, `07`, `08`, atau `09`.
@@ -17,7 +17,7 @@ Protokol ini berlaku untuk **audit baru**. Audit yang sudah berjalan dengan skem
 | Audit | Skema | Catatan |
 |---|---|---|
 | **Baru** (mulai sekarang) | `00`–`09` (10 file murni): `04-code-guarded` · `05-raw-leads` · `06-refuted-invalid` · `07-needs-next-step` · `08-valid-not-eligible` · `09-confirmed-findings` | 11 Pernyataan + Gate Cakupan + Tangga Bukti + Langkah 0 wajib |
-| **Legacy** (mis. Across, selesai) | `04-rejected-hypotheses` · `05-raw-leads` · `06-unproven-needs-review` · `07-confirmed-findings` | tetap apa adanya; **jangan** dipetakan ulang. Catatan: `04` legacy = hipotesis ditolak, berbeda arti dari `04-code-guarded` skema baru |
+| **Legacy** (format wadah lama, sudah tidak dipakai) | `04-rejected-hypotheses` · `05-raw-leads` · `06-unproven-needs-review` · `07-confirmed-findings` | tetap apa adanya; **jangan** dipetakan ulang. Catatan: `04` legacy = hipotesis ditolak, berbeda arti dari `04-code-guarded` skema baru |
 
 Artefak legacy tetap sah dibaca dengan penomoran lamanya. Jangan mencampur penomoran antar-audit dalam satu laporan.
 
@@ -29,12 +29,12 @@ Tujuan: memisahkan temuan yang sudah terbukti secara mekanis di Fase 3 menjadi t
 
 > **Penting:** Pengecekan ini adalah **wewenang eksklusif Hakim Fase 4**. Fase 3 **dilarang** menghentikan penulisan PoC hanya karena kontrak belum *live* atau versi repo berbeda.
 
-> **Alat wajib:** seluruh Langkah 0 dijalankan lewat `verify/tools/deploy_parity.py` (bukan penilaian manual). Jalankan dengan `--out` agar artefak JSON tersimpan di `audit/notes/`. Aturan "bytecode harus identik" **DILARANG** dipakai: setiap repo punya siklus rilis berbeda dan build Foundry jarang reproducible. Yang diuji adalah **keberadaan & perilaku entrypoint yang diserang PoC**, bukan hash file.
+> **Alat wajib:** seluruh Langkah 0 dijalankan lewat `tools/deploy_parity.py` (bukan penilaian manual). Jalankan dengan `--out` agar artefak JSON tersimpan di `audit/notes/`. Aturan "bytecode harus identik" **DILARANG** dipakai: setiap repo punya siklus rilis berbeda dan build Foundry jarang reproducible. Yang diuji adalah **keberadaan & perilaku entrypoint yang diserang PoC**, bukan hash file.
 
 ### 0.0 — Gerbang Siklus (satu perintah per kontrak)
 
 ```bash
-python3 verify/tools/deploy_parity.py --paradigm <evm|solana|sui|aptos|ton|generic|<plugin>> \
+python3 tools/deploy_parity.py --paradigm <evm|solana|sui|aptos|ton|generic|<plugin>> \
   --chain <mainnet|testnet|local> --addr <ALAMAT> --rpc <RPC> \
   --entrypoints "<signature yang diserang PoC>" --repo <path repo> \
   --out audit/notes/deploy-parity-<ID>.json
@@ -166,7 +166,7 @@ salah satu sumber berikut:
    `Severity Basis : <platform> — <URL>`.
 2. **`verify/SEVERITY-RUBRIC.md`** (satu folder dengan berkas ini) — tabel per platform dan
    definisi Low universal:
-   - Bagian 2.1 OWASP (dipakai Across) · 2.2 Immunefi · 2.3 Sherlock · 2.4 Cantina BB ·
+   - Bagian 2.1 OWASP (bila program menyatakannya) · 2.2 Immunefi · 2.3 Sherlock · 2.4 Cantina BB ·
      2.5 Cantina Comp · 2.6 Code4rena · 2.7 Relay · 2.8 Self-hosted
    - **Bagian 4** = definisi Low universal (L1–L6) untuk project tanpa rujukan
    - Bagian 3 = tabel perbandingan (di mana griefing/DoS/admin-only diletakkan per platform)
@@ -286,7 +286,7 @@ Sebuah temuan HANYA boleh mendapat vonis `VALID_ELIGIBLE` dan bertahan di `audit
 > *"Untuk masuk ke `09-confirmed-findings.md`, kode yang diserang wajib terbukti eksis dan aktif pada deployment produksi (`LIVE_MATCH`). Apabila PoC eksploitasi berhasil (`[PASS]`) membuktikan kerentanan nyata pada kode repositori (`FORK_DEPLOYED_HEAD` / `LOKAL`), namun kontrak/fitur tersebut masih berstatus `HEAD-only` (belum di-deploy ke mainnet atau berbeda dari bytecode produksi aktif), temuan tersebut **WAJIB disimpan secara utuh** di `08-valid-not-eligible.md` dengan kelas `PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)` — bukan dipaksakan ke `09` dan bukan diparkir di `07`."*
 → Pelanggaran (memaksakan kode HEAD-only sebagai `09` produksi aktif tanpa cek deployment): `REJECTED_UNPROVEN_DEPLOYMENT` — atau turunkan dari `09` ke `08` [`PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`] bila PoC-nya valid.
 
-> *(Catatan Anti-False-Negative #2b — Deployment Fidelity Berbasis Entrypoint, BUKAN Bytecode Identik: `LIVE_MATCH` **TIDAK BOLEH** dituntut sebagai "bytecode identik". Setiap repo punya siklus rilis berbeda (live bisa v1.3.3 sementara repo HEAD v1.2.1) dan build Foundry jarang reproducible (metadata hash, optimizer, versi solc). Yang wajib diuji adalah **keberadaan dan perilaku entrypoint yang diserang PoC** pada objek live — lewat `verify/tools/deploy_parity.py` (Gerbang Siklus 0.0 → pra-syarat 0.1 → lima verdict 0.2). Menolak temuan karena "ukuran bytecode berbeda" atau "sha256 tidak sama" adalah `REJECTED_MISMATCH` yang SALAH dan dilarang.)*
+> *(Catatan Anti-False-Negative #2b — Deployment Fidelity Berbasis Entrypoint, BUKAN Bytecode Identik: `LIVE_MATCH` **TIDAK BOLEH** dituntut sebagai "bytecode identik". Setiap repo punya siklus rilis berbeda (live bisa v1.3.3 sementara repo HEAD v1.2.1) dan build Foundry jarang reproducible (metadata hash, optimizer, versi solc). Yang wajib diuji adalah **keberadaan dan perilaku entrypoint yang diserang PoC** pada objek live — lewat `tools/deploy_parity.py` (Gerbang Siklus 0.0 → pra-syarat 0.1 → lima verdict 0.2). Menolak temuan karena "ukuran bytecode berbeda" atau "sha256 tidak sama" adalah `REJECTED_MISMATCH` yang SALAH dan dilarang.)*
 
 > *(Catatan Anti-False-Negative #2c — `ENV_ERROR` Bukan Bukti Ketiadaan: rate-limit RPC, HTTP 403, timeout, atau `revert 0x` yang tidak terklasifikasi **DILARANG** dijadikan dasar menyimpulkan "fungsi tidak ada di produksi". Verdict yang sah adalah `ENV_ERROR` → `07 TOOL_BLOCKED` dengan `PERCOBAAN:` berisi minimal dua percobaan endpoint. Khusus paradigma `generic` (rantai belum dikenal), verdict `ABSENT` **DILARANG MUTLAK**; gunakan `IDENTITY_ONLY`.)*
 

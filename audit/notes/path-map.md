@@ -26,11 +26,11 @@ Hop `off-chain` adalah pemicu Tahap E.
 
 | Domain cartridge | Dipakai? | Alasan |
 |---|---|---|
-| BRIDGE | ya | inti Across (hub-and-spoke, merkle bundle) |
-| LP/AMM | belum diputuskan | perlu dicek apakah ada AMM di scope |
-| LENDING | belum diputuskan | perlu dicek (bad debt / liquidation) |
-| STAKING/REWARDS | belum diputuskan | perlu dicek (LP rewards di HubPool) |
-| NFT | tidak | tidak relevan |
-| DERIVATIF | belum diputuskan | perps di HyperCore handler? perlu dicek |
+| BRIDGE | belum diputuskan | cek apakah ada cross-chain hop |
+| LP/AMM | belum diputuskan | cek apakah ada AMM/pool likuiditas |
+| LENDING | belum diputuskan | cek apakah ada borrow/liquidation/bad debt |
+| STAKING/REWARDS | belum diputuskan | cek apakah ada akrual reward/cooldown |
+| NFT | belum diputuskan | cek apakah ada escrow/royalty |
+| DERIVATIF | belum diputuskan | cek apakah ada margin/PnL/expiry window |
 
-Kolom "belum diputuskan" wajib diputuskan sebelum GATE-B ditutup.
+Semua baris wajib diputuskan (`ya`/`tidak` + alasan) sebelum GATE-B ditutup.

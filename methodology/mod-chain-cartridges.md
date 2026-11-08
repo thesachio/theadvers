@@ -7,7 +7,7 @@ hasil tidak pasti WAJIB ditandai `CHAIN: AMBIGUOUS`.
 ## EVM (Solidity/Vyper)
 
 - **Census**: `cast balance/call/storage/code`; `getAccountInfo` tidak ada → pakai proxy slot
-  EIP-1967. **WAJIB probe via PROXY**, bukan impl (storage impl kosong — pelajaran Base SpokePool).
+  EIP-1967. **WAJIB probe via PROXY**, bukan impl (storage impl kosong — pelajaran empiris dari run sebelumnya).
 - **Parity**: `cast code` + disassembly dispatch (3 bentuk: `EQ`, `GT`, `SUB`-inverted; selector
   `0x00xx` jadi `PUSH3`(0x62)/`PUSH2`(0x61)); `deploy_parity.py` (SUDAH dipatch).
 - **Jebakan**: `eth_call` tidak diskriminatif bila ada `fallback()` — pakai selector + probe.

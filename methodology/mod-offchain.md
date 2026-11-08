@@ -12,8 +12,8 @@ Plug-in METHODOLOGY-SEGITIGA. **Kontrak ekstensi**: kebijakan baru = append satu
 
 Bedah off-chain HANYA bila salah satu terpenuhi:
 
-1. **Scope bounty memasukkan off-chain** (cek aturan bounty proyek — Across: eksplisit YA,
-   termasuk bot & front-end).
+1. **Scope bounty memasukkan off-chain** (cek aturan bounty proyek di `audit/INTEL.md` §3 —
+   sebagian program menyatakan eksplisit YA, termasuk bot & front-end; jangan mengasumsikan).
 2. **Anomali on-chain teramati**: dispute nyata, bundle gagal, pola fill menyimpang.
 3. **Kelas ketiadaan aksi**: keeper/bot SEHARUSNYA bertindak tapi diam (tidak ada tx) —
    on-chain tak bisa membedakan diam-yang-benar vs diam-yang-bug; hanya kode yang bisa.

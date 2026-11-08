@@ -53,12 +53,12 @@ menguntungkan diri sendiri secara diam-diam.
 
 ## 2. KRITERIA PER PLATFORM (sumber primer, terverifikasi)
 
-### 2.1 OWASP Risk Rating — *dipakai Across Protocol*
+### 2.1 OWASP Risk Rating — *dipakai sebagian program (mis. program yang menyatakan OWASP di docs bounty)*
 
-- **Sumber:** `https://docs.across.to/introduction/bug-bounty`
+- **Sumber:** halaman bug-bounty resmi program target (isi sendiri di `audit/INTEL.md` §3)
 - **Kutipan:** *"Severity is calculated according to the OWASP risk rating model based on Impact and Likelihood."*
 - **Struktur:** Risk = Impact x Likelihood, masing-masing berskala Low/Medium/High.
-- **Reward (Across):** Low $250 · Medium $1.000 · High $10.000 · Critical s.d. $1.000.000
+- **Reward:** isi dari tier program target — **jangan** mengasumsikan angka; ambil dari docs bounty.
 - **Catatan:** OWASP asli memakai sub-faktor teknis; untuk pemetaan ke tier reward, gunakan
   Matriks Universal (Bagian 4) yang konsisten dengan pendekatan dua sumbu OWASP.
 
@@ -238,8 +238,8 @@ temuan kategori ini **WAJIB** menyebut platform; satu label tanpa rujukan tidak 
 
 | Project / Program | Rujukan | Bagian rubrik |
 |---|---|---|
-| **Across Protocol** | OWASP Risk Rating (dinyatakan di docs bug-bounty) | 2.1 + 4 |
-| **Relay** | Relay S1–S4 x L1–L3 + modifier | 2.7 |
+| Program yang menyatakan OWASP | OWASP Risk Rating (dinyatakan di docs bug-bounty) | 2.1 + 4 |
+| Program dengan matriks S1–S4 x L1–L3 (mis. Relay) | Level Self + modifier | 2.7 |
 | Immunefi-hosted program | Immunefi v2.3 | 2.2 |
 | Sherlock contest/audit | Sherlock (High/Medium saja) | 2.3 |
 | Cantina bug bounty | Cantina BB matrix | 2.4 |
@@ -248,7 +248,7 @@ temuan kategori ini **WAJIB** menyebut platform; satu label tanpa rujukan tidak 
 | Self-hosted tanpa rujukan | **Kriteria Universal Bagian 4** | 4 |
 
 **Cara mengisi:** setiap `INTEL.md` **wajib** menyebut baris ini, mis.
-`Severity Basis : OWASP — https://docs.across.to/introduction/bug-bounty (rubrik 2.1)`.
+`Severity Basis : OWASP — <URL bounty target> (rubrik 2.1)`.
 
 ---
 
@@ -266,8 +266,9 @@ Tiga alasan berbasis data, bukan selera:
    menaikkan griefing ke Medium, OWASP/Relay menaruhnya di Low/S1. Low adalah **irisan teraman**.
 2. **Menurunkan severity tidak pernah membuat laporan salah**; menaikkan tanpa rujukan membuat laporan
    ditolak atau dipotong. Asimetri ini menentukan arah default.
-3. **Low tetap dibayar di hampir semua program** (Across $250 · Relay $500–$2.000 · Immunefi ada tier
-   Low · Cantina ada Low). Jadi konservatif ≠ kehilangan reward sepenuhnya.
+3. **Low tetap dibayar di hampir semua program** (beberapa program self-hosted punya tier Low
+   berbayar · Relay $500–$2.000 · Immunefi ada tier Low · Cantina ada Low). Jadi konservatif ≠
+   kehilangan reward sepenuhnya. Angka tier ambil dari docs bounty target, jangan diasumsikan.
 
 **Low yang diadopsi = Low yang paling defensible, bukan Low yang paling murah.**
 
@@ -369,10 +370,10 @@ TanggaBukti : <A|A-HEAD|B|C|D>
 Bila severity **berbeda antar platform** (lazim pada griefing/DoS), tulis eksplisit:
 
 ```yaml
-Severity    : Low (OWASP, sesuai docs.across.to)
+Severity    : Low (OWASP, sesuai docs bounty target)
 Asumsi      : di Immunefi/Cantina-BB kategori ini setara Medium;
               di Sherlock kemungkinan tidak diterima. Diturunkan ke Low
-              karena Across mengeksplisitkan OWASP.
+              karena program target mengeksplisitkan OWASP.
 ```
 
 Baris `Asumsi` **wajib** — ini yang mencegah tuduhan menurunkan/menaikkan severity diam-diam.
@@ -411,7 +412,6 @@ Baris `Asumsi` **wajib** — ini yang mencegah tuduhan menurunkan/menaikkan seve
 
 | Platform | URL |
 |---|---|
-| Across (OWASP) | https://docs.across.to/introduction/bug-bounty |
 | Immunefi v2.3 | https://immunefi.com/immunefi-vulnerability-severity-classification-system-v2-3/ |
 | Sherlock | https://docs.sherlock.xyz/audits/judging/guidelines |
 | Cantina Bug Bounty | https://docs.cantina.security/standards/severity/bug-bounty |

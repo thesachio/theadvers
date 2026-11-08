@@ -66,15 +66,15 @@ dikerjakan lebih dulu (jam pertama = census seluruh TVL + pot terbesar).
 
 | Sistem lama | Sumber | Dipakai di tahap |
 |---|---|---|
-| M-001..M-010 | `skills/security/sc-phase2-hunt/references/ref-method-registry.md` | C (bedah), D (routing sim) |
-| POV router + 8-field | `ref-attacker-pov.md` + `ref-pov-*.md` | C (generator per pot) |
+| M-001..M-010 | `references/ref-method-registry.md` | C (bedah), D (routing sim) |
+| POV router + 8-field | `references/ref-attacker-pov.md` + `references/ref-pov-*.md` | C (generator per pot) |
 | 5 Jalur Permissionless | registry M-005 | C (klasifikasi reachability) |
-| 3-Stage Escalation + Victim Seeding + dual-mode fork | `sc-phase3-verify-and-poc` | D |
+| 3-Stage Escalation + Victim Seeding + dual-mode fork | `templates/VERDICT.md` §Tangga Bukti + `references/ref-test-evm-advanced.md` | D |
 | TANGGA_BUKTI A/B/C/D + No-Code-No-Reject | konstitusi AGENTS.md + VERDICT.md | D, F |
 | Wadah 04-09 + 11 Pernyataan | VERDICT.md | D, F |
 | Atomic-write, staging, 1-penulis, anti-truncate | AGENTS.md §1.3-1.4, §4 | semua tahap (penulisan) |
 | CLASS-A/B/C topologi | registry §1 | B (panjang rantai), C |
-| deploy_parity (sudah dipatch PUSH3/SUB) + probe-via-proxy | verify/tools + catatan ledger | A, F |
+| deploy_parity (sudah dipatch PUSH3/SUB) + probe-via-proxy | `tools/deploy_parity.py` + catatan ledger | A, F |
 
 ## 5. Guardrail Low & Checkpoint
 

@@ -36,7 +36,7 @@ DAMPAK KUANTITATIF  : <angka kerugian/profit terukur dari log PoC>
 >
 > **`POC_STATUS` wajib literal `PASS`.** `08` berarti *valid tetapi tidak eligible* — bila PoC belum bisa dijalankan (RPC mati, rantai tak dikenal, toolchain absen), tempatnya **`07`**, bukan `08`.
 >
-> **`CYCLE` dan `ELIGIBILITY` diisi dari artefak `deploy_parity`:** `python3 verify/tools/deploy_parity.py … --out audit/notes/deploy-parity-<ID>.json`. Bila artefak tidak ada, entri `08` ditolak.
+> **`CYCLE` dan `ELIGIBILITY` diisi dari artefak `deploy_parity`:** `python3 tools/deploy_parity.py … --out audit/notes/deploy-parity-<ID>.json`. Bila artefak tidak ada, entri `08` ditolak.
 
 ## Kelas yang sah
 

@@ -21,7 +21,7 @@ dampak finansial nyata (Critical/High/Medium), lolos 11 Pernyataan Wajib
 - **BUKTI_SIMULASI:**
   $ forge test --match-test test_LEADNNN -vvv
   # <keluaran asli>
-- **Duplikat di run lama?** <hasil grep across2 05/06/08/09 + SUBMISSION_REPORT/INDEX.md>
+- **Duplikat di run lama?** <hasil grep <run-lama> 05/06/08/09 + SUBMISSION_REPORT/INDEX.md>
 ```
 
 ---
