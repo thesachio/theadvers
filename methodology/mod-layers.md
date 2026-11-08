@@ -12,6 +12,8 @@ Kontrak ekstensi: lapis baru = append satu blok di bawah; core tidak disentuh.
   messenger OFT/CCTP, pause flags, fee params, role holders (hasRole per role).
 - Output: `notes/money-ledger.md` — EV terurut + status pot.
 - Alat: `cast balance/call/storage`, `getAccountInfo` (Solana), `getObject` (Sui), `getAccountState` (TON).
+- **Referensi yang dibuka:** `ref-chain-<rantai>.md` (tooling) + `ref-atomic-write.md`.
+  **DILARANG** membuka `ref-pov-*` / `ref-test-*` di tahap ini (lihat matriks `references/_INDEX-SEGITIGA.md`).
 - **GATE-A**: kontrak bernilai > ambang WAJIB masuk B/C. Keluarga mati-dini (dibunuh di sini,
   1 query, bukan lab): tidak ter-deploy, tidak ter-inisialisasi, konfigurasi kosong,
   role tak terpasang, saldo 0 DAN tidak di jalur aliran.
@@ -26,6 +28,7 @@ Kontrak ekstensi: lapis baru = append satu blok di bawah; core tidak disentuh.
 - Khusus jahitan asinkron (bridge hop, message in-flight): tandai `ASYNC` — zona observasi khusus.
 - Output: `notes/path-map.md` — daftar jahitan + EV + kelas (sinkron/asinkron) + aktor
   (on-chain/off-chain) tiap hop.
+- **Referensi yang dibuka:** `ref-pov-chain.md` (zona ASYNC) + `ref-chain-<rantai>.md`.
 - **GATE-B**: kontrak zero-balance TAPI dilalui aliran WAJIB diburu (kelas MulticallHandler);
   cabang tanpa throughput dipangkas (uang terkonsentrasi di rute dominan — anti state-space blowup).
 
@@ -37,6 +40,8 @@ Kontrak ekstensi: lapis baru = append satu blok di bawah; core tidak disentuh.
   GENERATOR (tanya per pot: "POV mana yang muat di uang ini?" — bukan filter pasca-baca).
 - Klasifikasi reachability: 5 Jalur Permissionless (registry M-005).
 - FACTS/RADAR dibuka SETELAH hipotesis buta lahir — murni falsifier.
+- **Referensi yang dibuka:** `ref-method-registry.md` (wajib) + `ref-attacker-pov.md` (router),
+  lalu **hanya 1-2** `ref-pov-*.md` yang gejalanya cocok. DILARANG memuat 4 katalog sekaligus.
 - Output: entri `05` ber-provenance `[LAPIS: VALUE|PATH|FLOW]` + `[CLASS-A|B|C]`
   + `[AF-xx]` + `[LOAD: M-xxx]`.
 - `[CLASS-x]` **BUKAN** digantikan oleh `[LAPIS]`: CLASS menentukan paket metode wajib

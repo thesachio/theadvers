@@ -1,8 +1,17 @@
 # Katalog Generalized Attacker POV — Domain Matematika, Pembulatan, & Akuntansi Share (`[POV-MATH-XX]`)
 
+<!-- SEGITIGA-PERAN:BEGIN -->
+**Peran.** **Katalog POV**: indeks akrual, inverse rounding, fee multi-hop.
+
+- **Tahap utama:** C (`L-FLOW`)
+- **Juga dipakai di:** B (jalur akrual antar-hop), D (fuzz parameter)
+- **Kontribusi ke lead:** `[LOAD: POV-MATH-xx]`
+- **Kapan TIDAK dibuka:** Hanya dibuka bila ada aritmetika/akrual/pembulatan.
+<!-- SEGITIGA-PERAN:END -->
+
 <!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> **Padanan istilah (berlaku repo-wide).** Peran & tahap berkas ini ada di blok
+> `SEGITIGA-PERAN` di atas. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
 > `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
 > `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
 > Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat

@@ -1,8 +1,17 @@
 # Katalog Generalized Attacker POV — Domain Penyerahan Kontrol, Subcall, & Otoritas (`[POV-CALL-XX]`)
 
+<!-- SEGITIGA-PERAN:BEGIN -->
+**Peran.** **Katalog POV**: penyerahan kontrol, subcall, callback, otoritas.
+
+- **Tahap utama:** C (`L-FLOW`)
+- **Juga dipakai di:** D (routing skenario PoC)
+- **Kontribusi ke lead:** `[LOAD: POV-CALL-xx]`
+- **Kapan TIDAK dibuka:** Hanya dibuka bila router `ref-attacker-pov.md` menunjuk ke sini.
+<!-- SEGITIGA-PERAN:END -->
+
 <!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> **Padanan istilah (berlaku repo-wide).** Peran & tahap berkas ini ada di blok
+> `SEGITIGA-PERAN` di atas. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
 > `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
 > `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
 > Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat

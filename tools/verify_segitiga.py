@@ -203,6 +203,16 @@ def main():
                 fails.append(f"G10: {p.relative_to(ad)}:{i} istilah warisan -> {ln.strip()[:70]}")
                 break
 
+    # G11: setiap berkas referensi wajib punya blok PERAN (bukan header seragam)
+    refdir = Path(__file__).resolve().parent.parent / "references"
+    if refdir.is_dir():
+        for rp in sorted(refdir.glob("ref-*.md")):
+            body = rp.read_text(encoding="utf-8")
+            if "SEGITIGA-PERAN:BEGIN" not in body:
+                fails.append(f"G11: {rp.name} tanpa blok SEGITIGA-PERAN (tahap peran tidak jelas)")
+            elif "**Tahap utama:**" not in body:
+                fails.append(f"G11: {rp.name} blok PERAN tanpa field Tahap utama")
+
     print("=== verify_segitiga ===")
     print("entri:", ", ".join(f"{k}={v}" for k, v in stats.items()) or "-")
     for w in warns:

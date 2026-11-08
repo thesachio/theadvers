@@ -1,8 +1,17 @@
 # Reference: Execution Control Handoff, Authorities, & External Entities
 
+<!-- SEGITIGA-PERAN:BEGIN -->
+**Peran.** **Checklist**: token non-standar, hook, reentrancy, otoritas eksternal.
+
+- **Tahap utama:** C (`L-FLOW`)
+- **Juga dipakai di:** B (edge yang membawa callback)
+- **Kontribusi ke lead:** Konteks untuk `[AF-07]`, `[AF-10]`
+- **Kapan TIDAK dibuka:** Tidak perlu bila pot tidak menyentuh token eksternal/callback.
+<!-- SEGITIGA-PERAN:END -->
+
 <!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> **Padanan istilah (berlaku repo-wide).** Peran & tahap berkas ini ada di blok
+> `SEGITIGA-PERAN` di atas. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
 > `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
 > `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
 > Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat

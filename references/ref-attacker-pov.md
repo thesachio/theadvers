@@ -1,8 +1,17 @@
 # Dynamic Symptom Router: Katalog Attacker POV (`[POV-XX]`) & 3-Level Chain Detector
 
+<!-- SEGITIGA-PERAN:BEGIN -->
+**Peran.** **Router gejala → POV.** Satu-satunya pintu ke katalog POV; mencegah memuat 4 katalog sekaligus.
+
+- **Tahap utama:** C (`L-FLOW`)
+- **Juga dipakai di:** B (gejala jahitan), E (gejala off-chain)
+- **Kontribusi ke lead:** `[LOAD: POV-XX]`
+- **Kapan TIDAK dibuka:** Jangan dibuka bila gejala kode belum terlihat — ia router, bukan bacaan.
+<!-- SEGITIGA-PERAN:END -->
+
 <!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> **Padanan istilah (berlaku repo-wide).** Peran & tahap berkas ini ada di blok
+> `SEGITIGA-PERAN` di atas. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
 > `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
 > `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
 > Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat

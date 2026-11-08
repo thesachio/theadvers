@@ -1,8 +1,17 @@
 # Checklist Paradigma Rantai: Sui & Aptos (Move — Object, Capability, & PTB)
 
+<!-- SEGITIGA-PERAN:BEGIN -->
+**Peran.** **Tooling rantai**: objek, capability, PTB.
+
+- **Tahap utama:** A (`L-VALUE`)
+- **Juga dipakai di:** B, C, D, F
+- **Kontribusi ke lead:** Menentukan apakah lead valid di Move
+- **Kapan TIDAK dibuka:** Tidak dibuka untuk target non-Move.
+<!-- SEGITIGA-PERAN:END -->
+
 <!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> **Padanan istilah (berlaku repo-wide).** Peran & tahap berkas ini ada di blok
+> `SEGITIGA-PERAN` di atas. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
 > `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
 > `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
 > Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat

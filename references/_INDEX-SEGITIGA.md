@@ -41,13 +41,52 @@ Berkas `ref-*.md` memberi konten untuk **sumbu apa** — lihat baris di bawah.
 4. **`[CLASS-x]` wajib diisi** — tanpanya paket metode wajib tidak diketahui.
 5. **`[AF-xx]` wajib diisi** — tanpanya lead ditolak G1.
 
-## Tahap mana yang memakai berkas ini
+## Matriks: berkas referensi × tahap
 
-| Tahap | Peran berkas ini |
-|---|---|
-| A (`L-VALUE`) | kolom `LINGKUNGAN`/`DATA` boleh dirujuk saat menyusun census |
-| B (`L-PATH`) | kelas `ASYNC` & transient-holder menentukan jahitan mana yang diburu |
-| C (`L-FLOW`) | **utama** — generator metode & POV saat membedah pot/jahitan |
-| D (`SIMULASI`) | routing ke harness sesuai rantai; Strike 1/2/3 |
-| E (`OFFCHAIN`) | bila anomali melibatkan aktor luar |
-| F (`VERDICT`) | hanya bagian "Batas Realitas" untuk menilai kelayakan gugur |
+Dibaca sebagai: `●` = dipakai aktif di tahap itu · `○` = dirujuk sesekali · `—` = tidak dipakai.
+
+Tahap: **A** = L-VALUE (census) · **B** = L-PATH (peta aliran) · **C** = L-FLOW (bedah) ·
+**D** = SIMULASI (PoC/fuzz) · **E** = OFFCHAIN · **F** = VERDICT.
+
+| Berkas | A | B | C | D | E | F | Peran utama |
+|---|:-:|:-:|:-:|:-:|:-:|:-:|---|
+| `ref-method-registry.md` | — | ○ | ● | ● | — | ○ | M-001..M-010 + 5 Jalur + CLASS-A/B/C |
+| `ref-attacker-pov.md` | — | ○ | ● | — | ○ | — | router gejala → POV |
+| `ref-pov-call.md` | — | — | ● | ○ | — | — | katalog POV penyerahan kontrol |
+| `ref-pov-defi.md` | — | — | ● | ○ | — | — | katalog POV DeFi/likuidasi |
+| `ref-pov-math.md` | — | ○ | ● | ○ | — | — | katalog POV akrual/pembulatan |
+| `ref-pov-chain.md` | — | ● | ● | ○ | — | — | katalog POV per rantai (zona ASYNC) |
+| `ref-calls-tokens-reentrancy.md` | — | ○ | ● | ○ | — | — | checklist token/hook/reentrancy |
+| `ref-math-and-vaults.md` | ○ | — | ● | ○ | — | — | checklist pembulatan/share |
+| `ref-defi-oracles-liquidation.md` | — | ○ | ● | ○ | — | — | checklist oracle/likuidasi |
+| `ref-chain-evm-tron.md` | ● | ○ | ○ | ○ | — | ○ | tooling EVM/Tron |
+| `ref-chain-solana.md` | ● | ○ | ○ | ○ | — | ○ | tooling Solana |
+| `ref-chain-sui-move.md` | ● | ○ | ○ | ○ | — | ○ | tooling Sui/Aptos |
+| `ref-chain-ton-async.md` | ● | ○ | ○ | ○ | — | ○ | tooling TON |
+| `ref-test-evm-advanced.md` | — | — | — | ● | — | ○ | harness uji EVM (Tier 1-5) |
+| `ref-test-multichain-advanced.md` | — | — | — | ● | — | ○ | harness uji non-EVM (Tier 6) |
+| `ref-atomic-write.md` | ● | ● | ● | ● | ● | ● | protokol tulis (semua tahap) |
+
+### Bacaan kunci
+
+- **Tahap C adalah pusat gravitasi** — 9 dari 16 berkas aktif di sini. Wajar: C adalah
+  tempat hipotesis lahir.
+- **Tahap A hanya butuh 5 berkas** (4 `ref-chain-*` + `ref-atomic-write`). Census nilai
+  tidak butuh POV atau harness — hanya tooling rantai.
+- **Tahap D hanya butuh 4** (`ref-test-*`, `ref-method-registry`, `ref-atomic-write`).
+  Jangan membawa katalog POV ke lab; itu generator, bukan bahan harness.
+- **Tahap E tidak butuh berkas khusus** — offchain dipandu `methodology/mod-offchain.md`;
+  referensi hanya dirujuk bila anomali menyentuh kode.
+- **`ref-atomic-write.md` satu-satunya yang ● di semua tahap** karena ia mengatur cara
+  menulis artefak, bukan isi analisis.
+
+### Aturan beban baca (hemat token)
+
+| Tahap | Wajib dibuka | Dilarang dibuka |
+|---|---|---|
+| A | `ref-chain-<rantai>.md`, `ref-atomic-write` | seluruh `ref-pov-*`, `ref-test-*` |
+| B | `ref-pov-chain.md` (jahitan ASYNC), `ref-chain-<rantai>` | `ref-test-*` |
+| C | `ref-method-registry` + `ref-attacker-pov`, lalu **hanya 1-2** `ref-pov-*` yang gejalanya cocok | 4 katalog POV sekaligus |
+| D | `ref-test-*`, `ref-method-registry` (routing) | `ref-attacker-pov` (sudah selesai tugasnya) |
+| E | `methodology/mod-offchain` + `ref-calls-tokens-reentrancy` bila perlu | `ref-test-*` |
+| F | `templates/VERDICT` + `ref-method-registry` (ambang gugur) | seluruh `ref-pov-*` |

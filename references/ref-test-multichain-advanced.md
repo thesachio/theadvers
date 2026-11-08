@@ -1,8 +1,17 @@
 # Referensi Pengujian Lanjut Non-EVM (Tier 6: Solana, Sui/Aptos Move, & TON Async)
 
+<!-- SEGITIGA-PERAN:BEGIN -->
+**Peran.** **Harness uji**: Tier 6 (Solana/Sui/TON).
+
+- **Tahap utama:** D (`SIMULASI`)
+- **Juga dipakai di:** F
+- **Kontribusi ke lead:** Menentukan Strike 3 valid atau tidak
+- **Kapan TIDAK dibuka:** Tidak dibuka saat masih di Tahap A-C.
+<!-- SEGITIGA-PERAN:END -->
+
 <!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> **Padanan istilah (berlaku repo-wide).** Peran & tahap berkas ini ada di blok
+> `SEGITIGA-PERAN` di atas. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
 > `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
 > `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
 > Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
