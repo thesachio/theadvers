@@ -7,7 +7,9 @@ Setiap lead (format `## [LEAD-XXX] Judul Singkat` atau `## [L-XX-N] Judul Singka
 ```markdown
 ## [L-V5-1] Judul Singkat Hipotesis & Lokasi
 - ID — mis. L-V5-1
-- Kelas Topologi — [CLASS-A] | [CLASS-B] | [CLASS-C]
+- Kelas Topologi — [CLASS-A] | [CLASS-B] | [CLASS-C]  (sumbu lama, WAJIB — menentukan paket metode wajib)
+- LAPIS — [LAPIS: VALUE] | [LAPIS: PATH] | [LAPIS: FLOW]  (sumbu baru — asal lead)
+- Bentuk Serangan — [AF-01] .. [AF-10]  (lihat methodology/mod-attack-forms.md)
 - Metode Pencarian — M-001 .. M-010 (Metode 1 .. Metode 10), dan/atau [POV-XX] dari references/ref-attacker-pov.md. Tanpa kolom ini, Fase 3 tidak dapat merancang harness simulasi yang presisi sesuai Langkah 1b.
 - File:Kontrak:Fungsi (Baris) — presisi sampai baris
 - Delta State — Expected vs Actual (kerangka Metode 2): state sebelum, aksi, delta yang seharusnya, delta yang benar-benar tertulis di kode
@@ -18,7 +20,7 @@ Setiap lead (format `## [LEAD-XXX] Judul Singkat` atau `## [L-XX-N] Judul Singka
 - Deployment (Fase 3, WAJIB sebelum harness) — `CYCLE`: P1_PRE_DEPLOY | P2_TESTNET_ONLY | P3_LIVE_PARTIAL | P4_LIVE_FULL | P0_UNKNOWN; `ENTRYPOINT`: LIVE_MATCH | HEAD_ONLY_PROVEN | TESTNET_ONLY | ENTRYPOINT_RELOCATED | ENV_ERROR | IDENTITY_ONLY. Diisi dari artefak `audit/notes/deploy-parity-<ID>.json` (jalankan `tools/deploy_parity.py`). **Bila kosong, `Mode Uji` di Tahap D tidak sah** — lihat `templates/VERDICT.md` §Tangga Bukti.
 ```
 
-**Aturan:** lead tanpa `Kelas Topologi`, tanpa `Metode Pencarian`, atau tanpa `Delta State` dikembalikan ke penulisnya, bukan diteruskan ke Fase 3.
+**Aturan:** lead tanpa `Kelas Topologi`, tanpa `LAPIS`, tanpa `Bentuk Serangan`, tanpa `Metode Pencarian`, atau tanpa `Delta State` dikembalikan ke penulisnya, bukan diteruskan ke Tahap D. Lihat `CLASSIFICATION.md` — tiga sumbu ini ortogonal, bukan saling menggantikan.
 
 **Aturan Deployment:** lead yang akan masuk Fase 3 **wajib** membawa `CYCLE` + `ENTRYPOINT`. Lead tanpa itu tetap boleh berada di `05`, tetapi **DILARANG** dinaikkan ke `09`/`08` — hasil akhirnya maksimum `07` dengan `Disposition: ENV_ERROR`.
 

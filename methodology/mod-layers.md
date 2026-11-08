@@ -37,7 +37,11 @@ Kontrak ekstensi: lapis baru = append satu blok di bawah; core tidak disentuh.
   GENERATOR (tanya per pot: "POV mana yang muat di uang ini?" — bukan filter pasca-baca).
 - Klasifikasi reachability: 5 Jalur Permissionless (registry M-005).
 - FACTS/RADAR dibuka SETELAH hipotesis buta lahir — murni falsifier.
-- Output: entri `05` ber-provenance `[LAPIS: VALUE|PATH|FLOW]` + `[AF-xx]` + `[LOAD: M-xxx]`.
+- Output: entri `05` ber-provenance `[LAPIS: VALUE|PATH|FLOW]` + `[CLASS-A|B|C]`
+  + `[AF-xx]` + `[LOAD: M-xxx]`.
+- `[CLASS-x]` **BUKAN** digantikan oleh `[LAPIS]`: CLASS menentukan paket metode wajib
+  minimum (`ref-method-registry.md` §1), LAPIS hanya menandai asal lead. Lihat
+  `CLASSIFICATION.md`.
 - **GATE-C**: tiap lead punya provenance + tag AF; klaim negatif wajib kutip rentang baris utuh.
 
 ## L-OFFCHAIN — Bedah aktor luar (Tahap E, opsional) — detail di mod-offchain.md

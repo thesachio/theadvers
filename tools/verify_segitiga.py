@@ -23,6 +23,8 @@ AF_REGISTRY = Path(__file__).resolve().parent.parent / "methodology" / "mod-atta
 ENTRY_RE = re.compile(r"^## \[(LEAD|GUARD|RADAR)-", re.M)
 LAPIS_RE = re.compile(r"\[LAPIS:\s*(VALUE|PATH|FLOW)\]")
 AF_RE = re.compile(r"\[AF-(\d{2})\]")
+CLASS_RE = re.compile(r"\[CLASS-([ABC])\]")
+valid_class = {"A", "B", "C"}
 RANGE_RE = re.compile(r"(\.sol|\.rs|\.move|\.ts):\d+[-–]\d+")
 STRIKE_HARD = ("REJECTED_POC_FAILS", "REJECTED_NEGATIVE_EV", "REJECTED_DUST")
 
@@ -122,6 +124,13 @@ def main():
             for af in afs:
                 if valid_af and af not in valid_af:
                     fails.append(f"G8: {title} -> [AF-{af}] tidak ada di registry")
+            # G9: CLASS wajib (sumbu lama yang tetap mengikat — menentukan paket metode)
+            classes = CLASS_RE.findall(e)
+            if not classes:
+                fails.append(f"G9: {title} -> tanpa tag [CLASS-A|CLASS-B|CLASS-C]")
+            for c in set(classes):
+                if c not in valid_class:
+                    fails.append(f"G9: {title} -> [CLASS-{c}] bukan nilai sah")
             if not RANGE_RE.search(e):
                 fails.append(f"G2: {title} -> File:Baris bukan rentang (awal-akhir)")
 

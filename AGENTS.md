@@ -159,9 +159,11 @@ Satu berkas = satu domain murni. Hemat token dan bebas risiko tertimpa.
 - **`04-code-guarded.md`** — murni hipotesis yang dihentikan **Guard Statis/Struktural**
   yang terbukti `TERSANGKAL` (tidak tembus 5 Jalur Permissionless). **DILARANG** memuat
   guard dinamis/matematis, atau guard statis yang `TEMBUS`.
-- **`05-raw-leads.md`** — antrean aktif. Tiap entri **WAJIB** `[LAPIS: VALUE|PATH|FLOW]`
-  + `[AF-xx]` + `File:Baris` berupa **rentang**. Semua anomali mutasi state, patch-scar,
-  view-vs-write, dan seluruh guard dinamis masuk sini.
+- **`05-raw-leads.md`** — antrean aktif. Tiap entri **WAJIB** tiga tag ortogonal:
+  `[LAPIS: VALUE|PATH|FLOW]` (asal lead) + `[CLASS-A|B|C]` (topologi entitas → paket metode)
+  + `[AF-xx]` (bentuk serangan), ditambah `File:Baris` berupa **rentang**.
+  Lihat `CLASSIFICATION.md`. Semua anomali mutasi state, patch-scar, view-vs-write, dan
+  seluruh guard dinamis masuk sini.
 - **`06-refuted-invalid.md`** — gugur permanen. `REJECTED_POC_FAILS`/`NEGATIVE_EV`/`DUST`
   **WAJIB** `BUKTI_SIMULASI:` (gerbang #11e).
 - **`07-needs-next-step.md`** — belum tuntas (`NEXT_EXPLORE`/`NEXT_MAINNET`/`TOOL_BLOCKED`).

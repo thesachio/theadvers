@@ -59,6 +59,8 @@ eksekusi; tanpa keduanya, label jujur adalah **"indikasi"**.
 - **CLASS-C** = alur Multi-Entity Long On-Chain Flow.
 - Kelas menunjukkan **topologi interaksi**, bukan severity, bukan EV, bukan nama modul.
 - **Metode** dirutekan lewat `references/ref-method-registry.md` (M-001..M-010).
+  `CLASS-A/B/C` **tidak digantikan** oleh metode segitiga — ia tetap menentukan paket metode
+  wajib minimum. Tiga sumbu (`LAPIS`, `CLASS`, `AF`) ortogonal; lihat `CLASSIFICATION.md`.
 - **POV** dicari lewat `references/ref-attacker-pov.md`; hanya katalog `ref-pov-*.md` yang
   gejalanya cocok yang dimuat (lazy-load, jangan baca 4 katalog sekaligus).
 - **Deteksi rantai** mengikuti urutan: ekstensi → manifes → sinyal kode. Hasil tidak pasti

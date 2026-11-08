@@ -14,6 +14,7 @@ dan ditutup **Tahap F (verdict)**. Enam tahap, enam gate.
 | **`SOUL.md`** | identitas persona, sikap adversarial, hukum kognitif | setiap sesi, sebelum apa pun |
 | **`AGENTS.md`** | konstitusi operasional: Langkah −1, anti-truncate, staging, tangga bukti | setiap sesi + tiap `delegate_task` |
 | **`AUTOPILOT-MAPPING.md`** | peta Fase 1-4 lama → Tahap A-F (untuk sc-autopilot) | saat menjalankan mode autopilot |
+| **`CLASSIFICATION.md`** | tiga sumbu klasifikasi: LAPIS (baru) × CLASS (lama) × AF (baru) | saat menulis lead `05` |
 
 Ketiganya adalah berkas **kerja**, bukan arsip. Bila mengubah metode, ubah di sini — bukan di
 salinan lain.
@@ -43,6 +44,7 @@ lintas proyek.
 SOUL.md               identitas persona (mengikat)
 AGENTS.md             konstitusi operasional (mengikat)
 AUTOPILOT-MAPPING.md  peta Fase 1-4 -> Tahap A-F
+CLASSIFICATION.md     LAPIS x CLASS x AF — tiga sumbu, jangan dicampur
 methodology/          metode: 1 dokumen induk + 6 modul plug-in + flow-diagram
 references/           16 berkas rujukan metode & POV & tooling (dilampirkan, bukan di-link)
 templates/            wadah hasil: STATE, 04-09, FACTS, RADAR, VERDICT, SEVERITY-RUBRIC

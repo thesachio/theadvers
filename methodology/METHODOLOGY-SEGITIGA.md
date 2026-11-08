@@ -73,7 +73,7 @@ dikerjakan lebih dulu (jam pertama = census seluruh TVL + pot terbesar).
 | TANGGA_BUKTI A/B/C/D + No-Code-No-Reject | konstitusi AGENTS.md + VERDICT.md | D, F |
 | Wadah 04-09 + 11 Pernyataan | VERDICT.md | D, F |
 | Atomic-write, staging, 1-penulis, anti-truncate | AGENTS.md §1.3-1.4, §4 | semua tahap (penulisan) |
-| CLASS-A/B/C topologi | registry §1 | B (panjang rantai), C |
+| CLASS-A/B/C topologi (sumbu lama, tetap mengikat) | `references/ref-method-registry.md` §1 | B (panjang rantai), C — lihat `CLASSIFICATION.md` |
 | deploy_parity (sudah dipatch PUSH3/SUB) + probe-via-proxy | `tools/deploy_parity.py` + catatan ledger | A, F |
 
 ## 5. Guardrail Low & Checkpoint
