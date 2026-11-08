@@ -27,7 +27,7 @@ Konsekuensi metodologis:
 |---|---|---|
 | `across` (run 1) | `b1c4e862` (`fix(ci): use Node 22.23.4`) | baseline |
 | `across2` (run 2) | `d0725ea0` (`chore(deps): bump ethers`) | +4 commit (deps/CI, bukan logika kontrak) |
-| `across3` (run 3) | `d0725ea0` (sama dengan run 2) | **0** |
+| `theadvers` (run 3) | `d0725ea0` (sama dengan run 2) | **0** |
 
 ## Cara menurunkan ulang (reproducible checkout)
 

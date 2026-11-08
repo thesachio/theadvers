@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""verify_segitiga.py — gate checker METHODOLOGY-SEGITIGA untuk across3.
+"""verify_segitiga.py — gate checker METHODOLOGY-SEGITIGA untuk theadvers.
 
 Menguji aturan yang paling sering dilanggar:
   G1  setiap entri 05 punya [LAPIS: ...] dan [AF-xx]
