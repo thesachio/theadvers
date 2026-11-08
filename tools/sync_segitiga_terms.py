@@ -58,7 +58,6 @@ REPLACEMENTS = [
     # Penamaan langkah internal Fase 3 -> Tahap D
     (r"Langkah 1b\b", "Langkah D-1b"),
     (r"Langkah 1c\b", "Langkah D-1c"),
-    (r"\bRouting Simulasi Tahap D\b", "Routing Simulasi Tahap D"),
 ]
 
 
@@ -74,12 +73,33 @@ def apply_header(text: str) -> tuple[str, bool]:
     return "".join(lines[:insert_at]) + HEADER + "".join(lines[insert_at:]), True
 
 
+def _protect(text: str) -> tuple[str, list[str]]:
+    """Keluarkan blok SEGITIGA-BINDING dari teks sebelum substitusi.
+
+    Blok itu SENGAJA memuat nama lama (`Fase 2` → Tahap C). Tanpa perlindungan ini,
+    substitusi memakan namanya sendiri dan alat jadi tidak idempoten.
+    """
+    store: list[str] = []
+    def swap(m):
+        store.append(m.group(0))
+        return f"\x00PROT{len(store)-1}\x00"
+    text = re.sub(r"<!-- SEGITIGA-BINDING -->.*?(?=\n\n)", swap, text, flags=re.S)
+    return text, store
+
+
+def _restore(text: str, store: list[str]) -> str:
+    for i, blk in enumerate(store):
+        text = text.replace(f"\x00PROT{i}\x00", blk)
+    return text
+
+
 def apply_terms(text: str) -> tuple[str, int]:
+    text, store = _protect(text)
     n = 0
     for pat, rep in REPLACEMENTS:
         text, k = re.subn(pat, rep, text)
         n += k
-    return text, n
+    return _restore(text, store), n
 
 
 LEFTOVER = re.compile(r"\bFase [0-9]\b|\bPutaran [12]\b|\bunit `S-\d+`\b|`0[0-3]-[a-z-]+\.md`|`00b-[a-z-]+\.md`")
