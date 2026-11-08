@@ -1053,7 +1053,7 @@ def load_env_rpc() -> dict[str, str]:
     cands = [
         os.path.join(os.path.dirname(__file__), "..", "..", "workspace", ".env.rpc"),
         os.path.expanduser("~/.hermes/profiles/adv/workspace/.env.rpc"),
-        "/home/ubuntu/repos/theadver/workspace/.env.rpc",
+        os.path.join(os.getcwd(), ".env.rpc"),
     ]
     out: dict[str, str] = {}
     for c in cands:

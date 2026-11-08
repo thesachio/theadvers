@@ -1,10 +1,22 @@
 # theadvers — Template Workflow Audit Web3 (SEGITIGA + OFFCHAIN)
 
 **Repo ini adalah TEMPLATE, bukan proyek audit.** Tidak memuat kode kontrak tertentu dan tidak
-memuat temuan. Tujuannya: dijalankan/di-fork untuk audit baru, lalu diisi.
+memuat temuan. Tujuannya: dijalankan/di-fork untuk audit baru, lalu diisi — termasuk sebagai
+basis **sc-autopilot (segitiga + offchain)**.
 
 Metode inti: **Segitiga** — `L-VALUE → L-PATH → L-FLOW` — diperluas dengan **Tahap E (off-chain)**
 dan ditutup **Tahap F (verdict)**. Enam tahap, enam gate.
+
+## Berkas konstitusi (mengikat)
+
+| Berkas | Isi | Kapan dibaca |
+|---|---|---|
+| **`SOUL.md`** | identitas persona, sikap adversarial, hukum kognitif | setiap sesi, sebelum apa pun |
+| **`AGENTS.md`** | konstitusi operasional: Langkah −1, anti-truncate, staging, tangga bukti | setiap sesi + tiap `delegate_task` |
+| **`AUTOPILOT-MAPPING.md`** | peta Fase 1-4 lama → Tahap A-F (untuk sc-autopilot) | saat menjalankan mode autopilot |
+
+Ketiganya adalah berkas **kerja**, bukan arsip. Bila mengubah metode, ubah di sini — bukan di
+salinan lain.
 
 ## Cara pakai untuk audit baru
 
@@ -28,12 +40,15 @@ lintas proyek.
 ## Struktur
 
 ```
+SOUL.md               identitas persona (mengikat)
+AGENTS.md             konstitusi operasional (mengikat)
+AUTOPILOT-MAPPING.md  peta Fase 1-4 -> Tahap A-F
 methodology/          metode: 1 dokumen induk + 6 modul plug-in + flow-diagram
 references/           16 berkas rujukan metode & POV & tooling (dilampirkan, bukan di-link)
 templates/            wadah hasil: STATE, 04-09, FACTS, RADAR, VERDICT, SEVERITY-RUBRIC
 audit/                INSTANCE yang diisi per proyek (kosong di template ini)
   STATE.md            kursor: TAHAP (A-F) + pot/jahitan aktif + Gate Meter
-  INTEL.md            Fase 0: nama, overview, link, bounty, deployment
+  INTEL.md            Tahap A0: nama, overview, link, bounty, deployment
   notes/
     money-ledger.md   Tahap A — EV ledger (artefak hidup)
     path-map.md       Tahap B — peta jahitan (artefak hidup)
