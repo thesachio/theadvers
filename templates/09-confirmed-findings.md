@@ -1,10 +1,18 @@
 # 09 — Confirmed Findings (Bounty-Ready / Live Production Only)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Wadah murni untuk temuan berstatus `VALID_ELIGIBLE` yang lolos **kesebelas** Pernyataan di `verify/VERDICT.md`, terbukti lewat eksekusi simulasi PoC tanpa curang (`[PASS]`), membuktikan bahaya finansial nyata (Critical / High / Medium), **DAN** terbukti eksis pada bytecode/kontrak produksi aktif (`DEPLOYMENT_MATCH: LIVE_MATCH`).
 
 > **GERBANG PEMISAHAN `09` (LIVE) VS `08` (HEAD-ONLY / PRE-LIVE) DI FASE 4:**
 > - **Masuk ke `09` ini:** PoC `[PASS]` pada state produksi nyata (`Mode Uji: FORK_LIVE`, atau `FORK_DEPLOYED_HEAD` yang kodenya terverifikasi 100% identik dengan bytecode produksi aktif) dan kontrak masuk cakupan aktif (`LIVE_MATCH`). Istilah "100% identik" di sini **bukan** berarti hash bytecode sama persis — yang diuji adalah **keberadaan & perilaku entrypoint yang diserang PoC** (lihat `VERDICT.md` §0.2b).
-> - **Pindahkan ke `08-valid-not-eligible.md`** (`LOW_CLASS: PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`): Apabila di Fase 3 PoC eksploitasi sudah terbukti `[PASS]` di atas kode repositori (`FORK_DEPLOYED_HEAD` / `LOKAL`), namun pada Rekonsiliasi Langkah 0 Fase 4 terbukti bahwa kontrak/fungsi tersebut belum di-deploy ke mainnet (`HEAD-only`) atau belum masuk daftar alamat bounty aktif (`[REPO_STAGED]`), Hakim Fase 4 **WAJIB** memindahkan temuan tersebut (lengkap dengan kode PoC utuhnya) ke `08-valid-not-eligible.md` — **BUKAN** dibiarkan di `09` dan **BUKAN** diparkir di `07`!
+> - **Pindahkan ke `08-valid-not-eligible.md`** (`LOW_CLASS: PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`): Apabila di Tahap D PoC eksploitasi sudah terbukti `[PASS]` di atas kode repositori (`FORK_DEPLOYED_HEAD` / `LOKAL`), namun pada Rekonsiliasi Langkah 0 Tahap F terbukti bahwa kontrak/fungsi tersebut belum di-deploy ke mainnet (`HEAD-only`) atau belum masuk daftar alamat bounty aktif (`[REPO_STAGED]`), Hakim Tahap F **WAJIB** memindahkan temuan tersebut (lengkap dengan kode PoC utuhnya) ke `08-valid-not-eligible.md` — **BUKAN** dibiarkan di `09` dan **BUKAN** diparkir di `07`!
 
 ## Field wajib per entri
 
@@ -23,7 +31,7 @@ POC_STATUS          : PASS                               <- WAJIB literal PASS
 Mode Uji            : FORK_LIVE (chain: <...>, block: <...>, RPC: <...>)
 File:Baris          : <path/to/File.sol:Baris>
 Metode / POV        : <M-00X / [POV-XX]>
-Invarian Dilanggar  : <invarian inti dari 00-project-map.md>
+Invarian Dilanggar  : <invarian inti dari PIN.md>
 DAMPAK KUANTITATIF  : <profit bersih penyerang / kerugian protokol dalam angka eksak>
 ```
 

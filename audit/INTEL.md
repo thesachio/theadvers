@@ -1,4 +1,11 @@
-# PROJECT INTELLIGENCE BRIEF (Fase 0 — Tahap A0)
+# PROJECT INTELLIGENCE BRIEF (Tahap A0 — Tahap A0)
+
+<!-- SEGITIGA-BINDING -->
+> **Peran berkas.** Konteks proyek tahap a0 — dipakai di **Tahap A0 (`BOOTSTRAP`)**. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
 
 **Status: KOSONG — wajib diisi ulang di Tahap A0.**
 DILARANG menyalin dari audit run sebelumnya tanpa verifikasi ulang: alamat, saldo, dan

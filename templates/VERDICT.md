@@ -1,5 +1,13 @@
 # PROTOKOL PENILAI & HAKIM AKHIR (VERDICT GATE)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Dokumen ini adalah **standar hukum tertinggi** pada dua jalur:
 
 1. **Jalur Audit Mandiri** (Tahap F): mengadili setiap kandidat yang lolos PoC Tahap D sebelum diizinkan bertahan di `audit/09-confirmed-findings.md`.
@@ -23,11 +31,11 @@ Artefak legacy tetap sah dibaca dengan penomoran lamanya. Jangan mencampur penom
 
 ---
 
-## LANGKAH 0 — Rekonsiliasi Siklus Deployment & Kesetaraan Entrypoint (Gerbang Eksklusif Fase 4)
+## LANGKAH 0 — Rekonsiliasi Siklus Deployment & Kesetaraan Entrypoint (Gerbang Eksklusif Tahap F)
 
-Tujuan: memisahkan temuan yang sudah terbukti secara mekanis di Fase 3 menjadi tiga jalur akhir: **Produksi Aktif** (`09`), **Pre-Live / Testnet / Entrypoint Relocated** (`08`), atau **Sudah Dipatch** (`06`) — berdasarkan **pengukuran**, bukan asumsi.
+Tujuan: memisahkan temuan yang sudah terbukti secara mekanis di Tahap D menjadi tiga jalur akhir: **Produksi Aktif** (`09`), **Pre-Live / Testnet / Entrypoint Relocated** (`08`), atau **Sudah Dipatch** (`06`) — berdasarkan **pengukuran**, bukan asumsi.
 
-> **Penting:** Pengecekan ini adalah **wewenang eksklusif Hakim Fase 4**. Fase 3 **dilarang** menghentikan penulisan PoC hanya karena kontrak belum *live* atau versi repo berbeda.
+> **Penting:** Pengecekan ini adalah **wewenang eksklusif Hakim Tahap F**. Tahap D **dilarang** menghentikan penulisan PoC hanya karena kontrak belum *live* atau versi repo berbeda.
 
 > **Alat wajib:** seluruh Langkah 0 dijalankan lewat `tools/deploy_parity.py` (bukan penilaian manual). Jalankan dengan `--out` agar artefak JSON tersimpan di `audit/notes/`. Aturan "bytecode harus identik" **DILARANG** dipakai: setiap repo punya siklus rilis berbeda dan build Foundry jarang reproducible. Yang diuji adalah **keberadaan & perilaku entrypoint yang diserang PoC**, bukan hash file.
 
@@ -189,7 +197,7 @@ grep -n "Severity Basis" <proyek>/audit/INTEL.md
 **DILARANG** langsung menggeser ke `08`. Wajib:
 
 1. Catat `RECHECK_REQUIRED` di artefak beserta `commit_ref` (HEAD) dan `nearest_tag`.
-2. Kembalikan entri ke Fase 3 untuk **satu putaran PoC kedua** yang menembak **objek live** (lewat Factory resmi, atau `vm.etch` bytecode live yang dicatat sebagai deviasi).
+2. Kembalikan entri ke Tahap D untuk **satu putaran PoC kedua** yang menembak **objek live** (lewat Factory resmi, atau `vm.etch` bytecode live yang dicatat sebagai deviasi).
 3. Baru setelah putaran kedua itu, bila tetap tidak cocok, entri masuk `08` dengan `LOW_CLASS: PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`.
 
 ---
@@ -199,7 +207,7 @@ grep -n "Severity Basis" <proyek>/audit/INTEL.md
 - Untuk kandidat **`09` & `08`**: PoC wajib dapat dikompilasi dan menghasilkan `[PASS]` (membuktikan invarian patah) pada `FORK_LIVE`, `FORK_DEPLOYED_HEAD`, atau `LOKAL` (khusus non-EVM / rantai tanpa RPC).
 - Untuk entri penolakan di **`06`** (`REJECTED_POC_FAILS`, `REJECTED_NEGATIVE_EV`, `REJECTED_DUST`):
   - PoC hanya sah dinyatakan gagal (`REJECTED_POC_FAILS`) atau merugi (`REJECTED_NEGATIVE_EV` / `REJECTED_DUST`) apabila di dalam entri `06` dilampirkan **bukti eksekusi simulasi nyata** (log terminal yang menjalankan *Victim Seeding* + *3-Way Amplification* + Strike 3 Fuzzing `testFuzz_`/`proptest`/`halmos`).
-  - Menolak lead ke `06` hanya dengan hitungan/argumen teks di atas kertas tanpa log eksekusi test adalah pelanggaran **`PAPER_REFUTATION_DETECTED`** (Pernyataan #11e) → **laporan DITOLAK** dan lead dikembalikan ke Fase 3!
+  - Menolak lead ke `06` hanya dengan hitungan/argumen teks di atas kertas tanpa log eksekusi test adalah pelanggaran **`PAPER_REFUTATION_DETECTED`** (Pernyataan #11e) → **laporan DITOLAK** dan lead dikembalikan ke Tahap D!
 - **Output test kosong bukan bukti kegagalan maupun keamanan.** Pastikan pola pencarian benar (`--match-contract` memakai **nama kontrak**, bukan nama berkas; jalankan `forge test --list` lebih dulu).
 
 ---
@@ -237,12 +245,18 @@ Baca **hanya** rentang baris yang diklaim beserta fungsi penjaga di sekitarnya.
 
 ### Dua gerbang berbeda
 
+Cakupan di segitiga diukur pada **pot** (`money-ledger`) dan **jahitan** (`path-map`) —
+bukan pada berkas `[MUST-AUDIT]`, karena populasi segitiga adalah *nilai* dan *aliran*,
+bukan daftar berkas.
+
 | Gerbang | Ambang | Diukur pada |
 |---|---|---|
-| **Gerbang Fase 2** | **= 100%** berkas `[MUST-AUDIT]` per domain berstatus `LEAD_GENERATED` atau `ATTESTED_CLEAN` (**0** berkas `BELUM` / `DIBACA` / `DEFERRED`) | `audit/03-attack-surface-queue.md` |
-| **Gerbang Fase 4** | **= 100%** berkas `[MUST-AUDIT]` per domain berjejak, **0** berkas `BELUM` / `DIBACA` / `DEFERRED` di seluruh domain | tabel cakupan di `03` |
+| **Gerbang Tahap C** | **= 100%** pot ber-`EV > 0` berstatus `HUNTED` atau `ATTESTED_CLEAN` (**0** pot `PENDING`/`DEFERRED`), **dan** 100% jahitan ber-`ASYNC` yang sudah diledah | `audit/notes/money-ledger.md` + `audit/notes/path-map.md` |
+| **Gerbang Tahap F** | Reproduksi mandiri oleh Hakim: setiap baris ledger/path-map yang diklaim `HUNTED` punya lead atau atestasi bersitasi `File:Baris` di `05`/`04` | hitung ulang dari ledger + path-map, **bukan** percaya tabel pelaksana |
 
-**DILARANG memakai "jumlah lead per domain" sebagai metrik kelulusan.** Kuota lead memicu pembuatan lead sampah pada modul yang memang aman (hukum Goodhart). Kelulusan diukur dari **jejak per berkas**, bukan banyaknya hipotesis.
+**DILARANG memakai "jumlah lead per pot" sebagai metrik kelulusan.** Kuota lead memicu
+pembuatan lead sampah pada modul yang memang aman (hukum Goodhart). Kelulusan diukur dari
+**jejak per pot/jahitan**, bukan banyaknya hipotesis.
 
 ### Kondisi pembatalan — `AUDIT_INCOMPLETE_COVERAGE_BIAS`
 
@@ -250,15 +264,17 @@ Baca **hanya** rentang baris yang diklaim beserta fungsi penjaga di sekitarnya.
 
 Vonis ini dijatuhkan bila **salah satu** terpenuhi:
 
-1. Ada domain `D1..Dn` tanpa berkas `[MUST-AUDIT]` sama sekali di antrean (domain kosong / tidak terwakili).
-2. Ada berkas `[MUST-AUDIT]` berstatus `BELUM`, atau berstatus `DICAKUP_U1/U10/S-xx` tanpa uji spesifik.
-3. Ada domain dengan cakupan **< 100%** pada Gerbang Fase 2.
-4. Audit memakai sampel, bukan populasi penuh yang terdaftar di `00b-file-inventory.md`.
+1. Ada pot ber-`EV > 0` di `money-ledger.md` yang **tidak punya** entri `05`/`04` dan bukan
+   `ATTESTED_CLEAN` bersitasi.
+2. Ada jahitan `ASYNC` di `path-map.md` yang belum diledah maupun diatestasi.
+3. Ada pot/jahitan berstatus `PENDING` atau `DEFERRED` yang tidak disertai alasan + EV.
+4. Census memakai sampel: ada kontrak bernilai yang **tidak** masuk `money-ledger.md`
+   padahal terdaftar di `target/PIN.md` (populasi = seluruh alamat yang di-pin).
 
 **Bila `AUDIT_INCOMPLETE_COVERAGE_BIAS` dijatuhkan:**
 
 - **DILARANG** menulis Ringkasan Eksekutif seolah audit selesai.
-- Hakim **wajib** mengembalikan eksekusi ke Fase 1/Fase 2 untuk menyapu domain yang terlewat.
+- Hakim **wajib** mengembalikan eksekusi ke Tahap A/B/Tahap C untuk menyapu domain yang terlewat.
 - Temuan yang sudah ada **tetap disimpan** sebagai hasil sementara dan **DILARANG dihapus**.
 - Status akhir laporan wajib ditulis: `COVERAGE: AUDIT_INCOMPLETE_COVERAGE_BIAS`, bukan `PASS`.
 
@@ -327,7 +343,7 @@ Sebuah temuan HANYA boleh mendapat vonis `VALID_ELIGIBLE` dan bertahan di `audit
 - **Logika kode + PoC lokal jujur tetapi belum dapat diuji pada fork produksi → `NEEDS_NEXT_STEP` → `07-needs-next-step.md`, HANYA BILA memenuhi ketiga syarat berikut:**
   1. **Blok `PERCOBAAN:` wajib** — entri `07` harus memuat perintah yang benar-benar dijalankan **beserta keluarannya** (bukan rencana). `NEXT_EXPLORE` wajib melampirkan log Tier 2/3/5 (handler fuzzing, differential, multi-step chaining, halmos) yang **mentok timeout komputasi**; `TOOL_BLOCKED` wajib melampirkan log **ketiga** usaha Tangga Self-Healing (flag/toolchain → standalone interface-only → fallback RPC); `NEXT_MAINNET` wajib bukti rantai benar-benar tanpa RPC/explorer — bila RPC tersedia, DILARANG parkir di sini, jalankan `cast call`/`cast storage` saat itu juga.
   2. **RPC tersedia ⇒ DILARANG `07`.** Selama pekerjaan itu masih bisa diselesaikan pada sesi berjalan, `07` tidak sah.
-  3. **Entri tanpa blok `PERCOBAAN:` = `LAZY_BAILOUT_DETECTED`** (lihat Pernyataan #11) → laporan DITOLAK dan lead dikembalikan ke Fase 3.
+  3. **Entri tanpa blok `PERCOBAAN:` = `LAZY_BAILOUT_DETECTED`** (lihat Pernyataan #11) → laporan DITOLAK dan lead dikembalikan ke Tahap D.
   4. **Field `Disposition:` wajib** — setiap entri `07` harus mendeklarasikan tepat satu label: `Disposition: NEXT_EXPLORE | NEXT_MAINNET | TOOL_BLOCKED`. Entri tanpa field ini tidak dapat diperiksa Hakim dan diperlakukan sebagai `LAZY_BAILOUT_DETECTED`.
 - **Bukti berbasis mock pihak ketiga tidak dapat memenuhi pernyataan ini** (lihat Langkah 2.3).
 
@@ -349,7 +365,7 @@ Sebuah temuan HANYA boleh mendapat vonis `VALID_ELIGIBLE` dan bertahan di `audit
 
 > *"Setiap entri di `07-needs-next-step.md` memuat blok `PERCOBAAN:` berisi perintah yang benar-benar dijalankan beserta keluarannya — bukan rencana, bukan kalimat alasan. Setiap klaim `TOOL_BLOCKED` melampirkan log ketiga usaha Tangga Self-Healing. Setiap klaim `NEXT_EXPLORE` melampirkan log Tier 2/3/5 yang mentok timeout komputasi. Setiap klaim `NEXT_MAINNET` melampirkan bukti bahwa RPC/explorer memang tidak tersedia."*
 
-→ Pelanggaran: **`LAZY_BAILOUT_DETECTED`** → **laporan DITOLAK**, `07` dikembalikan ke Fase 3. Temuan yang sudah ada **tetap disimpan** sebagai hasil sementara dan DILARANG dihapus.
+→ Pelanggaran: **`LAZY_BAILOUT_DETECTED`** → **laporan DITOLAK**, `07` dikembalikan ke Tahap D. Temuan yang sudah ada **tetap disimpan** sebagai hasil sementara dan DILARANG dihapus.
 
 **Cara Hakim memeriksa (wajib, per entri `07`):**
 
@@ -361,33 +377,44 @@ Sebuah temuan HANYA boleh mendapat vonis `VALID_ELIGIBLE` dan bertahan di `audit
 
 **Label basi tidak sah.** Judul entri sudah dipindah ke wadah lain tetapi label lama masih tertinggal → dihitung sebagai pelanggaran #11.
 
-**11d. Gerbang Cakupan (`AUDIT_INCOMPLETE_COVERAGE_BIAS`) — laporan DITOLAK, dikembalikan ke Fase 1/2**
+**11d. Gerbang Cakupan (`AUDIT_INCOMPLETE_COVERAGE_BIAS`) — laporan DITOLAK, dikembalikan ke Tahap A/B/2**
 
 > **Prosedur, ambang, dan format tabel cakupan: lihat [LANGKAH 4a](#langkah-4a--gate-cakupan-wajib-sebelum-langkah-4) (sumber normatif).** Bagian ini hanya menetapkan **status vonis** dan akibatnya di tingkat laporan; bila ada perbedaan redaksi, **LANGKAH 4a yang menang**.
 
-> *"Cakupan berkas `[MUST-AUDIT]` yang berstatus `LEAD_GENERATED` atau `ATTESTED_CLEAN` mencapai **100% di setiap domain**, tanpa berkas yang masih berstatus `BELUM`, `DIBACA`, maupun `DEFERRED`."*
+> *"Cakupan pot ber-`EV > 0` di `money-ledger.md` yang berstatus `HUNTED` atau `ATTESTED_CLEAN` mencapai **100%**, dan seluruh jahitan `ASYNC` di `path-map.md` sudah diledah atau diatestasi — tanpa pot `PENDING`/`DEFERRED` tanpa alasan."*
 
-Hakim **WAJIB** menghitung sendiri dari `00b-file-inventory.md` × `03-attack-surface-queue.md`, bukan mempercayai tabel cakupan yang ditulis pelaksana.
+Hakim **WAJIB** menghitung sendiri dari `money-ledger.md` × `path-map.md`, bukan mempercayai tabel cakupan yang ditulis pelaksana.
 
 **Syarat tolak (salah satu saja cukup):**
-1. Cakupan `[MUST-AUDIT]` berstatus `LEAD_GENERATED` / `ATTESTED_CLEAN` **< 100%** pada domain mana pun (termasuk sisa berkas `DIBACA` atau `DEFERRED`).
-2. Ada berkas `[MUST-AUDIT]` berstatus `BELUM`, atau berstatus `DICAKUP_U1/U10/S-xx` tanpa uji spesifik.
-3. Ada domain `D1..Dn` tanpa berkas `[MUST-AUDIT]` sama sekali di antrean (domain kosong / tidak terwakili).
-4. Audit memakai sampel, bukan populasi penuh yang terdaftar di `00b-file-inventory.md` (gate pemetaan < 100%).
+1. Ada pot ber-`EV > 0` yang tidak punya entri `05`/`04` dan bukan `ATTESTED_CLEAN` bersitasi.
+2. Ada jahitan `ASYNC` yang belum diledah maupun diatestasi.
+3. Ada pot/jahitan `PENDING` atau `DEFERRED` tanpa alasan + EV tertulis.
+4. Census memakai sampel: kontrak bernilai di `target/PIN.md` tidak masuk `money-ledger.md`.
 
-**Atestasi hampa tidak dihitung sebagai jejak (#11c):** `ATTESTED_CLEAN` yang tidak memuat `File:Baris` konkret per fungsi yang diperiksa — atau yang bersandar hanya pada volume (`forge build`/`cargo test` PASS, jumlah berkas, `N/N PASS`, nama unit `S-0n`) — **DIBATALKAN**. Berkas tersebut dikembalikan ke `BELUM` **sebelum** persentase dihitung. Tanpa aturan ini, angka cakupan dapat mencapai 100% sementara berkas berisiko tinggi belum pernah dibedah.
+**Atestasi hampa tidak dihitung sebagai jejak (#11c):** `ATTESTED_CLEAN` yang tidak memuat `File:Baris` konkret per fungsi yang diperiksa — atau yang bersandar hanya pada volume (`forge build`/`cargo test` PASS, jumlah berkas, `N/N PASS`) — **DIBATALKAN**. Pot/jahitan tersebut dikembalikan ke `PENDING` **sebelum** persentase dihitung. Tanpa aturan ini, angka cakupan dapat mencapai 100% sementara jalur berisiko tinggi belum pernah dibedah.
 
-→ Pelanggaran: **`AUDIT_INCOMPLETE_COVERAGE_BIAS`** → **laporan DITOLAK**. Akibat wajib (identik dengan LANGKAH 4a): (a) Ringkasan Eksekutif DILARANG ditulis seolah audit selesai; (b) eksekusi dikembalikan ke Fase 1/Fase 2; (c) temuan yang sudah ada tetap disimpan sebagai hasil sementara, DILARANG dihapus; (d) baris status wajib `COVERAGE: AUDIT_INCOMPLETE_COVERAGE_BIAS`, bukan `PASS`.
+→ Pelanggaran: **`AUDIT_INCOMPLETE_COVERAGE_BIAS`** → **laporan DITOLAK**. Akibat wajib (identik dengan LANGKAH 4a): (a) Ringkasan Eksekutif DILARANG ditulis seolah audit selesai; (b) eksekusi dikembalikan ke Tahap A/B/Tahap C; (c) temuan yang sudah ada tetap disimpan sebagai hasil sementara, DILARANG dihapus; (d) baris status wajib `COVERAGE: AUDIT_INCOMPLETE_COVERAGE_BIAS`, bukan `PASS`.
 
 **Larangan pelarian wadah (#11b).** Memindahkan lead dari `07` ke `08` (`LOW_NUISANCE`/`ADMIN_ONLY`/`PRE_LIVE_SCOPE`) **hanya sah bila mekanismenya sudah terbukti secara mekanis** (PoC jalan tanpa curang + dampak kuantitatif terukur). Lead yang **belum teruji** lalu dilabeli Low = melanggar #11 dengan cara lain: `07` mensyaratkan bukti usaha, `08` mensyaratkan bukti mekanisme — **tidak ada wadah yang boleh menampung lead yang belum dikerjakan**. Bila ragu antara `07` dan `08`, lead itu masih `07` dan wajib `PERCOBAAN:`.
 
 **Target akhir `07` = 0 entri.** Setiap sisa wajib dipertahankan dengan log komputasi, bukan kalimat.
 
-**11e. Larangan Penolakan Kertas Tanpa Bukti Simulasi (`PAPER_REFUTATION_DETECTED`) — laporan DITOLAK, dikembalikan ke Fase 3**
+**11e. Larangan Penolakan Kertas Tanpa Bukti Simulasi (`PAPER_REFUTATION_DETECTED`) — laporan DITOLAK, dikembalikan ke Tahap D**
 
-> *"Setiap entri di `06-refuted-invalid.md` yang menyandang vonis `REJECTED_POC_FAILS`, `REJECTED_NEGATIVE_EV`, atau `REJECTED_DUST` **WAJIB** memuat blok `BUKTI_SIMULASI:` berisi perintah test yang benar-benar dijalankan beserta log terminalnya — termasuk bukti telah dilakukannya *Victim Seeding* dan minimal 1× eksekusi Fuzzing (`testFuzz_` / `proptest` / `halmos`) pada Strike 3. Penolakan tanpa kode test hanya diizinkan untuk 4 Kemustahilan Statis Sempit (`REJECTED_FANTASY_MOCK`, `REJECTED_GENESIS_MIRAGE` pada pool tunggal terkunci, `REJECTED_NON_LIVE_INIT` yang terkunci, `REJECTED_PRIVILEGED_FANTASY` di luar batas validasi, `REJECTED_MISMATCH`, dan `REJECTED_BY_DESIGN`)."*
+> **Definisi "Kemustahilan Statis Sempit" — RUJUKAN NORMATIF.** Istilah ini dipakai di `ref-method-registry.md` dan `AGENTS.md`; hanya **tepat empat** kondisi di bawah yang membolehkan gugur tanpa kode test. Semua kelas `REJECTED_*` di luar daftar ini **WAJIB** melampirkan `BUKTI_SIMULASI:`.
+>
+> | # | Nama | Syarat (semua harus terpenuhi) |
+> |---|---|---|
+> | **KS-1** | `REJECTED_MISMATCH` | Salah baca statis literal: kutipan `File:Baris` yang diklaim terbukti **tidak** berisi kode yang diklaim (perbedaan ≠ ambiguitas; harus dibuktikan dengan kutipan ulang rentang utuh) |
+> | **KS-2** | `REJECTED_BY_DESIGN` | Perilaku terdokumentasi sebagai disengaja dan dapat dikutip: NatSpec, `DESIGN.md`, README resmi, atau proposal governance yang **menyebut perilaku itu persis** |
+> | **KS-3** | `REJECTED_GENESIS_MIRAGE` | Prasyarat hanya terpenuhi pada kondisi genesis: `totalSupply == 0` **atau** pool tunggal terkunci **dan** tidak ada jalur untuk mengosongkannya (dibuktikan dengan pembacaan utuh fungsi penghasil state) |
+> | **KS-4** | `REJECTED_NON_LIVE_INIT` | Fungsi target **tidak dapat** dijangkau pada objek yang diuji karena slot inisialisasi terkunci permanen (`initializer` habis, `reinitializer` tidak tersisa) — dibuktikan dari bytecode/storage live, bukan dari asumsi |
+>
+> **Yang BUKAN kemustahilan statis** (wajib kode test): `REJECTED_POC_FAILS`, `REJECTED_NEGATIVE_EV`, `REJECTED_DUST`, `REJECTED_NO_VICTIM`, `REJECTED_FANTASY_MOCK`, `REJECTED_CHEATCODE`, `REJECTED_PRIVILEGED_FANTASY`, `REJECTED_UNPROVEN_DEPLOYMENT`. Alasan: semuanya bergantung pada **angka** (EV, ambang, keberadaan korban), dan angka tidak boleh dinilai di atas kertas.
 
-→ Pelanggaran: **`PAPER_REFUTATION_DETECTED`** → **laporan DITOLAK**, entri `06` yang bermasalah dikembalikan ke Fase 3 untuk dibuatkan simulasi PoC/Fuzz-nya.
+> *"Setiap entri di `06-refuted-invalid.md` yang menyandang vonis `REJECTED_POC_FAILS`, `REJECTED_NEGATIVE_EV`, atau `REJECTED_DUST` **WAJIB** memuat blok `BUKTI_SIMULASI:` berisi perintah test yang benar-benar dijalankan beserta log terminalnya — termasuk bukti telah dilakukannya *Victim Seeding* dan minimal 1× eksekusi Fuzzing (`testFuzz_` / `proptest` / `halmos`) pada Strike 3. Penolakan tanpa kode test hanya diizinkan untuk empat Kemustahilan Statis Sempit **KS-1..KS-4** (lihat tabel di atas)."*
+
+→ Pelanggaran: **`PAPER_REFUTATION_DETECTED`** → **laporan DITOLAK**, entri `06` yang bermasalah dikembalikan ke Tahap D untuk dibuatkan simulasi PoC/Fuzz-nya.
 
 **Hubungan dengan Aturan Anti-False-Negative:** #11 adalah cermin dari aturan tersebut. Anti-false-negative melarang menyimpulkan *"aman"* dari data kosong; #11 melarang menyimpulkan *"belum bisa diuji"* tanpa percobaan; #11e melarang menyimpulkan *"gugur"* tanpa eksekusi. Ketiganya menolak kesimpulan yang lebih murah daripada pekerjaannya.
 
@@ -423,9 +450,9 @@ Pelanggaran aturan ini pernah menghasilkan satu temuan High **palsu** yang nyari
 | `VALID_ELIGIBLE` | Lolos 11 pernyataan | Fork PASS + tanpa curang + bahaya finansial nyata (Critical/High/Medium) | `09-confirmed-findings.md` |
 | `VALID_NOT_ELIGIBLE` | Dalam batasan (#7b, #8b, #10b) | Mekanisme nyata & PoC PASS, dampak Low/annoying, admin-only, atau `HEAD_ONLY_PROVEN` | `08-valid-not-eligible.md` |
 | `NEEDS_NEXT_STEP` | Dalam batasan eksplorasi (#9b) | Logika kuat tetapi pengujian **belum tuntas** — **wajib `Disposition:` + blok `PERCOBAAN:`** | `07-needs-next-step.md` |
-| `PAPER_REFUTATION_DETECTED` | **Penolakan laporan (#11e)** | Entri `06` (`REJECTED_POC_FAILS`/`REJECTED_NEGATIVE_EV`/`REJECTED_DUST`) tanpa log eksekusi test + Strike 3 Fuzz | **DITOLAK** → kembali ke Fase 3 |
-| `LAZY_BAILOUT_DETECTED` | **Penolakan laporan (#11)** | Entri `07` tanpa bukti usaha: `TOOL_BLOCKED` tanpa log 3-Step Self-Healing, `NEXT_MAINNET` padahal RPC tersedia, `NEXT_EXPLORE` tanpa log fuzzer/halmos mentok timeout, atau label basi | **DITOLAK** → kembali ke Fase 3 |
-| `AUDIT_INCOMPLETE_COVERAGE_BIAS` | **Penolakan laporan (#11d)** | Cakupan `[MUST-AUDIT]` **< 100%** di domain mana pun, sisa berkas `BELUM`/`DIBACA`/`DEFERRED`, domain 0%, gate pemetaan < 100%, atau `ATTESTED_CLEAN` tanpa `File:Baris` | **DITOLAK** → kembali ke Fase 1/2 |
+| `PAPER_REFUTATION_DETECTED` | **Penolakan laporan (#11e)** | Entri `06` (`REJECTED_POC_FAILS`/`REJECTED_NEGATIVE_EV`/`REJECTED_DUST`) tanpa log eksekusi test + Strike 3 Fuzz | **DITOLAK** → kembali ke Tahap D |
+| `LAZY_BAILOUT_DETECTED` | **Penolakan laporan (#11)** | Entri `07` tanpa bukti usaha: `TOOL_BLOCKED` tanpa log 3-Step Self-Healing, `NEXT_MAINNET` padahal RPC tersedia, `NEXT_EXPLORE` tanpa log fuzzer/halmos mentok timeout, atau label basi | **DITOLAK** → kembali ke Tahap D |
+| `AUDIT_INCOMPLETE_COVERAGE_BIAS` | **Penolakan laporan (#11d)** | Cakupan `[MUST-AUDIT]` **< 100%** di domain mana pun, sisa berkas `BELUM`/`DIBACA`/`DEFERRED`, domain 0%, gate pemetaan < 100%, atau `ATTESTED_CLEAN` tanpa `File:Baris` | **DITOLAK** → kembali ke Tahap A/B/2 |
 | `REJECTED_POC_FAILS` | Gugur mutlak (#9a) | PoC gagal kompilasi / revert di state nyata | `06-refuted-invalid.md` |
 | `REJECTED_FANTASY_MOCK` | Gugur mutlak (#1) | Sifat palsu pada token Kasta 1 / parameter ter-whitelist | `06-refuted-invalid.md` |
 | `REJECTED_CHEATCODE` | Gugur mutlak (#9a) | `vm.store`/`vm.etch`/`vm.prank(admin)`/fisika rantai dilanggar | `06-refuted-invalid.md` |

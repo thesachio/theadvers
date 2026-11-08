@@ -66,6 +66,27 @@ Jangan "menyederhanakan" bagian ini — semuanya menutup kegagalan nyata:
 - Pemisahan murni `04`–`09`
 - Buta cakupan administratif di Tahap D (subagent dilarang menyentuh `08`)
 
+## Sinkronisasi terminologi (wajib, bukan opsional)
+
+Istilah warisan sudah diselaraskan di seluruh `references/`, `templates/`, `audit/`, dan
+`methodology/`:
+
+| Lokasi | Tindakan | Alat |
+|---|---|---|
+| `references/ref-*.md` | blok `SEGITIGA-BINDING` ditempel + **111** istilah diganti | `tools/sync_segitiga_terms.py --refs references` |
+| `templates/*.md` | blok ditempel + **82** istilah diganti | `tools/sync_segitiga_terms.py --refs templates` |
+| `audit/*.md` | blok peran-berkas ditempel + istilah diganti | `tools/sync_segitiga_terms.py --refs audit` |
+| Gerbang cakupan `VERDICT.md` | diukur pada **pot/jahitan**, bukan `[MUST-AUDIT]` | manual (LANGKAH 4a + #11d) |
+| "4 Kemustahilan Statis" | **didefinisikan** (`KS-1..KS-4`) — sebelumnya dirujuk 3× tanpa definisi | manual (#11e) |
+
+**Penegak:** `verify_segitiga.py` **G10** menggagalkan audit bila istilah warisan
+(`Fase N`, `Putaran N`, `unit S-n`, rujukan `00b`/`03`) muncul kembali di `audit/*.md`.
+Tanpa G10, keselarasan ini akan luntur pada audit berikutnya.
+
+Dokumen yang **sengaja** menyebut istilah lama: `AUTOPILOT-MAPPING.md`,
+`CLASSIFICATION.md`, `references/_INDEX-SEGITIGA.md`, dan blok `SEGITIGA-BINDING` —
+fungsinya memang memetakan nama lama ke baru. G10 tidak memeriksa berkas-berkas itu.
+
 ## Perintah pemeriksa per gate
 
 ```bash

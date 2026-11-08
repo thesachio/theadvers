@@ -1,10 +1,18 @@
-# 04 — Code-Guarded (Khusus Guard Statis / Struktural — Umpan Metode 5 Putaran 2)
+# 04 — Code-Guarded (Khusus Guard Statis / Struktural — Umpan Metode 5 Tahap C putaran sintesis)
 
-Wadah murni untuk hipotesis Fase 2 yang berhenti di **guard izin atau struktural statis** (`onlyOwner`, `onlyRole`, `msg.sender == router`, `nonReentrant`, `whenNotPaused`, atau pengecekan alamat `address != address(0)`).
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
+Wadah murni untuk hipotesis Tahap C yang berhenti di **guard izin atau struktural statis** (`onlyOwner`, `onlyRole`, `msg.sender == router`, `nonReentrant`, `whenNotPaused`, atau pengecekan alamat `address != address(0)`).
 
 > **GERBANG PEMISAHAN GUARD STATIS VS DINAMIS (WAJIB):**
 > - **Guard Statis (Masuk ke `04` ini):** Guard yang variabel pembentuknya hanya berupa alamat pemanggil (msg.sender), role/whitelist tetap, atau flag mutex/boolean sederhana — **DAN berstatus `TERSANGKAL`**, yaitu tidak tembus oleh **5 Jalur Permissionless** di bawah ini.
-> - **Guard Dinamis / Matematis (DILARANG masuk `04` — WAJIB masuk `05-raw-leads.md`!):** Apabila ekspresi `require` / `if (...) revert` / `assert!` melibatkan perhitungan aritmetika, pembulatan (`mulDiv`), saldo token (`balanceOf`), rasio pool (`totalAssets`/`totalSupply`), akumulator waktu/indeks, batas LTV/likuidasi, atau panjang array, hipotesis tersebut **DILARANG diparkir di `04`!** Masukkan langsung ke `05-raw-leads.md` (dengan tag `M-005`) agar diuji secara mekanis menggunakan fuzzer di Fase 3.
+> - **Guard Dinamis / Matematis (DILARANG masuk `04` — WAJIB masuk `05-raw-leads.md`!):** Apabila ekspresi `require` / `if (...) revert` / `assert!` melibatkan perhitungan aritmetika, pembulatan (`mulDiv`), saldo token (`balanceOf`), rasio pool (`totalAssets`/`totalSupply`), akumulator waktu/indeks, batas LTV/likuidasi, atau panjang array, hipotesis tersebut **DILARANG diparkir di `04`!** Masukkan langsung ke `05-raw-leads.md` (dengan tag `M-005`) agar diuji secara mekanis menggunakan fuzzer di Tahap D.
 
 ## Field wajib per entri
 
@@ -16,7 +24,7 @@ Ekspresi Guard      : <require(msg.sender == router) / onlyRole(...)>
 Variabel Pembentuk  : <router / role mapping / flag>
 Penulis Variabel    : <setRouter(...) onlyOwner / konstruktor>
 Hipotesis Dihentikan: <hipotesis yang terhenti di guard ini>
-Status Putaran 2    : TERSANGKAL | TEMBUS | BELUM
+Status Tahap C putaran sintesis    : TERSANGKAL | TEMBUS | BELUM
 ```
 
 - `TERSANGKAL` — variabel guard terbukti hanya bisa diubah admin sah (lolos **Jalur 1**) **DAN** lolos keempat pemeriksaan rute *Permissionless* lainnya (**Jalur 2 s/d Jalur 5**):

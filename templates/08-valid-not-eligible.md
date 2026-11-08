@@ -1,6 +1,14 @@
 # 08 — Valid but Not Eligible (Terbukti Secara Mekanis, Terkendala Eligibilitas / Pre-Live / Low)
 
-Mekanisme **nyata dan terbukti** lewat eksekusi simulasi PoC (`[PASS]`), tetapi dipisahkan oleh Hakim Fase 4 (`verify/VERDICT.md`) agar tidak masuk `09` karena berada dalam batas eligibilitas:
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
+Mekanisme **nyata dan terbukti** lewat eksekusi simulasi PoC (`[PASS]`), tetapi dipisahkan oleh Hakim Tahap F (`verify/VERDICT.md`) agar tidak masuk `09` karena berada dalam batas eligibilitas:
 
 - **`PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)` (#2 & #7b):** Kerentanan berdampak finansial nyata (Critical/High/Medium) yang PoC eksploitasinya terbukti `[PASS]` pada kode repositori (`Mode Uji: FORK_DEPLOYED_HEAD` atau `LOKAL`), tetapi kontrak/fitur tersebut belum *live* di mainnet, berbeda dari bytecode produksi saat ini (`HEAD-only`), atau belum terdaftar di halaman alamat Bug Bounty.
 - **`ADMIN_ONLY` (#8b):** Bug mekanis nyata pada fungsi khusus admin, tanpa jalur eksploitasi eksternal.
@@ -8,7 +16,7 @@ Mekanisme **nyata dan terbukti** lewat eksekusi simulasi PoC (`[PASS]`), tetapi 
 
 > **Gerbang masuk:**
 > 1. Kata "nyata dan terbukti" bersifat **harfiah** (`[PASS]` di simulator). Wadah ini **bukan** tempat menyimpan lead yang belum diuji (lead belum teruji wajib di `07` dengan `PERCOBAAN:`, Pernyataan #11b).
-> 2. Wadah `08` ini **HANYA** boleh diisi oleh **Hakim Fase 4**, bukan oleh Subagent Fase 3.
+> 2. Wadah `08` ini **HANYA** boleh diisi oleh **Hakim Tahap F**, bukan oleh Subagent Tahap D.
 
 ## Field wajib per entri
 

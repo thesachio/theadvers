@@ -1,9 +1,17 @@
 # RADAR — Sinyal Celah Lintas-Domain (Append-Only)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Wadah untuk **sinyal yang belum layak jadi lead**: sesuatu yang janggal, presisi lokasinya,
 tetapi belum ada bukti eksploitasi — dan **bukan** milik unit yang sedang dibedah.
 
-> **Mengapa file ini ada.** Fase 2 hanya punya dua keluaran: `LEAD_GENERATED` dan
+> **Mengapa file ini ada.** Tahap C hanya punya dua keluaran: `LEAD_GENERATED` dan
 > `ATTESTED_CLEAN`. Sinyal "ini mencurigakan tapi saya belum bisa membuktikan apa pun"
 > tidak punya rumah, sehingga dibuang bersama konteks subagent. Padahal justru kelas
 > sinyal inilah yang paling sering menjadi temuan bernilai setelah dirangkai lintas-domain.
@@ -16,7 +24,7 @@ tetapi belum ada bukti eksploitasi — dan **bukan** milik unit yang sedang dibe
    RADAR menyimpan insight yang **tidak bisa diregenerasi** dari kode — kerugiannya lebih besar.
 2. **DILARANG memarkir bukti di sini.** Begitu ada PoC `[PASS]`, sinyal **wajib** naik jadi
    lead di `05` saat itu juga. RADAR yang menampung bukti berubah jadi tempat pembuangan
-   dan lead berharga akan mati tanpa pernah masuk antrean Fase 3.
+   dan lead berharga akan mati tanpa pernah masuk antrean Tahap D.
 3. **Satu penulis: Parent.** Subagent hanya **mengusulkan** — maks 2 kandidat per unit,
    ditulis ke **`audit/notes/radar-<item>.md`** (satu file per item), **bukan** ke `RADAR.md`,
    **bukan** ke manifest/ringkasan balasan, dan **bukan** ke staging item. Parent membaca file
@@ -134,7 +142,7 @@ grep -n "Pemicu" audit/RADAR.md
 - **Target 10–25 observasi per proyek.** Lebih dari itu = gerbang 3-Uji sedang dilonggarkan.
 - Maksimal **2 kandidat per unit**; subagent wajib memilih yang terbaik, bukan menuang semua.
 - Entri `EXHAUSTED` hilang dari grep penarikan, tetapi **tetap tersimpan** sebagai jejak audit.
-- **Sweep wajib di akhir Putaran 2** (sintesis lintas-unit): saat seluruh `03` sudah diketahui,
+- **Sweep wajib di akhir Tahap C putaran sintesis** (sintesis lintas-unit): saat seluruh `03` sudah diketahui,
   lengkapi `Tujuan` yang terlewat lewat `TARGET-ADDED`.
 
 ## Penjaga Integritas

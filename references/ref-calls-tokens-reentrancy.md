@@ -1,7 +1,15 @@
 # Reference: Execution Control Handoff, Authorities, & External Entities
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 > ATURAN REALITAS PRODUKSI (WAJIB DIBACA SEBELUM MENGGUNAKAN KAMUS INI!):
-> Jangan pernah menerapkan daftar periksa token di bawah ini secara membabi buta! Selalu cek Kasta Realitas Aset di audit/01-threat-and-env.md:
+> Jangan pernah menerapkan daftar periksa token di bawah ini secara membabi buta! Selalu cek Kasta Realitas Aset di audit/FACTS.md (LINGKUNGAN/DATA):
 > 1. LP Token / Share Token / Token Internal (Kasta 1): ADALAH ERC-20 STANDAR. DILARANG KERAS membuat hipotesis bahwa LP Token atau token internal memiliki *Fee-on-Transfer*, *Rebase*, *Callback*, atau berperilaku seperti USDT!
 > 2. Token Whitelist Produksi (Kasta 2): Gunakan 100% sifat nyata di produksi dari token yang benar-benar di-whitelist protokol! Menguji perilaku asli token Kasta 2 **BUKAN Fantasy Mock**, melainkan **FAKTA PRODUKSI yang WAJIB diuji**:
 >    - **USDT**: desimal 6, *blacklistable*, tidak mengembalikan `bool` pada `transfer`, dan `approve(spender, newAmount)` akan `revert` jika `allowance` saat ini `!= 0` (wajib `approve(0)` dulu / `forceApprove`), meskipun biaya transfernya saat ini 0.

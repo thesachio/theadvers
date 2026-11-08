@@ -1,5 +1,12 @@
 # RADAR.md — Sinyal Lintas-Domain (Append-Only)
 
+<!-- SEGITIGA-BINDING -->
+> **Peran berkas.** Sinyal lintas-domain — dipakai di **Tahap B–C**. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Observasi berpresisi `File:Baris` yang **belum layak jadi lead** — belum ada bukti
 eksploitasi, tapi menunjukkan asimetri. Bukan `05` (belum teruji), bukan atestasi.
 

@@ -1,16 +1,24 @@
 # Dynamic Symptom Router: Katalog Attacker POV (`[POV-XX]`) & 3-Level Chain Detector
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Berkas ini adalah **Router Gejala Kode (Symptom Router)** untuk memanggil pola eksploitasi on-chain yang telah digeneralisasi secara **hemat token (Lazy-Load)**.
 - **Checklist Prinsip Dasar** tetap berada di `ref-math-and-vaults.md`, `ref-calls-tokens-reentrancy.md`, `ref-defi-oracles-liquidation.md`, dan `ref-chain-*.md` (selalu tipis < 60 baris).
 - **Detail 8 Field Katalog POV** berada di modul terpisah: `ref-pov-math.md`, `ref-pov-call.md`, `ref-pov-defi.md`, dan `ref-pov-chain.md`.
 
 ---
 
-## 1. Prosedur Pemakaian Hemat-Token di Fase 2 (Tahap B) & Fase 3 (Langkah 1b)
+## 1. Prosedur Pemakaian Hemat-Token di Tahap C (Tahap B) & Tahap D (Langkah D-1b)
 
 1. **Jangan Membuka Semua File `ref-pov-*.md` Sekaligus!**
 2. Baca kolom **Gejala Pemicu di Kode (Trigger Symptom)** pada Tabel Router di Bagian 2 di bawah ini.
-3. **Gejala Kode Adalah Satu-Satunya Pemicu (Lintas-Kelas):** Kolom **Kelas Entitas** hanya menunjukkan topologi **tipikal**, **BUKAN pembatas!** Apabila unit `[CLASS-A]` (kontrak monolitik tunggal) memiliki gejala pemicu di kode (misal: fungsi transfer ber-indeks akrual atau `liquidate` internal), Anda **WAJIB** tetap membuka berkas `ref-pov-*.md` yang ditunjuk untuk membaca 8 field lengkapnya (termasuk *Auditor Blindspot* dan *Routing Simulasi Fase 3*).
+3. **Gejala Kode Adalah Satu-Satunya Pemicu (Lintas-Kelas):** Kolom **Kelas Entitas** hanya menunjukkan topologi **tipikal**, **BUKAN pembatas!** Apabila unit `[CLASS-A]` (kontrak monolitik tunggal) memiliki gejala pemicu di kode (misal: fungsi transfer ber-indeks akrual atau `liquidate` internal), Anda **WAJIB** tetap membuka berkas `ref-pov-*.md` yang ditunjuk untuk membaca 8 field lengkapnya (termasuk *Auditor Blindspot* dan *Routing Simulasi Tahap D*).
 4. **Larangan Halusinasi Nomor POV:** DILARANG memakai nomor `[POV-XX]` yang belum terdaftar di tabel ini. Jika menemukan pola baru yang belum ada di katalog, gunakan analogi mekanis bebas dari `ref-method-registry.md` (`M-001`..`M-010`).
 
 ---
@@ -34,9 +42,9 @@ Berkas ini adalah **Router Gejala Kode (Symptom Router)** untuk memanggil pola e
 
 ## 3. Hierarki Deteksi Rantai 3-Level (3-Level Chain-Type Detection)
 
-Gunakan tabel 3-level ini di Fase 1 (`00-project-map.md` & `03-attack-surface-queue.md`), Fase 2, dan Fase 3 agar agen tidak salah memuat cartridge (khususnya pada berkas `.rs` atau `.move`):
+Gunakan tabel 3-level ini di Tahap A/B (`PIN.md` & `audit/notes/path-map.md` (peta jahitan)), Tahap C, dan Tahap D agar agen tidak salah memuat cartridge (khususnya pada berkas `.rs` atau `.move`):
 
-| Level 1: Ekstensi File | Level 2: Manifes Build (Wajib Cek!) | Level 3: Sinyal Kode Spesifik | Cartridge Checklist Fase 2 | POV Rantai (`ref-pov-chain.md`) | Referensi Mesin Uji Fase 3 |
+| Level 1: Ekstensi File | Level 2: Manifes Build (Wajib Cek!) | Level 3: Sinyal Kode Spesifik | Cartridge Checklist Tahap C | POV Rantai (`ref-pov-chain.md`) | Referensi Mesin Uji Tahap D |
 |---|---|---|---|---|---|
 | `.sol`, `.vy`, `.yul` | `foundry.toml`, `hardhat.config.*`, `truffle-config.js`, `tronbox.js` | `msg.sender`, `msg.value`, `delegatecall`, `abi.encode` (atau `SUN`/`msg.tokenvalue` untuk Tron) | `ref-chain-evm-tron.md` | `[POV-EVM-01]` | `ref-test-evm-advanced.md` |
 | `.rs` | `Cargo.toml` memuat `anchor-lang`, `solana-program`, atau `pinocchio`; atau ada `Anchor.toml` | `#[program]`, `#[derive(Accounts)]`, `AccountInfo`, `invoke_signed`, `Pubkey` | `ref-chain-solana.md` | `[POV-SOL-01]` | `ref-test-multichain-advanced.md` |

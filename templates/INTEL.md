@@ -1,7 +1,15 @@
 # PROJECT INTELLIGENCE BRIEF (PHASE 0)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 > **Skema tunggal untuk `audit/INTEL.md`.** Ditempatkan sejajar dengan `audit/STATE.md`
-> agar tidak bentrok dengan `00b-file-inventory.md` dan `00-project-map.md`.
+> agar tidak bentrok dengan `money-ledger.md (census)` dan `PIN.md`.
 > **Target saat diisi: 35–40 baris.** Berkas ini adalah *fakta yang dapat ditunjuk*,
 > bukan narasi — setiap isian wajib berupa URL langsung atau penanda ketiadaan.
 >
@@ -75,7 +83,7 @@
 5. **Bagian 5 bersifat terukur.** Deployment dinyatakan ada hanya bila ada `eth_getCode` non-kosong
    atau tx deploy. "Seharusnya live" bukan bukti.
 6. **Bagian 6 tidak boleh kosong** bila `Intel Status = PARTIAL`. Justru bagian inilah yang
-   melindungi audit dari klaim berlebih di Fase 4.
+   melindungi audit dari klaim berlebih di Tahap F.
 
 ---
 

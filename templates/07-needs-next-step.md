@@ -1,5 +1,13 @@
 # 07 — Needs Next Step
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Mekanisme nyata & PoC jujur, tetapi **belum dapat diputuskan** karena: butuh fork produksi, RPC/tooling terblokir, verifikasi mainnet lanjutan, atau **kendala komputasi/RPC ekstrem setelah 3-Step Self-Healing**. *(Catatan: temuan `HEAD-only` yang PoC-nya sudah `[PASS]` wajib masuk `08` sebagai `PRE_LIVE_SCOPE / HEAD_ONLY_PROVEN`, **bukan** `07`; dan temuan berdampak Low juga masuk `08`.)*
 
 > **GARIS PEMISAH `07` vs `08` — WAJIB DIBACA SEBELUM MENGISI ENTRI:**
@@ -9,7 +17,7 @@ Mekanisme nyata & PoC jujur, tetapi **belum dapat diputuskan** karena: butuh for
 
 > **Target akhir `07` = 0 entri.** Setiap sisa wajib dipertahankan dengan log komputasi, bukan kalimat.
 > Entri tanpa `Disposition:` **atau** tanpa blok `PERCOBAAN:` → `LAZY_BAILOUT_DETECTED`
-> (Pernyataan #11) → **laporan DITOLAK** dan lead dikembalikan ke Fase 3.
+> (Pernyataan #11) → **laporan DITOLAK** dan lead dikembalikan ke Tahap D.
 
 ---
 

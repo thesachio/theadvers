@@ -1,5 +1,12 @@
 # METHODOLOGY-DELTA — template untuk audit ulang pada kode yang sama
 
+<!-- SEGITIGA-BINDING -->
+> **Peran berkas.** Template audit ulang — dipakai di **sebelum Tahap A**. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 **Kapan dokumen ini dipakai:** saat menjalankan audit ulang (run ke-2 dst.) pada target yang
 **kodenya identik atau hampir identik** dengan run sebelumnya. Dokumen ini memaksa penulis
 menjawab: *"apa yang membuat run ini beda, dan apa yang DILARANG diklaim?"*
@@ -19,7 +26,7 @@ Isi tabel ini dengan **perintah + keluaran nyata**. Kosong = belum diverifikasi.
 | Run sebelumnya memakai lapis L-VALUE/PATH/FLOW? | `grep -c "LAPIS:" <run-lama>/audit/05-raw-leads.md` | `-` |
 | Run sebelumnya memakai tag bentuk serangan? | `grep -c "AF-0" <run-lama>/audit/05-raw-leads.md` | `-` |
 | Tahap E (offchain) pernah dijalankan? | `grep -rc "L-OFFCHAIN" <run-lama>/audit/notes/*.md` | `-` |
-| Persebaran kerja run lama: EV-major atau unit-major? | urutan item di `<run-lama>/audit/STATE.md` + `03-attack-surface-queue.md` | `-` |
+| Persebaran kerja run lama: EV-major atau unit-major? | urutan item di `<run-lama>/audit/STATE.md` + `audit/notes/path-map.md` (peta jahitan) | `-` |
 
 ## 2. Tiga pergeseran yang membenarkan run ulang
 

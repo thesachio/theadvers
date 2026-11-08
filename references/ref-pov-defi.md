@@ -1,5 +1,13 @@
 # Katalog Generalized Attacker POV — Domain DeFi, Oracle, AMM, & Likuidasi (`[POV-DEFI-XX]`)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Berkas ini menyimpan pola eksploitasi on-chain nyata pada mekanisme valuasi oracle, eksekusi DEX/AMM, dan likuidasi/bad-debt.
 - **Indeks & Router Gejala:** `references/ref-attacker-pov.md`
 - **Checklist Prinsip Dasar:** `references/ref-defi-oracles-liquidation.md`
@@ -20,9 +28,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata pada mekanisme valuasi orac
   3. **[Ekstraksi Nilai]** Identitas kedua mengeksekusi likuidasi/klaim terhadap identitas pertama — secara atomik atau dalam jendela eksekusi yang sama — untuk mengantongi bonus likuidasi atau menyedot cadangan asuransi protokol yang nilainya lebih besar daripada modal yang sengaja dikorbankan.
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor selalu mengasumsikan Borrower (peminjam) dan Liquidator (pelikuidasi) adalah dua pihak yang saling bermusuhan, sehingga auditor tidak pernah menghitung bahwa jika keduanya dikendalikan satu penyerang, kerugian di satu identitas bisa menghasilkan keuntungan lebih besar di identitas lain atas beban kolam protokol.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* Gugur (`REJECTED_NEGATIVE_EV`) **hanya setelah** simulasi PoC 2-identitas dan *Strike 3 Fuzzing* membuktikan bahwa pada seluruh ukuran posisi, kemiringan harga, dan skenario likuidasi parsial, nilai `Total_Jaminan_Tersita` selalu lebih besar daripada `Bonus_Liquidator + Utang_Dihapus` tanpa menyisakan *bad debt* ke kolam publik.
-  - *Routing Simulasi Fase 3:* **DILARANG KERAS menggugurkan `[POV-DEFI-01]` hanya dengan menghitung pertidaksamaan di atas kertas!** Wajib tulis tes simulasi 2-identitas (`Attacker_A` sebagai Borrower + `Attacker_B` sebagai Liquidator) disertai **Strike 3 Fuzz** (`testFuzz_`) yang mengacak jumlah pinjaman, urutan likuidasi pecahan kecil, dan distorsi harga spot/agunan. Jika gagal, wajib lampirkan log eksekusi test & fuzz di `06` (`BUKTI_SIMULASI:` — Pernyataan #11e).
+  - *Routing Simulasi Tahap D:* **DILARANG KERAS menggugurkan `[POV-DEFI-01]` hanya dengan menghitung pertidaksamaan di atas kertas!** Wajib tulis tes simulasi 2-identitas (`Attacker_A` sebagai Borrower + `Attacker_B` sebagai Liquidator) disertai **Strike 3 Fuzz** (`testFuzz_`) yang mengacak jumlah pinjaman, urutan likuidasi pecahan kecil, dan distorsi harga spot/agunan. Jika gagal, wajib lampirkan log eksekusi test & fuzz di `06` (`BUKTI_SIMULASI:` — Pernyataan #11e).
 
 ---
 
@@ -40,9 +48,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata pada mekanisme valuasi orac
   3. **[Ekstraksi Nilai]** Kontrak protokol mengeksekusi penukaran/pelepasan aset pada harga Sumber B yang sedang terdistorsi, lalu penyerang memulihkan posisi Sumber B untuk mengekstrak selisih nilai dari protokol.
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor berhenti memeriksa risiko manipulasi harga begitu melihat kontrak membaca harga acuan dari Oracle yang tahan manipulasi satu blok (Sumber A), tanpa memeriksa ke mana eksekusi riil dikirim (Sumber B) dan bagaimana batas *slippage* pada eksekusi tersebut dihitung.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
-  - *Batas Realitas:* Gugur (`REJECTED_POC_FAILS` / `REJECTED_NEGATIVE_EV`) **hanya setelah simulasi PoC di Fase 3** membuktikan bahwa: (a) batas penerimaan minimum (`amountOutMin`) pada eksekusi Sumber B diturunkan secara presisi (tanpa cacat konversi desimal) dari harga Oracle Sumber A dengan toleransi yang tidak dapat diekstrak secara menguntungkan, **DAN** (b) skenario *sandwich/front-run* terhadap transaksi publik maupun transaksi Keeper/Bot di mempool tidak menghasilkan profit bersih maupun DoS pada fungsi protokol.
-  - *Routing Simulasi Fase 3:* **DILARANG menggugurkan `[POV-DEFI-02]` secara statis di atas kertas!** Baik fungsi dipanggil publik maupun oleh Keeper/Bot, dan baik `amountOutMin == 0` maupun diturunkan dari Oracle Sumber A, **WAJIB tulis PoC** simulasi pada fork (`FORK_LIVE` atau `FORK_DEPLOYED_HEAD`) untuk menguji: (1) ekstraksi nilai via *Flashloan Skew / Sandwich* pada Sumber B, (2) akurasi desimal rumus `amountOutMin`, serta (3) apakah manipulasi cadangan spot Sumber B dapat mem-brick (*DoS revert*) eksekusi likuidasi/rebalance Keeper!
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
+  - *Batas Realitas:* Gugur (`REJECTED_POC_FAILS` / `REJECTED_NEGATIVE_EV`) **hanya setelah simulasi PoC di Tahap D** membuktikan bahwa: (a) batas penerimaan minimum (`amountOutMin`) pada eksekusi Sumber B diturunkan secara presisi (tanpa cacat konversi desimal) dari harga Oracle Sumber A dengan toleransi yang tidak dapat diekstrak secara menguntungkan, **DAN** (b) skenario *sandwich/front-run* terhadap transaksi publik maupun transaksi Keeper/Bot di mempool tidak menghasilkan profit bersih maupun DoS pada fungsi protokol.
+  - *Routing Simulasi Tahap D:* **DILARANG menggugurkan `[POV-DEFI-02]` secara statis di atas kertas!** Baik fungsi dipanggil publik maupun oleh Keeper/Bot, dan baik `amountOutMin == 0` maupun diturunkan dari Oracle Sumber A, **WAJIB tulis PoC** simulasi pada fork (`FORK_LIVE` atau `FORK_DEPLOYED_HEAD`) untuk menguji: (1) ekstraksi nilai via *Flashloan Skew / Sandwich* pada Sumber B, (2) akurasi desimal rumus `amountOutMin`, serta (3) apakah manipulasi cadangan spot Sumber B dapat mem-brick (*DoS revert*) eksekusi likuidasi/rebalance Keeper!
 
 ---
 

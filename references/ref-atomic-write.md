@@ -1,6 +1,14 @@
 # Protokol Anti-Truncate: Penulisan File Atomik & Backup Write-Ahead
 
-**Insiden pemicu:** `04-code-guarded.md` terpotong jadi **0 byte**. Skrip Python membuka file dengan `mode="w"` (truncate seketika), lalu penulisan gagal `PermissionError`. Backup yang dibuat worker menyalin file yang **sudah kosong** — sehingga tidak ada salinan pulih. Hilang ~247 entri Putaran 1 + 39 entri Putaran 2; restorasi verbatim mustahil.
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
+**Insiden pemicu:** `04-code-guarded.md` terpotong jadi **0 byte**. Skrip Python membuka file dengan `mode="w"` (truncate seketika), lalu penulisan gagal `PermissionError`. Backup yang dibuat worker menyalin file yang **sudah kosong** — sehingga tidak ada salinan pulih. Hilang ~247 entri Tahap C putaran bedah + 39 entri Tahap C putaran sintesis; restorasi verbatim mustahil.
 
 ---
 
@@ -73,7 +81,7 @@ Setiap penulisan ke file audit wajib diikuti pemeriksaan:
 **Hanya SATU penulis aktif pada satu waktu** (`max_concurrent_children: 1`). Bila memakai `delegate_task`:
 - **DILARANG** menjalankan lebih dari 1 Subagent secara paralel.
 - Subagent **HANYA** boleh menyentuh `audit/03`–`09` melalui native tool `append` (untuk menambah entri baru) atau `patch` (untuk memperbarui baris status), atau `atomic_write` via `.tmp` -> `os.replace`. Subagent **DILARANG KERAS** memakai `open("w")`, `>`, `sed -i`, atau `write_file` penuh pada file audit yang sudah ada.
-- **Pengecualian wajib — entri unit `S-n`:** hasil pendadahan unit antrean Fase 2 tetap ditulis ke `audit/notes/staging-<unit>.md` (bukan langsung ke `04`/`05`), lalu Parent me-merge. Alasannya: hanya Parent yang dapat mencocokkan `grep -c '^## \['` terhadap manifes, dan hanya Parent yang memutuskan klasifikasi akhir `04` vs `05`.
+- **Pengecualian wajib — entri unit `S-n`:** hasil pendadahan pot/jahitan Tahap C tetap ditulis ke `audit/notes/staging-<unit>.md` (bukan langsung ke `04`/`05`), lalu Parent me-merge. Alasannya: hanya Parent yang dapat mencocokkan `grep -c '^## \['` terhadap manifes, dan hanya Parent yang memutuskan klasifikasi akhir `04` vs `05`.
 - Khusus `audit/STATE.md`, Subagent **DILARANG** menulisnya sendiri — Subagent melaporkan perubahan kursor di ringkasan 12 baris, dan Parent yang melakukan `patch` pada `audit/STATE.md`.
 
 > Rujukan: `workspace/AGENTS.md` Pasal 1.3 & 4.
@@ -81,7 +89,7 @@ Setiap penulisan ke file audit wajib diikuti pemeriksaan:
 ## 5. Protokol Pemulihan Bila Terlanjur Terpotong
 
 1. **Cek backup write-ahead** — bila ada & terverifikasi, pulihkan.
-2. **Cek sumber sekunder** — `03-attack-surface-queue.md` (jejak unit), `05-raw-leads.md`, `notes/` (draf worker), riwayat chat.
+2. **Cek sumber sekunder** — `audit/notes/path-map.md` (peta jahitan) (jejak unit), `05-raw-leads.md`, `notes/` (draf worker), riwayat chat.
 3. **Rekonstruksi dari kode sumber** — bukti utama tetap `File:Baris` + ekspresi guard di source.
 4. **Tandai jelas sebagai REKONSTRUKSI**, bukan file asli:
    ```

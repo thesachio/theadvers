@@ -1,5 +1,13 @@
 # Katalog Generalized Attacker POV — Domain Penyerahan Kontrol, Subcall, & Otoritas (`[POV-CALL-XX]`)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Berkas ini menyimpan pola eksploitasi on-chain nyata pada penyerahan kontrol eksekusi, callback, dan isolasi sub-panggilan.
 - **Indeks & Router Gejala:** `references/ref-attacker-pov.md`
 - **Checklist Prinsip Dasar:** `references/ref-calls-tokens-reentrancy.md`
@@ -21,9 +29,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata pada penyerahan kontrol eks
   3. **[Ekstraksi Nilai]** Di dalam callback, penyerang memanggil fungsi di Kontrak B (atau fungsi lain) yang membaca nilai rasio yang sedang timpang sementara (*inflated/deflated mid-tx state*) untuk meminjam berlebih atau melikuidasi secara tidak sah.
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor melihat kata kunci `nonReentrant` pada fungsi tersebut lalu langsung menandainya aman dari reentrancy, tanpa memeriksa apakah ada kontrak/fungsi lain di ekosistem yang membaca state yang baru setengah selesai diperbarui tersebut.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* Gugur jika seluruh mutasi state internal dan akuntansi bersama diselesaikan 100% sebelum interaksi eksternal (CEI murni), atau jika terdapat *global reentrancy lock* yang juga diperiksa oleh seluruh fungsi pembaca/fungsi pasangan.
-  - *Routing Simulasi Fase 3:* Jika benar ada jendela di mana variabel pertama sudah berubah namun variabel pasangannya belum berubah saat kontrol diserahkan keluar, **WAJIB tulis kontrak/hook penyerang di simulator** yang masuk kembali ke fungsi pembaca/pasangan pada jendela *mid-tx* tersebut (lengkap dengan *Victim Seeding* pada pool).
+  - *Routing Simulasi Tahap D:* Jika benar ada jendela di mana variabel pertama sudah berubah namun variabel pasangannya belum berubah saat kontrol diserahkan keluar, **WAJIB tulis kontrak/hook penyerang di simulator** yang masuk kembali ke fungsi pembaca/pasangan pada jendela *mid-tx* tersebut (lengkap dengan *Victim Seeding* pada pool).
   - *Jalur 3 — Unprivileged State Poisoning pada Eksekusi Rutin (`M-005`/`M-009`):* `nonReentrant` lokal **BUKAN** bukti aman bila fungsi pembaca/pasangan hanya bisa dipanggil oleh aktor berizin (Keeper/Relayer/Solver/Operator). Penyerang tak berizin dapat meracuni state/antrean/saldo di fungsi publik **sebelum** aktor rutin memanggil fungsi tersebut secara normal, sehingga pembacaan state yang timpang terjadi **tanpa** reentrancy sama sekali. **WAJIB tulis PoC** yang (a) meracuni state lewat jalur *permissionless*, lalu (b) memicu fungsi rutin sebagai Keeper/Relayer (prank sah menurut `VERDICT.md` Pengecualian #9a-iii) dan mengukur kebocoran nilai atau DoS revert. **DILARANG menggugurkan lead ini hanya karena fungsi pembacanya ber-guard `onlyKeeper`/`onlyRole`.**
 
 ---
@@ -45,9 +53,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata pada penyerahan kontrol eks
   3. **[Ekstraksi Nilai]** Transaksi induk tetap berhasil dengan state menguntungkan dari cabang gagal, atau seluruh gas pemanggil terkuras habis oleh biaya ekspansi memori kuadratik sebelum blok `catch` dapat menyelamatkan transaksi (DoS permanen pada fungsi likuidasi/penyelesaian).
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor menganggap keberadaan `try/catch` atau pembatasan `.call{gas: X}()` sudah otomatis menjamin keamanan dari kegagalan pihak ketiga, sehingga tidak membandingkan selisih akuntansi antara cabang sukses vs gagal dan lupa bahwa biaya penyalinan returndata ke memori dibebankan ke kontrak pemanggil.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* Gugur **hanya setelah simulasi PoC** membuktikan bahwa: (a) mutasi state antara cabang sukses dan gagal 100% simetris tanpa celah penghindaran kewajiban/penalti, **DAN** (b) subcall tidak dapat dipaksa gagal melalui input batas, kondisi state, maupun pencatatan takaran gas EIP-150 (63/64 rule) di simulator. *(Jangan pernah menggugurkan secara statis hanya karena target subcall adalah kontrak internal `immutable`, sebab penyerang tetap dapat mengatur gas transaksi induk agar subcall kehabisan gas/OOG sementara induk tetap jalan di blok `catch`!)*
-  - *Routing Simulasi Fase 3:* Setiap kali terdapat perbedaan mutasi state antara cabang `try`/`success` dan `catch`/`!success` (atau penyalinan returndata tanpa batas assembly), **WAJIB tulis PoC** simulasi yang memaksa eksekusi masuk ke cabang gagal — baik melalui revert di penerima, kondisi batas state/likuiditas, maupun manipulasi takaran gas EIP-150 (63/64 OOG) pada kontrak internal `immutable` — lalu ukur dampak state/gas-nya di simulator!
+  - *Routing Simulasi Tahap D:* Setiap kali terdapat perbedaan mutasi state antara cabang `try`/`success` dan `catch`/`!success` (atau penyalinan returndata tanpa batas assembly), **WAJIB tulis PoC** simulasi yang memaksa eksekusi masuk ke cabang gagal — baik melalui revert di penerima, kondisi batas state/likuiditas, maupun manipulasi takaran gas EIP-150 (63/64 OOG) pada kontrak internal `immutable` — lalu ukur dampak state/gas-nya di simulator!
 
 ---
 

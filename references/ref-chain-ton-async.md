@@ -1,5 +1,13 @@
 # Checklist Paradigma Rantai: TON (FunC / Tact / Tolk — Asynchronous Actor Model)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Gunakan daftar periksa ini saat mengaudit smart contract di jaringan TON. **INGAT HUKUM UTAMA TON: Tidak ada transaksi atomik lintas kontrak! Kegagalan di kontrak hilir TIDAK membatalkan perubahan state di kontrak hulu secara otomatis!**
 
 1. **Ketiadaan atau Cacat pada Handler Pesan `bounced` (Batas 256-Bit):**

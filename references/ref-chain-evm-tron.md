@@ -1,5 +1,13 @@
 # Checklist Paradigma Rantai: EVM (Ethereum/L2) & Tron (TVM)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Gunakan daftar periksa ini saat mengaudit kontrak Solidity/Vyper di jaringan EVM maupun Tron TVM:
 
 1. **Penyalahgunaan `msg.value` di Dalam Loop, Multicall, atau Delegatecall:**

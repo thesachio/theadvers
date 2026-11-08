@@ -293,11 +293,26 @@ Tanpa butir 7, subagent menalar tanpa model proyek dan ketajaman kembali ke nol.
 ## 6. Pemeriksa & Alat
 
 ```bash
-python3 tools/verify_segitiga.py --audit-dir audit    # G1-G8: provenance, rentang, bukti
+python3 tools/verify_segitiga.py --audit-dir audit    # G1-G10
 python3 tools/verify07.py audit/07-needs-next-step.md # LAZY_BAILOUT gate
 python3 tools/merge_audit.py --audit-dir audit        # integritas staging/merge
 python3 tools/deploy_parity.py --paradigm <p> ...     # rekonsiliasi deployment
 ```
+
+**Yang diperiksa `verify_segitiga.py`:**
+
+| Gate | Memeriksa |
+|---|---|
+| G1 | tiap lead `05` punya `[LAPIS]` dan `[AF-xx]` |
+| G2 | `File:Baris` berupa **rentang** (`awal-akhir`), bukan satu baris |
+| G3 | entri `06` berkategori keras punya `BUKTI_SIMULASI` **dengan keluaran nyata** |
+| G4 | entri `07` punya `PERCOBAAN` dengan keluaran nyata |
+| G5 | entri `08`/`09` punya `BUKTI_SIMULASI` nyata |
+| G6 | `STATE.md` ≤50 baris; scratchpad ≤10 baris |
+| G7 | tidak ada `audit/*.md` berukuran 0 byte |
+| G8 | tag `[AF-xx]` ada di `methodology/mod-attack-forms.md` |
+| G9 | tiap lead punya `[CLASS-A|B|C]` (menentukan paket metode wajib) |
+| G10 | tidak ada **istilah warisan** (`Fase N`, `Putaran N`, `unit S-n`, rujukan `00b`/`03`) di `audit/*.md` |
 
 **Aturan alat:** setiap pemeriksa wajib diuji **dua arah** — PASS pada kondisi bersih,
 dan **FAIL** pada pelanggaran yang disuntikkan. Pemeriksa yang tidak pernah menggigit =

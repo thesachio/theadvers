@@ -1,5 +1,13 @@
 # 06 — Refuted / Invalid (Gugur Permanen)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Temuan yang **gugur mutlak** per `verify/VERDICT.md`. Setiap entri wajib **diawali heading `## [ID] Judul`** dan memuat:
 `ID`, `VERDICT`, `Pernyataan Dilanggar (#1-#10)`, `File:Baris`, `TANGGA_BUKTI`, `DEPLOYMENT_MATCH`, `Mode Uji`, dan **`BUKTI_SIMULASI`** (atau **`BUKTI_STATIS`** khusus untuk salah baca kode literal).
 
@@ -15,7 +23,7 @@ Untuk kelas vonis `REJECTED_POC_FAILS`, `REJECTED_NEGATIVE_EV`, dan `REJECTED_DU
 2. **Ringkasan kode setup** yang membuktikan telah dilakukannya *Victim Lifecycle Seeding* dan *3-Way EV Amplification*,
 3. **Log hasil Strike 3 Mandatory Fuzzing** (`testFuzz_... (runs: 256, ...)` / `proptest` / `halmos`) yang membuktikan invarian tetap tidak tertembus.
 
-Entri `REJECTED_POC_FAILS` / `REJECTED_NEGATIVE_EV` / `REJECTED_DUST` tanpa log eksekusi test dan fuzz di atas adalah pelanggaran **Pernyataan #11e (`PAPER_REFUTATION_DETECTED`)** → **laporan DITOLAK** di Fase 4 dan lead dikembalikan ke **Fase 3**!
+Entri `REJECTED_POC_FAILS` / `REJECTED_NEGATIVE_EV` / `REJECTED_DUST` tanpa log eksekusi test dan fuzz di atas adalah pelanggaran **Pernyataan #11e (`PAPER_REFUTATION_DETECTED`)** → **laporan DITOLAK** di Tahap F dan lead dikembalikan ke **Tahap D**!
 
 ## Kelas yang sah di wadah ini
 

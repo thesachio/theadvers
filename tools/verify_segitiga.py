@@ -192,6 +192,17 @@ def main():
         if p.stat().st_size == 0:
             fails.append(f"G7: {p.name} 0 byte")
 
+    # G10: istilah warisan di artefak audit (regresi terminologi)
+    # Sengaja hanya memeriksa audit/*.md — dokumen pemetaan (AUTOPILOT-MAPPING, _INDEX-SEGITIGA)
+    # memang WAJIB menyebut nama lama, dan referensi menjelaskannya di blok padanan.
+    LEGACY = re.compile(r"\bFase [0-4]\b|\bPutaran [12]\b|\bunit `S-\d+`\b|`0[0-3]-[a-z-]+\.md`|`00b-[a-z-]+\.md`")
+    EXEMPT = re.compile(r"Padanan istilah|→ \*\*Tahap|Peran berkas|SEGITIGA-BINDING")
+    for p in sorted(ad.rglob("*.md")):
+        for i, ln in enumerate(p.read_text().splitlines(), 1):
+            if LEGACY.search(ln) and not EXEMPT.search(ln):
+                fails.append(f"G10: {p.relative_to(ad)}:{i} istilah warisan -> {ln.strip()[:70]}")
+                break
+
     print("=== verify_segitiga ===")
     print("entri:", ", ".join(f"{k}={v}" for k, v in stats.items()) or "-")
     for w in warns:

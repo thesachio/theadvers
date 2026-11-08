@@ -1,5 +1,12 @@
 # 05-raw-leads.md — Antrean Lead Aktif (METHODOLOGY-SEGITIGA)
 
+<!-- SEGITIGA-BINDING -->
+> **Peran berkas.** Antrean lead aktif — dipakai di **Tahap C → D**. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 > Setiap lead WAJIB membawa **provenance lapis** `[LAPIS: VALUE|PATH|FLOW]` dan **tag bentuk
 > serangan** `[AF-xx]` (GATE-C). Tanpa keduanya, entri ditolak.
 > Urutan kerja = EV menurun (lihat `notes/money-ledger.md`), bukan urutan tulis.

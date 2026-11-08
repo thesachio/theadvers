@@ -1,5 +1,13 @@
 # Katalog Generalized Attacker POV — Domain Matematika, Pembulatan, & Akuntansi Share (`[POV-MATH-XX]`)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Berkas ini menyimpan pola eksploitasi on-chain nyata pada domain matematika/vault yang telah digeneralisasi.
 - **Indeks & Router Gejala:** `references/ref-attacker-pov.md`
 - **Checklist Prinsip Dasar:** `references/ref-math-and-vaults.md`
@@ -20,9 +28,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata pada domain matematika/vaul
   3. **[Ekstraksi Nilai]** Akun penerima mengeklaim hak penuh menggunakan saldo baru dikalikan selisih indeks lama, lalu mengembalikan pokoknya untuk diulang (*loop*).
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor memeriksa fungsi masuk, keluar, dan klaim utama (1-aktor) lalu melihat ketiganya sudah memanggil modifier/fungsi penyinkron indeks untuk `msg.sender`. Auditor lupa bahwa penyinkron 1-argumen tersebut tidak memperbarui akun kedua (`to`) pada fungsi 2-aktor, atau luput melihat variabel memori yang saling menimpa saat `from == to`.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* Gugur secara statis (`REJECTED_MISMATCH`) **hanya jika** pada baris awal fungsi pemindahan (tanpa cabang kondisional `if`/`else` yang dapat dilewati), sinkronisasi indeks dipanggil **tanpa syarat untuk kedua akun** (`from` DAN `to`) sebelum saldo dimutasi, DAN mutasi dilakukan langsung pada state persisten (`balances[from] -= x; balances[to] += x`) atau memiliki `require(from != to)` eksplisit.
-  - *Routing Simulasi Fase 3:* Jika sinkronisasi indeks berada di dalam **cabang kondisional (`if`)**, hanya menyinkronkan **salah satu akun**, memakai **struct/variabel memori lokal**, atau **tidak memiliki `require(from != to)` eksplisit**, **DILARANG menggugurkan di atas kertas** — WAJIB langsung tulis **PoC 2-Identitas** (`Attacker_A -> Attacker_B`) dan **Self-Transfer** (`Attacker_A -> Attacker_A`) di simulator!
+  - *Routing Simulasi Tahap D:* Jika sinkronisasi indeks berada di dalam **cabang kondisional (`if`)**, hanya menyinkronkan **salah satu akun**, memakai **struct/variabel memori lokal**, atau **tidak memiliki `require(from != to)` eksplisit**, **DILARANG menggugurkan di atas kertas** — WAJIB langsung tulis **PoC 2-Identitas** (`Attacker_A -> Attacker_B`) dan **Self-Transfer** (`Attacker_A -> Attacker_A`) di simulator!
 
 ---
 
@@ -40,9 +48,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata pada domain matematika/vaul
   3. **[Ekstraksi Nilai]** Potongan biaya atau beban bagian yang harus dibakar terpangkas menjadi 0 atau berkurang 1 unit di setiap iterasi, lalu dilipatgandakan dalam satu transaksi batch/multicall.
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor terpaku memeriksa fungsi *Exact-Input* utama serta proteksi pendeposit pertama (`totalSupply == 0`), lalu menganggap fungsi *Exact-Output* pasangannya sudah simetris tanpa menguji apakah pembagian antara (*intermediate division*) memotong penyebut atau biaya sebelum langkah pembulatan terakhir.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* Gugur jika seluruh tahap pembagian pada fungsi *Exact-Output* terbukti membulatkan beban pengguna ke atas (`Rounding.Up` / *ceil*) tanpa pemangkasan di langkah tengah, **DAN** setelah disimulasikan dengan *3-Way EV Amplification* + *Strike 3 Fuzzing* hasilnya tetap merugi (`REJECTED_DUST` / `REJECTED_NEGATIVE_EV`).
-  - *Routing Simulasi Fase 3:* **DILARANG menghitung pembulatan di atas kertas lalu membuang ke `06`!** Wajib tulis fungsi `testFuzz_` di simulator yang menguji rasio pool tidak bulat dan membandingkan $N \times \text{aksi}(a)$ terhadap $1 \times \text{aksi}(N \cdot a)$. Hanya boleh masuk `06` bila log eksekusi test dan fuzz dilampirkan (`BUKTI_SIMULASI:` sesuai Pernyataan #11e).
+  - *Routing Simulasi Tahap D:* **DILARANG menghitung pembulatan di atas kertas lalu membuang ke `06`!** Wajib tulis fungsi `testFuzz_` di simulator yang menguji rasio pool tidak bulat dan membandingkan $N \times \text{aksi}(a)$ terhadap $1 \times \text{aksi}(N \cdot a)$. Hanya boleh masuk `06` bila log eksekusi test dan fuzz dilampirkan (`BUKTI_SIMULASI:` sesuai Pernyataan #11e).
 
 ---
 

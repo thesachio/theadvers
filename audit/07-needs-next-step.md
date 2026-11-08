@@ -1,5 +1,12 @@
 # 07-needs-next-step.md — Belum Tuntas Diuji
 
+<!-- SEGITIGA-BINDING -->
+> **Peran berkas.** Wadah belum tuntas — dipakai di **Tahap D → F**. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 **Target akhir: 0 entri.** Tujuan file ini adalah menjadi **kosong** di akhir run.
 
 **Status: 0 entri.**

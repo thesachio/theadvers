@@ -1,5 +1,13 @@
 # Katalog Generalized Attacker POV — Spesifik Paradigma Rantai (`[POV-EVM/SOL/MOVE/TON-XX]`)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Berkas ini menyimpan pola eksploitasi on-chain nyata yang bertumpu pada perilaku mesin virtual atau runtime rantai spesifik.
 - **Indeks & Router Gejala:** `references/ref-attacker-pov.md`
 - **Checklist Dasar per Rantai:** `ref-chain-evm-tron.md`, `ref-chain-solana.md`, `ref-chain-sui-move.md`, `ref-chain-ton-async.md`
@@ -21,9 +29,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata yang bertumpu pada perilaku
   3. **[Ekstraksi Nilai]** Karena setiap sub-panggilan `delegatecall` membaca konteks `msg.value` yang sama ($X$), kontrak mengkreditkan nilai sebesar $N \times X$ kepada penyerang dengan modal hanya $1 \times X$.
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor menguji fungsi pembayaran secara terpisah (1 transaksi = 1 panggilan) di mana `msg.value` memang valid, dan menganggap kontrak pembungkus Multicall dari library standar sudah aman tanpa melihat efek penggabungan keduanya.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* Gugur secara statis (`REJECTED_MISMATCH`) **hanya jika** fungsi pembungkus batch **tidak `payable`** DAN kontrak tidak memakai *Transient Storage*/`TSTORE`, serta melacak total pemakaian pembayaran dalam akumulator per-transaksi.
-  - *Routing Simulasi Fase 3:* Jika fungsi batch `payable` dan memakai `delegatecall` (atau loop internal yang membaca `msg.value`), atau tidak me-reset slot transient `TSTORE` -> **DILARANG menggugurkan di atas kertas** — WAJIB tulis PoC simulasi batch 1 transaksi dengan $N$ sub-call dan verifikasi penggandaan saldo!
+  - *Routing Simulasi Tahap D:* Jika fungsi batch `payable` dan memakai `delegatecall` (atau loop internal yang membaca `msg.value`), atau tidak me-reset slot transient `TSTORE` -> **DILARANG menggugurkan di atas kertas** — WAJIB tulis PoC simulasi batch 1 transaksi dengan $N$ sub-call dan verifikasi penggandaan saldo!
 
 ---
 
@@ -43,9 +51,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata yang bertumpu pada perilaku
   3. **[Ekstraksi Nilai]** Program memproses penjumlahan/klaim di atas snapshot memori yang belum diperbarui (atau menimpa pengurangan saldo), menggandakan hak penyerang dalam satu instruksi.
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor melihat deklarasi tipe `Account<'info, ...>` di Anchor sudah memeriksa pemilik dan diskriminator tipe, sehingga berasumsi dua variabel parameter dengan nama berbeda pasti menunjuk ke dua akun berbeda dan nilainya selalu mutakhir sepanjang fungsi.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* Gugur secara statis (`REJECTED_MISMATCH`) **hanya jika** constraint `key() !=` terpasang pada **seluruh** pasangan akun `mut`/`remaining_accounts` **DAN** `.reload()?` dipanggil setiap kali data akun dibaca ulang pasca-CPI.
-  - *Routing Simulasi Fase 3:* Jika constraint `key() !=` **belum** terpasang pada pasangan akun `mut`/`remaining_accounts` **ATAU** `.reload()?` tidak dipanggil pasca-CPI sebelum akun dibaca/ditulis ulang -> **DILARANG menggugurkan di atas kertas** — WAJIB tulis tes simulasi (`cargo test` / LiteSVM / Bankrun) yang mengirim akun kembar `[A, A]` atau memicu CPI!
+  - *Routing Simulasi Tahap D:* Jika constraint `key() !=` **belum** terpasang pada pasangan akun `mut`/`remaining_accounts` **ATAU** `.reload()?` tidak dipanggil pasca-CPI sebelum akun dibaca/ditulis ulang -> **DILARANG menggugurkan di atas kertas** — WAJIB tulis tes simulasi (`cargo test` / LiteSVM / Bankrun) yang mengirim akun kembar `[A, A]` atau memicu CPI!
 
 ---
 
@@ -65,9 +73,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata yang bertumpu pada perilaku
   3. **[Ekstraksi Nilai]** Masih di PTB yang sama, penyerang menyerahkan `Position` / `Receipt` tersebut ke `Container_Utama` untuk menguras aset riil.
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor mengandalkan jaminan keamanan tipe Move (`has key`, linear *Hot Potato*, dan *auto-overflow check* pada `+`/`*`), tanpa menyadari bahwa tipe yang sama bisa berasal dari instansi objek yang berbeda dan operator `<<` di Move dapat memangkas bit tinggi secara diam-diam.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* Untuk poin (1) **Cross-Object Aliasing**, gugur secara statis (`REJECTED_MISMATCH`) **hanya jika** `assert!(receipt.pool_id == object::id(pool))` tertulis eksplisit **tanpa syarat** di **setiap** fungsi penerima objek. Untuk poin (2) **Operasi Geser Bit (`<<`) & Matematika Kustom**, **DILARANG KERAS menggugurkan di atas kertas!**
-  - *Routing Simulasi Fase 3:* Jika pemeriksaan `object::id` absen pada **salah satu** fungsi publik -> wajib tulis PoC multi-PTB (`sui move test` / `aptos move test`). Jika kontrak memakai operasi geser bit `<<` pada matematika kustom -> **WAJIB tulis unit test/fuzz** di simulator dengan nilai batas bit tinggi (`(1u128 << 64) + 1` / batas mask) **sebelum boleh menyatakannya aman!**
+  - *Routing Simulasi Tahap D:* Jika pemeriksaan `object::id` absen pada **salah satu** fungsi publik -> wajib tulis PoC multi-PTB (`sui move test` / `aptos move test`). Jika kontrak memakai operasi geser bit `<<` pada matematika kustom -> **WAJIB tulis unit test/fuzz** di simulator dengan nilai batas bit tinggi (`(1u128 << 64) + 1` / batas mask) **sebelum boleh menyatakannya aman!**
 
 ---
 
@@ -87,9 +95,9 @@ Berkas ini menyimpan pola eksploitasi on-chain nyata yang bertumpu pada perilaku
   3. **[Ekstraksi Nilai]** Handler bounced membaca nilai yang terpotong/rusak (atau gagal berjalan), menyebabkan pengembalian saldo berlebih atau penghapusan kewajiban tanpa membatalkan hak yang sudah dicetak.
 - **Mengapa Lolos dari Auditor Biasa (Auditor Blindspot):**
   Auditor melihat kontrak sudah menyediakan fungsi `on_bounce` lalu menganggap mekanisme *rollback* asinkron sudah tuntas, tanpa menghitung offset bit pada skema serialisasi pesan yang dikirim.
-- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Fase 3:
+- Batas Realitas (Kapan Pola Ini GUGUR) & Routing Simulasi Tahap D:
   - *Batas Realitas:* **DILARANG menggugurkan alur pesan multi-hop TON secara statis di atas kertas** hanya karena melihat adanya fungsi `on_bounce` atau `query_id`! Di TON, kegagalan karena habis gas (*Out-of-Gas*) pada *Action Phase* atau di kontrak ke-2 dalam rantai `A -> B -> C` **tidak selalu** memicu pesan bounced kembali ke kontrak asal `A`.
-  - *Routing Simulasi Fase 3:* Setiap kali kontrak TON mengubah state lokal **sebelum** mengirim pesan asinkron keluar, **WAJIB tulis tes simulasi** di `@ton/sandbox` / Blueprint untuk menguji **ketiga** skenario: (1) pesan mental (*bounced*) dengan pemeriksaan apakah seluruh data pemulihan muat di 224 bit pertama, (2) pesan kedua yang disisipkan saat pesan pertama masih *in-flight* (uji *pending lock*), dan (3) pengiriman `msg_value` gas tanggung yang membuat pesan gagal di tengah rantai multi-hop!
+  - *Routing Simulasi Tahap D:* Setiap kali kontrak TON mengubah state lokal **sebelum** mengirim pesan asinkron keluar, **WAJIB tulis tes simulasi** di `@ton/sandbox` / Blueprint untuk menguji **ketiga** skenario: (1) pesan mental (*bounced*) dengan pemeriksaan apakah seluruh data pemulihan muat di 224 bit pertama, (2) pesan kedua yang disisipkan saat pesan pertama masih *in-flight* (uji *pending lock*), dan (3) pengiriman `msg_value` gas tanggung yang membuat pesan gagal di tengah rantai multi-hop!
 
 ---
 

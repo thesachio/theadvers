@@ -1,12 +1,20 @@
 # FACTS — Fakta Mekanisme Proyek (hidup, terverifikasi)
 
-Berisi **fakta tentang bagaimana proyek bekerja**, yang membuat Fase 3 bisa merancang uji tajam.
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
+Berisi **fakta tentang bagaimana proyek bekerja**, yang membuat Tahap D bisa merancang uji tajam.
 Bukan hipotesis, bukan status deployment, bukan catatan aktivitas.
 
-> **Mengapa file ini ada.** `00-project-map.md` ditulis di Fase 1, sebelum ada yang benar-benar
-> memahami proyek. Pemahaman terdalam muncul saat membedah unit di Fase 2 — dan dulu hilang
-> bersama konteks. Akibatnya Fase 3 merancang harness dari peta basi.
-> Bukti empiris dari run sebelumnya: `02-state-and-var-matrix.md` terakhir disentuh 09:20,
+> **Mengapa file ini ada.** `PIN.md` ditulis di Tahap A/B, sebelum ada yang benar-benar
+> memahami proyek. Pemahaman terdalam muncul saat membedah pot/jahitan di Tahap C — dan dulu hilang
+> bersama konteks. Akibatnya Tahap D merancang harness dari peta basi.
+> Bukti empiris dari run sebelumnya: `FACTS.md (DATA)` terakhir disentuh 09:20,
 > eksplorasi berjalan sampai 15:01 (5 jam 41 menit) tanpa satu pun pembaruan pemahaman.
 
 ---
@@ -20,11 +28,11 @@ Bukan hipotesis, bukan status deployment, bukan catatan aktivitas.
    `LIVE_MATCH`, hash/identitas live → **milik `notes/deploy-parity-<ID>.json`** dan field
    `Deployment` di `05`. Jangan disalin ke sini; rujuk artefaknya.
 3. **`patch` per baris.** Dilarang tulis ulang penuh (`open("w")`/`>`). Maks **12 baris per
-   domain**, tambahan **≤3 baris per unit**.
+   pot/jahitan**, tambahan **≤3 baris per pot/jahitan**.
 4. **`UNKNOWN` wajib ditulis**, bukan dihilangkan. Fakta yang tidak diukur adalah titik buta —
    dan titik buta sering justru celahnya.
-5. **Maksimal 2 `M-FACT` per unit.** Pilih yang paling mengubah cara menguji, bukan yang paling banyak.
-6. **Gerbang masuk:** fakta hanya layak bila *"tanpa fakta ini, Fase 3 akan merancang uji yang berbeda?"*
+5. **Maksimal 2 `M-FACT` per pot/jahitan.** Pilih yang paling mengubah cara menguji, bukan yang paling banyak.
+6. **Gerbang masuk:** fakta hanya layak bila *"tanpa fakta ini, Tahap D akan merancang uji yang berbeda?"*
    - `relayerFeePct int64` → ya (batas tipe) ✅
    - `quoteTimestamp uint32, satuan DETIK` → ya (detik vs ms = 1000×) ✅
    - `fungsi ada di baris 340` → tidak ❌
@@ -35,9 +43,9 @@ Bukan hipotesis, bukan status deployment, bukan catatan aktivitas.
 ## BENTUK BLOK (7 komponen wajib)
 
 ```markdown
-## D1: <nama-domain>
-BERKAS    : <path/ke/*.sol yang memuat domain ini — kunci pencarian>
-MEKANISME : <bagaimana domain bekerja, 1-3 baris> → <File:Baris penopang>
+## P-01: <nama-pot-atau-jahitan>
+BERKAS    : <path/ke/*.sol yang memuat pot/jahitan ini — kunci pencarian>
+MEKANISME : <bagaimana pot/jahitan ini bekerja, 1-3 baris> → <File:Baris penopang>
 CHAINING  : <hop1> → <hop2> → <hop3>   (state yang bertahan lintas-hop)
               <namaVariabel>  <File:Baris>
               <namaVariabel>  <File:Baris>
@@ -51,7 +59,7 @@ LINGKUNGAN:
 ASUMSI    : [A] <asumsi yang dipegang> — BELUM diverifikasi
 ```
 
-**`BERKAS` wajib** — ini satu-satunya kunci yang membuat Fase 3 bisa menemukan blok dari
+**`BERKAS` wajib** — ini satu-satunya kunci yang membuat Tahap D bisa menemukan blok dari
 `File:Baris` lead. Tanpa itu, blok tidak bisa dicari dan model tidak terpakai.
 
 ---
@@ -68,13 +76,13 @@ ASUMSI    : [A] <asumsi yang dipegang> — BELUM diverifikasi
 **ASUMSI** | *Apa yang saya andalkan tapi belum saya periksa?* | catat setiap "karena X, maka Y" tanpa bukti | `BELUM` / `VERIFIED` / `GUGUR` | — |
 
 **Metode bukan pekerjaan tambahan** — FACTS memanen hasil `M-001..M-NNN` yang sudah dijalankan
-di Fase 2. Tidak ada langkah baru, hanya pencatatan hasil.
+di Tahap C. Tidak ada langkah baru, hanya pencatatan hasil.
 
 ### Tiga titik waktu
-1. **Sebelum unit** — baca blok domain yang ada, tulis **prediksi**: *"invarian apa yang saya
+1. **Sebelum membedah pot/jahitan** — baca blok pot/jahitan yang ada, tulis **prediksi**: *"invarian apa yang saya
    harap ditegakkan di sini, di mana kemungkinan patah?"*
-2. **Saat unit** — kumpulkan fakta; tulis `M-FACT` **lengkap di blok `## USULAN` staging item itu** — satu-satunya jalur (bukan FACTS langsung, bukan manifes; manifes hanya hitungan). `R-CAND` justru punya file sendiri: `audit/notes/radar-<item>.md`. Aturan mengikat di `AGENTS.md` §4.
-3. **Sesudah unit** — bandingkan prediksi vs temuan. Prediksi **meleset** → fakta penyebabnya
+2. **Saat bedah** — kumpulkan fakta; tulis `M-FACT` **lengkap di blok `## USULAN` staging item itu** — satu-satunya jalur (bukan FACTS langsung, bukan manifes; manifes hanya hitungan). `R-CAND` justru punya file sendiri: `audit/notes/radar-<item>.md`. Aturan mengikat di `AGENTS.md` §4.
+3. **Sesudah bedah** — bandingkan prediksi vs temuan. Prediksi **meleset** → fakta penyebabnya
    wajib masuk. Prediksi **tepat** → jangan tambah baris.
 
 ### Batas pelacakan `CHAINING`
@@ -83,12 +91,12 @@ Lebih dari itu → tulis `CHAINING: >2 hop, belum ditelusuri` dan daftarkan siny
 
 ---
 
-## PROTOKOL AKSES (bagaimana Fase 3 memakainya)
+## PROTOKOL AKSES (bagaimana Tahap D memakainya)
 
-Fase 3 bekerja dari **`File:Baris`**, bukan dari nama domain:
+Tahap D bekerja dari **`File:Baris`**, bukan dari nama pot/jahitan:
 
 ```bash
-# 1. Cetak blok domain yang memuat path berkas lead (berhenti di heading berikutnya)
+# 1. Cetak blok pot/jahitan yang memuat path berkas lead (berhenti di heading berikutnya)
 awk -v pat="<NamaBerkas>.sol" '/^## D/{if(hit){print head;printf "%s",buf;done=1;exit} head=$0;buf="";hit=0;next}{buf=buf $0 ORS; if(index($0,pat))hit=1} END{if(hit&&!done){print head;printf "%s",buf}}' audit/FACTS.md
 
 # 2. RADAR yang menyentuh berkas yang sama (seam yang mungkin memperkuat)
@@ -105,7 +113,7 @@ Total ±400–600 token — cukup untuk menyusun harness tanpa memuat seluruh au
 
 ### Pemetaan komponen → rancangan serangan
 
-| Komponen | Yang dilakukan Fase 3 |
+| Komponen | Yang dilakukan Tahap D |
 |---|---|
 `MEKANISME` | pilih **entrypoint** + **siapa penyerang** → `vm.prank(attacker)` tepat |
 `CHAINING` | rancang **uji multi-langkah**: state apa di-seed di hop 1 agar hop 3 rentan |
@@ -118,12 +126,12 @@ Total ±400–600 token — cukup untuk menyusun harness tanpa memuat seluruh au
 | Kondisi | Tindakan |
 |---|---|
 `Lokasi` beririsan dengan lead | uji **kombinasi** — seam itu mungkin yang membuat lead bisa dieksploitasi |
-`Tujuan` = unit lead ini | sinyal unit lain yang bertemu di sini |
+`Tujuan` = pot/jahitan lead ini | sinyal pot/jahitan lain yang bertemu di sini |
 `Pemicu` terpenuhi | promosikan saat itu juga, uji bersamaan |
 `RESOLVED-REFUTED` + alasan | hindari mengulang jalan buntu yang sama |
 
-### Bila blok FACTS tidak ada untuk domain lead
-Fase 3 **wajib backfill dulu**: baca fungsi utuh → tulis blok 12 baris → baru menulis harness.
+### Bila blok FACTS tidak ada untuk pot/jahitan lead
+Tahap D **wajib backfill dulu**: baca fungsi utuh → tulis blok 12 baris → baru menulis harness.
 Dilarang menulis harness tanpa blok — itu menguji tanpa tahu mekanismenya.
 
 ---
@@ -135,9 +143,9 @@ Dilarang menulis harness tanpa blok — itu menguji tanpa tahu mekanismenya.
 Menulis *"mungkin bisa di-reentrancy"* | hipotesis → tempatnya `05`, bukan FACTS |
 Menyalin `CYCLE`/`ENTRYPOINT`/`Mode Uji` | duplikasi dengan `deploy-parity-*.json` |
 `LINGKUNGAN` tanpa tag `[chain:alamat]` | akan terbawa ke chain lain → vonis palsu |
-Menghilangkan fakta yang tidak diketahui | Fase 3 akan menganggapnya tidak ada; tulis `UNKNOWN` |
-Menambah 10 baris per unit | batas 3. Model bengkak = tidak terbaca = nol |
-Menyalin fakta dari `00 §4` | `00` baseline Fase 1; bila berbeda, **FACTS menang** (lebih baru) |
+Menghilangkan fakta yang tidak diketahui | Tahap D akan menganggapnya tidak ada; tulis `UNKNOWN` |
+Menambah 10 baris per pot/jahitan | batas 3. Model bengkak = tidak terbaca = nol |
+Menyalin fakta dari `00 §4` | `00` baseline Tahap A/B; bila berbeda, **FACTS menang** (lebih baru) |
 
 ---
 
@@ -149,4 +157,4 @@ Menyalin fakta dari `00 §4` | `00` baseline Fase 1; bila berbeda, **FACTS menan
 `audit/RADAR.md` | *apa yang janggal tapi belum terbukti?* | hidup, `append` |
 `audit/05-raw-leads.md` | *hipotesis mana yang harus diuji?* | antrean |
 `notes/deploy-parity-*.json` | *kode ini live atau HEAD?* | per-lead |
-`audit/00-project-map.md` | baseline Fase 1 (beku) | arsip |
+`audit/PIN.md` | baseline Tahap A/B (beku) | arsip |

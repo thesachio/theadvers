@@ -30,8 +30,8 @@ D. SIMULASI  10 bentuk serangan (mod-attack-forms.md) + 3-Stage + dual-mode fork
    GATE-D    verdict negatif tanpa eksekusi dilarang (No-Code-No-Reject); target akhir 07 = 0
 E. OFFCHAIN  (opsional) DIPICU anomali on-chain → bedah repo bot publik → blackbox bila privat
    GATE-E    hanya bila: scope bounty memasukkan off-chain ATAU gejalanya "ketiadaan aksi"
-F. VERDICT   11 Pernyataan + severity rubric + rekonsiliasi deployment (warisan Fase 4)
-   GATE-F    PAPER_REFUTATION + LAZY_BAILOUT + coverage + 00b sinkron — semua PASS
+F. VERDICT   11 Pernyataan + rubrik severity + rekonsiliasi deployment
+   GATE-F    PAPER_REFUTATION + LAZY_BAILOUT + coverage pot/jahitan (Gerbang Tahap F) — semua PASS
 ```
 
 **Urutan eksekusi EV-first**: bila anggaran terputus di tahap mana pun, nilai tertinggi sudah

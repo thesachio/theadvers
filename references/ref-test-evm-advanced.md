@@ -1,5 +1,13 @@
 # Referensi Pengujian Lanjut EVM & Tron TVM (Tier 1 s/d Tier 5)
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Gunakan pola pengujian di bawah ini saat menyusun file AdvVerify_<Target>.t.sol di Foundry. Selalu jalankan dengan worker tunggal: forge test --match-contract AdvVerify_<Target> -vvvv -j 1.
 
 ---
@@ -31,7 +39,7 @@ Gunakan pola ini untuk menguji urutan transaksi 3-langkah (Aktor A -> Aktor B ->
 ---
 
 ## 2. TIER 2: Handler-Based Stateful Invariant Fuzzing + Ghost Variables
-Gunakan pola ini ketika Fase 2 tidak menemukan bug kasatmata, agar mesin fuzzer mengacak urutan panggilan fungsi dan menguji apakah hukum kekekalan nilai patah:
+Gunakan pola ini ketika Tahap C tidak menemukan bug kasatmata, agar mesin fuzzer mengacak urutan panggilan fungsi dan menguji apakah hukum kekekalan nilai patah:
 // 1. Buat Kontrak Handler yang membungkus fungsi protokol & mencatat Ghost Variables:
     contract AdvProtocolHandler is Test {
         TargetProtocol public target;

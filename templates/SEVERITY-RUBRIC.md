@@ -1,8 +1,16 @@
 # SEVERITY RUBRIC — Standar Penilaian Severity Lintas Platform
 
+<!-- SEGITIGA-BINDING -->
+> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
+> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 > **Berlaku untuk seluruh audit, semua project.**
 > Lokasi: `verify/SEVERITY-RUBRIC.md` — **satu folder dengan `VERDICT.md`**, dirujuk oleh
-> `VERDICT.md` Langkah 0.3b. Hakim Fase 4 memuat berkas ini, bukan menebak.
+> `VERDICT.md` Langkah 0.3b. Hakim Tahap F memuat berkas ini, bukan menebak.
 > Terakhir diverifikasi: 2026-11-05 dari dokumentasi resmi masing-masing platform.
 
 ---

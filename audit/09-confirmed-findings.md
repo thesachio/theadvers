@@ -1,5 +1,12 @@
 # 09-confirmed-findings.md — Bounty-Ready (Live Production)
 
+<!-- SEGITIGA-BINDING -->
+> **Peran berkas.** Wadah bounty-ready — dipakai di **Tahap F**. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
+> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
+> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
+> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
+> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+
 Hanya untuk `VALID_ELIGIBLE`: PoC `[PASS]` pada fork state produksi (`FORK_LIVE`, atau
 `FORK_DEPLOYED_HEAD` yang terbukti `LIVE_MATCH`), tanpa Fantasy Mock/Cheatcode,
 dampak finansial nyata (Critical/High/Medium), lolos 11 Pernyataan Wajib
