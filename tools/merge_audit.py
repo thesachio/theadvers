@@ -38,17 +38,34 @@ def sha256_of(path: Path) -> str:
     return h.hexdigest()
 
 
+def _strip_fenced(text: str) -> str:
+    """Buang isi blok ```...``` supaya heading FORMAT CONTOH tidak dihitung sebagai entri.
+
+    Tanpa ini, template yang memuat contoh format menghasilkan ENTRI EKSTRA palsu
+    sepanjang audit (bug nyata: 5 alarm palsu pada kerangka bersih).
+    """
+    out, inside = [], False
+    for ln in text.splitlines():
+        if ln.strip().startswith("```"):
+            inside = not inside
+            out.append("")
+            continue
+        out.append("" if inside else ln)
+    return "\n".join(out)
+
+
 def count_entries(path: Path) -> int:
     if not path.exists():
         return 0
-    return len(ENTRY_RE.findall(path.read_text(encoding="utf-8", errors="replace")))
+    return len(ENTRY_RE.findall(_strip_fenced(
+        path.read_text(encoding="utf-8", errors="replace"))))
 
 
 def entry_ids(path: Path) -> list[str]:
     if not path.exists():
         return []
-    return [m.strip() for m in ENTRY_RE.findall(
-        path.read_text(encoding="utf-8", errors="replace"))]
+    return [m.strip() for m in ENTRY_RE.findall(_strip_fenced(
+        path.read_text(encoding="utf-8", errors="replace")))]
 
 
 def parse_log(log: Path) -> tuple[list[dict], list[str]]:
