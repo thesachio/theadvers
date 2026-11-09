@@ -297,6 +297,36 @@ python3 tools/verify_segitiga.py --audit-dir audit    # G1-G10
 python3 tools/verify07.py audit/07-needs-next-step.md # LAZY_BAILOUT gate
 python3 tools/merge_audit.py --audit-dir audit        # integritas staging/merge
 python3 tools/deploy_parity.py --paradigm <p> ...     # rekonsiliasi deployment
+python3 verify/ingest.py <repo-inbox>                 # gerbang submission (MECH-OK)
+```
+
+### 6.1 Gerbang Submission — DILARANG Kirim Sebelum `MECH-OK`
+
+**Temuan yang belum lolos `verify/ingest.py` DILARANG dikirim ke program bounty**, sekalipun
+laporan naratifnya meyakinkan. Validator menggugurkan klaim tanpa biaya model bila: field wajib
+hilang, enum tak dikenal, `lines` melebihi jumlah baris berkas, `snippet` tidak ditemukan,
+berkas target/PoC tidak ada, `cmd` kosong, atau `id` duplikat.
+
+Schema lengkap: **`verify/SCHEMA.md`**. Template: `templates/TECHNICAL-REPORT.md`,
+`templates/POC-PACKAGE.md`, `templates/SUBMISSION-EMAIL.md`.
+
+**Empat kesalahan yang pernah terjadi dan wajib dihindari:**
+
+| Kesalahan | Gejala | Aturan |
+|---|---|---|
+| `"version": "6.2.4"` | `[FATAL] version tidak didukung` | `version` adalah **integer `1`** |
+| Path relatif terhadap repo target | `file tidak ada` | `file`/`poc` relatif terhadap **root inbox** |
+| `severity_label: "Low"` di samping `severity_claimed: "S4"` | `SEVERITY DITURUNKAN KARENA SIKLUS` | `S4` **adalah** Low — jangan tambah label tandingan |
+| `eligibility: LIVE_MATCH` tanpa `live_identity` | `LIVE_MATCH tanpa live_identity terukur` | Isi dari artefak `deploy_parity` |
+
+**Layout inbox wajib:**
+
+```
+<repo-inbox>/
+├── MANIFEST.json
+├── findings/<ID>.md          <- templates/TECHNICAL-REPORT.md
+├── poc/<ID>.<ext>            <- templates/POC-PACKAGE.md
+└── snippets/                 <- kutipan kode yang dirujuk field `file`
 ```
 
 **Yang diperiksa `verify_segitiga.py`:**

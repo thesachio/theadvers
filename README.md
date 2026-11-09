@@ -21,18 +21,26 @@ salinan lain.
 
 ## Cara pakai untuk audit baru
 
+**Template dan hasil audit DIPISAH.** Repo ini hanya berisi metode + alat; hasil audit tinggal di
+repo inbox/privat terpisah agar `ingest.py` dapat membacanya dari root dan agar temuan tidak
+terpublikasi sebelum dilaporkan.
+
 ```bash
-# 1. Fork/clone template ini ke folder proyek baru
-git clone <repo-ini> ~/audits/<nama-proyek>
+# 1. Salin template ini ke folder kerja audit (tanpa .git)
+rsync -a --exclude .git <path-template>/ ~/audits/<nama-proyek>/
 cd ~/audits/<nama-proyek>
 
-# 2. Isi pin target (commit yang diaudit) — WAJIB, tanpa ini temuan tak bisa direproduksi
+# 2. Tandai pin target (commit yang diaudit) — WAJIB
 $EDITOR target/PIN.md
 
-# 3. Kosongkan artefak hidup (template ini sengaja berisi schema, bukan data)
-#    STATE.md, INTEL.md, notes/money-ledger.md, notes/path-map.md
+# 3. Siapkan wadah hasil (dibuat lokal, TIDAK masuk repo template)
+mkdir -p audit/notes/backups audit/lab
+cp templates/STATE.md templates/INTEL.md audit/
+cp templates/04-code-guarded.md templates/05-raw-leads.md templates/06-refuted-invalid.md \
+   templates/07-needs-next-step.md templates/08-valid-not-eligible.md \
+   templates/09-confirmed-findings.md templates/FACTS.md templates/RADAR.md audit/
 
-# 4. Mulai dari Tahap A0 (bootstrap) sesuai audit/STATE.md
+# 4. Mulai dari Tahap A0 sesuai audit/STATE.md
 ```
 
 **Jangan** menyalin isi `references/` ke folder audit — folder itu adalah rujukan metode, dipakai
@@ -46,32 +54,53 @@ AGENTS.md             konstitusi operasional (mengikat)
 AUTOPILOT-MAPPING.md  peta Fase 1-4 -> Tahap A-F
 CLASSIFICATION.md     LAPIS x CLASS x AF — tiga sumbu, jangan dicampur
 methodology/          metode: 1 dokumen induk + 6 modul plug-in + flow-diagram
-references/           16 berkas rujukan metode & POV & tooling (dilampirkan, bukan di-link)
-templates/            wadah hasil: STATE, 04-09, FACTS, RADAR, VERDICT, SEVERITY-RUBRIC
-audit/                INSTANCE yang diisi per proyek (kosong di template ini)
-  STATE.md            kursor: TAHAP (A-F) + pot/jahitan aktif + Gate Meter
-  INTEL.md            Tahap A0: nama, overview, link, bounty, deployment
-  notes/
-    money-ledger.md   Tahap A — EV ledger (artefak hidup)
-    path-map.md       Tahap B — peta jahitan (artefak hidup)
-    backups/          backup write-ahead
-  lab/                harness PoC
-  04..09              wadah hasil
-  FACTS.md            falsifier, dibangun setelah hipotesis
-  RADAR.md            sinyal lintas-domain (append-only)
-target/PIN.md         commit, cara reproduce, repo pendukung
+references/           18 berkas rujukan metode & POV & tooling (dilampirkan, bukan di-link)
+templates/            wadah hasil + 3 template submission
+verify/               SCHEMA.md (aturan MANIFEST.json) + ingest.py + VERDICT + RUBRIK
 tools/                gate checker + verifikasi integritas
 ```
+
+Hasil audit **dibuat** oleh operator di folder kerja, tidak disimpan di repo ini:
+
+```
+audit/                wadah per proyek (TIDAK di repo template)
+  STATE.md            kursor: TAHAP (A-F) + pot/jahitan aktif + Gate Meter
+  INTEL.md            Tahap A0
+  notes/money-ledger.md, notes/path-map.md, notes/backups/
+  lab/                harness PoC
+  04..09              wadah hasil
+  FACTS.md, RADAR.md
+target/PIN.md         commit, cara reproduce, repo pendukung
+```
+
+## Submission ke program bounty
+
+Setelah Tahap F, temuan yang layak dikirim ke program memakai **repo inbox terpisah**:
+
+```
+<repo-inbox>/
+├── MANIFEST.json          <- diverifikasi tools/ingest.py (WAJIB MECH-OK)
+├── findings/<ID>.md       <- templates/TECHNICAL-REPORT.md
+├── poc/<ID>.<ext>         <- templates/POC-PACKAGE.md
+└── snippets/              <- kutipan kode yang dirujuk field `file`
+```
+
+```bash
+python3 verify/ingest.py <repo-inbox>    # target: N/N MECH-OK
+```
+
+**Gerbang:** temuan yang belum `MECH-OK` DILARANG dikirim, sekalipun laporannya meyakinkan.
+Email pengantar: `templates/SUBMISSION-EMAIL.md`.
 
 ## Alur kerja (6 tahap, 6 gate)
 
 ```
-A. L-VALUE   census nilai live → EV ledger          GATE-A
-B. L-PATH    peta aliran → jahitan + EV             GATE-B
-C. L-FLOW    bedah sink → lead 05 (LAPIS + AF)      GATE-C
-D. SIMULASI  10 bentuk serangan → 06/07/08/09       GATE-D
-E. OFFCHAIN  dipicu anomali → akar kode             GATE-E
-F. VERDICT   11 Pernyataan + rubrik severity        GATE-F
+A. L-VALUE   census nilai live -> EV ledger          GATE-A
+B. L-PATH    peta aliran -> jahitan + EV             GATE-B
+C. L-FLOW    bedah sink -> lead 05 (LAPIS + AF)      GATE-C
+D. SIMULASI  10 metode x POV -> 06/07/08/09          GATE-D
+E. OFFCHAIN  dipicu anomali -> akar kode             GATE-E
+F. VERDICT   11 Pernyataan + rubrik severity         GATE-F
 ```
 
 ## Rujukan (dilampirkan penuh di `references/`)
