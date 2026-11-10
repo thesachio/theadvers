@@ -3,10 +3,11 @@
 > ATURAN PENGISIAN (`MEKANISME-TERBUKTI GUARD` + `ZERO-COMPRESSION LAW`):
 > 1. Kata **"nyata dan terbukti" bersifat harfiah**: mekanisme wajib sudah lulus simulasi PoC (`POC_STATUS: PASS`) tanpa curang, dengan dampak kuantitatif terukur. Wadah ini **BUKAN** tempat menyimpan lead yang belum diuji — lead belum teruji wajib di `07-needs-next-step.md` dengan `PERCOBAAN:`.
 > 2. Wadah ini menampung kandidat dari 05-raw-leads.md yang perilakunya terbukti valid secara teknis, namun tidak memenuhi kriteria sebagai temuan utama yang *eligible* karena salah satu dari tiga kelas berikut:
->    - **`PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`** — dampak finansial nyata (Critical/High/Medium), PoC `[PASS]` pada `FORK_DEPLOYED_HEAD` / `LOKAL`, tetapi kontrak/fitur belum live di mainnet, berbeda dari bytecode produksi aktif, atau belum terdaftar di halaman alamat bounty.
+>    - **`PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`** — dampak finansial nyata (Critical/High/Medium), PoC `[PASS]` pada `FORK_DEPLOYED_HEAD`, tetapi kode tersebut **lebih baru dari live dan belum aktif** (`HEAD_NEWER_THAN_LIVE`), atau kontraknya belum terdaftar di halaman alamat bounty. **Syarat mutlak:** `Mode Uji` wajib `FORK_DEPLOYED_HEAD` + `VERSION_RELATION: HEAD_NEWER_THAN_LIVE`. Implementation yang **terpasang tapi belum di-`upgradeTo`** di balik proxy live juga masuk kelas ini — ia belum dieksekusi siapa pun.
 >    - **`ADMIN_ONLY`** — bug mekanis nyata pada fungsi khusus admin, tanpa jalur eksploitasi eksternal.
 >    - **`LOW_NUISANCE`** — DoS tanpa kehilangan dana, kerugian kecil terbatas (*capped*), atau griefing non-finansial (Severity Low / S4).
 > 3. **Severity ditentukan IMPACT, bukan siklus deployment.** Menurunkan severity karena alasan "masih HEAD-only" / "hanya testnet" adalah pelanggaran; yang berubah hanya wadah (`09` vs `08`).
+> 4. **DILARANG memakai `PRE_LIVE_SCOPE` untuk kode yang SUDAH LIVE.** Apabila `VERSION_RELATION` menunjukkan kode itu aktif di proxy mainnet (`LIVE_IS_DEPLOYED_COMMIT` / `LIVE_NEWER_THAN_HEAD`), temuan **wajib** ke `09`, bukan `08`. Menaruhnya di `08` = menurunkan temuan live menjadi "belum live" — pelanggaran yang sama beratnya dengan menaikkan severity tanpa bukti.
 > 4. Wajib menyertakan jangkar verbatim `Path/File.ext:Lxx-Lyy`, `TANGGA_BUKTI`, dan `DEPLOYMENT_MATCH`. Dilarang memakai token kompresi (..., dll., dst., etc., rest of logic).
 
 ---
@@ -43,9 +44,10 @@
 - SEVERITY: [CRITICAL | HIGH | MEDIUM | LOW] *(dari IMPACT sesuai rubrik severity)*
 - Rujukan Severity: [Platform + URL, atau Matriks Universal `templates/SEVERITY-RUBRIC.md`]
 - POC_STATUS: PASS
-- TANGGA_BUKTI: [A-HEAD | B] *(A yang sudah `LIVE_MATCH` seharusnya masuk `09`)*
+- TANGGA_BUKTI: [A-HEAD | B] *(A yang sudah `LIVE_MATCH` wajib masuk `09`, bukan `08`)*
 - DEPLOYMENT_MATCH: [HEAD-only (PROVEN_ON_REPO_HEAD) | UNVERIFIED (<sumber yang gagal>)]
-- Mode Uji: [FORK_DEPLOYED_HEAD (chain, block, RPC) | LOKAL (<alasan>)]
+- VERSION_RELATION: [HEAD_NEWER_THAN_LIVE] *(wajib untuk `PRE_LIVE_SCOPE`; bila live sudah memuat kode ini → pindah ke `09`)*
+- Mode Uji: [FORK_DEPLOYED_HEAD (chain, block, RPC) | LOKAL (<alasan>)] *(proyek mainnet: `FORK_LIVE` di sini = salah wadah)*
 - Jangkar Kode Eksak (`Path/File.ext:Lxx-Lyy`): [Kutipan lokasi dan perilaku teknis]
 - Dampak Kuantitatif: [Angka eksak + satuan aset; biaya serangan bila relevan]
 - Alasan Ketidaklayakan: [Rujukan aturan scope / status deployment / ambang severity yang mengecualikan isu ini dari `09-confirmed-findings.md`]

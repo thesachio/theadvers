@@ -41,9 +41,10 @@
 - **DEPLOYMENT_MATCH**: `LIVE_MATCH`
 - **CYCLE**: `[P4_LIVE_FULL | P3_LIVE_PARTIAL]` *(`P1`/`P2` dilarang di `09`)*
 - **ELIGIBILITY**: `LIVE_MATCH`
-- **LIVE_IDENTITY**: `[Identitas terukur dari deploy_parity: accountId() / sha256 ProgramData / bytecode hash impl EIP-1967]`
+- **LIVE_IDENTITY**: `[Terukur: alamat impl AKTIF dari slot EIP-1967 proxy 0x360894a1...382bbc, atau accountId() / sha256 ProgramData untuk non-EVM — bukan nama berkas repo]`
+- **VERSION_RELATION**: `[LIVE_IS_DEPLOYED_COMMIT | LIVE_NEWER_THAN_HEAD | HEAD_NEWER_THAN_LIVE]` *(`LIVE_UNVERIFIED` dilarang di `09`)*
 - **POC_STATUS**: `PASS`
-- **Mode Uji**: `[FORK_LIVE (chain: <...>, block: <...>, RPC: <...>) | LOKAL (<alasan non-EVM>)]`
+- **Mode Uji**: `FORK_LIVE (chain: <...>, block: <...>, RPC: <...>)` *(wajib — proyek mainnet; `FORK_DEPLOYED_HEAD`/`LOKAL` tidak sah di `09`. `FORK_TESTNET` hanya bila STATE.md menyatakan testnet/devnet)*
 - **File:Baris**: `[Path/File.ext:Lxx-Lyy]` *(wajib rentang awal-akhir)*
 - **Metode / POV**: `[M-xxx / AF-xx / POV-xx]`
 - **Invarian Dilanggar**: `[INV-Ri-xx — rumus invarian inti dari FACTS.md / path-map.md]`

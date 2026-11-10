@@ -48,7 +48,8 @@ Di luar empat kondisi itu, seluruh kelas `REJECTED_*` **WAJIB** melampirkan `BUK
 - TARGET_FILE: 06-refuted-invalid.md
 - TANGGA_BUKTI: [A | A-HEAD | B | C] *(wajib terisi meski vonis gugur)*
 - DEPLOYMENT_MATCH: [LIVE_MATCH | HEAD-only (PROVEN_ON_REPO_HEAD) | UNVERIFIED (<sumber yang gagal>)]
-- Mode Uji: [FORK_LIVE (chain, block, RPC) | FORK_DEPLOYED_HEAD | LOKAL]
+- Mode Uji: [FORK_LIVE (chain, **block**, RPC) | FORK_DEPLOYED_HEAD | LOKAL] *(wajib menyebut `block:` — kegagalan pun harus terjadi pada state nyata, bukan state karangan)*
+- VERSION_RELATION: [LIVE_IS_DEPLOYED_COMMIT | LIVE_NEWER_THAN_HEAD | HEAD_NEWER_THAN_LIVE | LIVE_UNVERIFIED]
 - Plugin yang Diuji: [M-xxx, AF-xx]
 - Hipotesis Awal: [Ringkasan dugaan serangan sebelum diuji]
 - Jejak Kode & Titik Patah (`Path/File.ext:Lxx-Lyy`): [Kutipan kondisi kode atau urutan state yang mematahkan hipotesis]

@@ -112,6 +112,18 @@ LEAD_STATUS_MOVED = (
 )
 LEAD_STATUS_OPEN = ("[QUEUED]", "[ACTIVE]")
 LEAD_STATUS_RX = re.compile(r"\[(?:QUEUED|ACTIVE|MOVED(?:-TO)?-0[6-9])\]")
+# --- Aturan fork live (proyek mainnet) ---
+MODE_UJI_RX = re.compile(r"Mode Uji\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?(FORK_LIVE|FORK_TESTNET|FORK_DEPLOYED_HEAD|LOKAL)\b")
+BLOCK_RX = re.compile(r"\bblock\s*[:=]\s*`?(\d{4,})")
+VERSION_RELATION_RX = re.compile(r"VERSION_RELATION\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Z_]+)")
+VERSION_RELATIONS = (
+    "LIVE_IS_DEPLOYED_COMMIT",
+    "LIVE_NEWER_THAN_HEAD",
+    "HEAD_NEWER_THAN_LIVE",
+    "LIVE_UNVERIFIED",
+)
+MODE_LIVE_OK = ("FORK_LIVE", "FORK_TESTNET")
+PROJECT_STAGE_RX = re.compile(r"Deployment Stage\s*[:=]\s*`?(MAINNET|TESTNET|DEVNET)", re.IGNORECASE)
 
 PLUGIN_SPECS = [
     {
@@ -667,7 +679,7 @@ def has_real_command_output(lines: List[str]) -> bool:
 
 
 def validate_six(text: str) -> List[str]:
-    """Aturan 06: kelas REJECTED_* + PAPER_REFUTATION guard (BUKTI_SIMULASI atau KS-n)."""
+    """Aturan 06: kelas REJECTED_* + PAPER_REFUTATION guard (BUKTI_SIMULASI atau KS-n) + bukti fork."""
     errors: List[str] = []
     for title, body in split_entries(text, ("REF",)):
         joined = "\n".join(body)
@@ -695,6 +707,9 @@ def validate_six(text: str) -> List[str]:
                     f"[06 BUKTI] Entri '{title[:60]}' berkelas {cls} wajib BUKTI_SIMULASI: (kelas ini bukan "
                     f"kemustahilan statis KS-1..KS-4)."
                 )
+        # Kegagalan pun wajib terjadi pada state nyata: FORK_LIVE harus menyebut blok.
+        if BUKTI_SIMULASI_RX.search(joined):
+            errors.extend(validate_fork_evidence(joined, body, "06", True))
     return errors
 
 
@@ -871,6 +886,83 @@ def validate_lead_status(raw_leads_text: str) -> List[str]:
     return errors
 
 
+def project_is_mainnet(audit_dir: Path) -> bool:
+    """Default MAINNET. Hanya STATE.md yang boleh menyatakan testnet/devnet."""
+    sp = audit_dir / "STATE.md"
+    if not sp.exists():
+        return True
+    m = PROJECT_STAGE_RX.search(sp.read_text(encoding="utf-8"))
+    if not m:
+        return True
+    return m.group(1).upper() == "MAINNET"
+
+
+def validate_fork_evidence(joined: str, body: List[str], label: str, mainnet: bool) -> List[str]:
+    """Aturan fork: mode uji wajib disebut; FORK_LIVE wajib blok; 09 wajib live."""
+    errors: List[str] = []
+    m_mode = MODE_UJI_RX.search(joined)
+    if not m_mode:
+        errors.append(f"[{label} FORK] Entri '{joined.splitlines()[0][:60]}' tanpa 'Mode Uji:' — bukti fork wajib dinyatakan.")
+        return errors
+    mode = m_mode.group(1)
+    if mode in ("FORK_LIVE", "FORK_TESTNET"):
+        block_line = next((l for l in body if BLOCK_RX.search(l)), "")
+        if not block_line:
+            errors.append(
+                f"[{label} FORK] Entri '{joined.splitlines()[0][:60]}' memakai {mode} tanpa nomor blok "
+                f"(butuh 'block: <n>') — fork tanpa blok tidak dapat direproduksi."
+            )
+    return errors
+
+
+def validate_nine_fork(audit_dir: Path, text: str) -> List[str]:
+    """Aturan 09 pada proyek mainnet: FORK_LIVE wajib, VERSION_RELATION wajib, LIVE_UNVERIFIED dilarang."""
+    errors: List[str] = []
+    mainnet = project_is_mainnet(audit_dir)
+    for title, body in split_entries(text, ("FIND",)):
+        joined = "\n".join(body)
+        errors.extend(validate_fork_evidence(joined, body, "09", mainnet))
+        m_mode = MODE_UJI_RX.search(joined)
+        allowed = "FORK_LIVE" if mainnet else "FORK_TESTNET"
+        if m_mode and m_mode.group(1) != allowed:
+            # 09 wajib bukti pada state yang benar-benar berjalan DAN sesuai sifat proyek:
+            # mainnet -> FORK_LIVE ; testnet/devnet -> FORK_TESTNET. Mode lain tidak sah di 09.
+            errors.append(
+                f"[09 FORK] Entri '{title[:60]}' memakai Mode Uji {m_mode.group(1)} — 09 wajib {allowed} "
+                f"(FORK_DEPLOYED_HEAD / LOKAL / mode lain tidak sah di 09)."
+            )
+        m_vr = VERSION_RELATION_RX.search(joined)
+        if not m_vr:
+            errors.append(f"[09 VERSION] Entri '{title[:60]}' wajib VERSION_RELATION (§2c).")
+        elif m_vr.group(1) not in VERSION_RELATIONS:
+            errors.append(f"[09 VERSION] Entri '{title[:60]}' memakai VERSION_RELATION tidak sah: {m_vr.group(1)}.")
+        elif m_vr.group(1) == "LIVE_UNVERIFIED":
+            errors.append(f"[09 VERSION] Entri '{title[:60]}' memakai LIVE_UNVERIFIED — dilarang di 09.")
+    return errors
+
+
+def validate_eight_fork(text: str) -> List[str]:
+    """Aturan 08: PRE_LIVE_SCOPE wajib FORK_DEPLOYED_HEAD + HEAD_NEWER_THAN_LIVE."""
+    errors: List[str] = []
+    for title, body in split_entries(text, ("VNE",)):
+        joined = "\n".join(body)
+        if "PRE_LIVE_SCOPE" not in joined:
+            continue
+        m_mode = MODE_UJI_RX.search(joined)
+        if m_mode and m_mode.group(1) == "FORK_LIVE":
+            errors.append(
+                f"[08 FORK] Entri '{title[:60]}' berkelas PRE_LIVE_SCOPE tetapi Mode Uji FORK_LIVE — "
+                f"kode yang sudah live wajib ke 09, bukan 08."
+            )
+        m_vr = VERSION_RELATION_RX.search(joined)
+        if not m_vr or m_vr.group(1) != "HEAD_NEWER_THAN_LIVE":
+            errors.append(
+                f"[08 VERSION] Entri '{title[:60]}' berkelas PRE_LIVE_SCOPE wajib "
+                f"VERSION_RELATION: HEAD_NEWER_THAN_LIVE."
+            )
+    return errors
+
+
 def validate_wadah_rules(audit_dir: Path) -> List[str]:
     """Jalankan seluruh aturan 06/07/08/09 + jejak lead."""
     errors: List[str] = []
@@ -882,6 +974,8 @@ def validate_wadah_rules(audit_dir: Path) -> List[str]:
     errors.extend(validate_seven(texts["07-needs-next-step.md"]))
     errors.extend(validate_eight(texts["08-valid-not-eligible.md"]))
     errors.extend(validate_nine(texts["09-confirmed-findings.md"]))
+    errors.extend(validate_nine_fork(audit_dir, texts["09-confirmed-findings.md"]))
+    errors.extend(validate_eight_fork(texts["08-valid-not-eligible.md"]))
     leads_text = (audit_dir / "05-raw-leads.md").read_text(encoding="utf-8") if (audit_dir / "05-raw-leads.md").exists() else ""
     errors.extend(validate_lead_status(leads_text))
     errors.extend(validate_lead_traceability(leads_text, texts))

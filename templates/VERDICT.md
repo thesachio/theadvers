@@ -28,13 +28,46 @@ Sebuah kandidat hanya sah disebut Temuan Terkonfirmasi (`09-confirmed-findings.m
 
 ## 2. TANGGA BUKTI (wajib dicantumkan pada setiap verdict)
 
+**Proyek ini LIVE DI MAINNET.** Karena itu `FORK_LIVE` adalah **default dan wajib**, bukan pilihan
+yang setara dengan yang lain. Proyek yang sejak awal dinyatakan masih testnet/devnet memakai
+`FORK_TESTNET` — dan status itu **wajib dicatat di `STATE.md`**, bukan disimpulkan per entri.
+
 | Tingkat | Jenis bukti | Boleh menopang |
 | :--- | :--- | :--- |
-| **A** | `Mode Uji: FORK_LIVE` terhadap bytecode produksi ter-deploy, tanpa cheatcode, `[PASS]` | hingga `09` |
-| **A-HEAD** | `Mode Uji: FORK_DEPLOYED_HEAD` di atas fork mainnet nyata, `[PASS]`, tanpa cheatcode | `09` bila `LIVE_MATCH`, atau `08` [`PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`] |
-| **B** | `Mode Uji: LOKAL` dengan kontrak asli (non-EVM, atau rantai tanpa RPC) | `09` (kode cocok live) atau `08` (EVM tanpa RPC / HEAD-only) |
+| **A** | `Mode Uji: FORK_LIVE` — fork state **produksi pada blok terakhir**, `[PASS]`, tanpa cheatcode | hingga `09` **(satu-satunya jalur sah untuk `09` pada proyek mainnet)** |
+| **T-ONLY** | `Mode Uji: FORK_TESTNET` — hanya bila proyek memang testnet/devnet (tercatat di `STATE.md`) | `09` sebagai *live-of-record* testnet, dengan label eksplisit |
+| **A-HEAD** | `Mode Uji: FORK_DEPLOYED_HEAD` di atas fork mainnet nyata, `[PASS]`, tanpa cheatcode | `08` [`PRE_LIVE_SCOPE`] — **hanya** bila kode HEAD **lebih baru** dari live dan belum aktif; tidak sah untuk `09` pada proyek mainnet |
+| **B** | `Mode Uji: LOKAL` dengan kontrak asli (non-EVM, atau rantai tanpa RPC) | `09` (non-EVM kode cocok live) atau `08` (EVM tanpa RPC) |
 | **C** | Bukti **struktural** (baca kode + `eth_call`) atau **mock pihak ketiga** | maksimal `07` (dengan `PERCOBAAN:`) atau `06` (salah baca statis) |
 | **D** | Asumsi/hitungan kertas **tanpa eksekusi test** | **TIDAK SAH** untuk `09`/`08`/`07`, dan TIDAK SAH untuk `06` pada kelas `POC_FAILS`/`NEGATIVE_EV`/`DUST` |
+
+### 2b. Fork wajib menyebut blok, dan blok itu harus blok live
+
+`Mode Uji: FORK_LIVE` **wajib** menyertakan `chain`, `block`, dan `RPC`. Entri tanpa `block:` tidak
+sah — "fork live" tanpa nomor blok tidak dapat direproduksi dan tidak membuktikan state apa pun.
+
+```
+Mode Uji: FORK_LIVE (chain: ethereum, block: 21345678, RPC: https://...)
+```
+
+Fork pada blok lama **bukan** `FORK_LIVE` — itu snapshot historis dan wajib ditandai `LOKAL` +
+`DEPLOYMENT_MATCH: UNVERIFIED (<alasan>)`.
+
+### 2c. `VERSION_RELATION` — relasi versi diukur, bukan diasumsikan
+
+Hindari asumsi "repo HEAD selalu lebih baru" atau "live selalu lebih baru". Ukur sekali per
+kontrak sebelum menggulirkan batch pertama di STAGE-D:
+
+| Nilai | Cara membuktikan | Kode pembanding yang dipakai |
+| :--- | :--- | :--- |
+| `LIVE_IS_DEPLOYED_COMMIT` | `cast code <impl aktif>` cocok dengan build commit tertentu | repo (commit itu) |
+| `LIVE_NEWER_THAN_HEAD` | impl aktif memuat kode yang **tidak ada** di HEAD (upgrade sudah jalan, repo tertinggal) | **bytecode live**, bukan repo |
+| `HEAD_NEWER_THAN_LIVE` | HEAD memuat perubahan yang belum aktif di proxy live | keduanya: live untuk `09`, HEAD untuk `08` |
+| `LIVE_UNVERIFIED` | bytecode live tidak bisa dipastikan berasal dari commit mana | tidak boleh `09` |
+
+**`LIVE_IDENTITY` wajib terukur:** alamat **impl aktif** dibaca dari slot EIP-1967 proxy
+(`0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc`), bukan dari nama berkas repo.
+Implementation yang **terpasang tapi belum di-`upgradeTo`** bukan live — ia milik `08`, bukan `09`.
 
 `DEPLOYMENT_MATCH` dan `TANGGA_BUKTI` wajib dicantumkan **bahkan pada verdict yang gugur** — tanpa keduanya, vonis dianggap belum sah dan entri wajib dikembalikan ke penulisnya.
 
@@ -136,9 +169,11 @@ Wajib memenuhi **seluruh** syarat berikut:
 
 1. **Sepuluh Pernyataan Keras** (§8) — enam mutlak + empat berbatas.
 2. **Pernyataan Integritas #11** (§9) — kejujuran usaha & cakupan laporan.
-3. Field metadata terukur: `TANGGA_BUKTI: A | B`, `DEPLOYMENT_MATCH: LIVE_MATCH`, `LIVE_IDENTITY` **terukur** (bukan disimpulkan), `POC_STATUS: PASS`.
-4. `TANGGA_BUKTI: A-HEAD` **DILARANG** di `09` — itu milik `08`.
-5. `CYCLE: P1_PRE_DEPLOY` / `P2_TESTNET_ONLY` **DILARANG** di `09`.
+3. Field metadata terukur: `TANGGA_BUKTI: A | B`, `DEPLOYMENT_MATCH: LIVE_MATCH`, `LIVE_IDENTITY` **terukur** (bukan disimpulkan), `POC_STATUS: PASS`, `VERSION_RELATION` (§2c).
+4. **`Mode Uji: FORK_LIVE` wajib** — proyek ini live di mainnet, jadi `FORK_DEPLOYED_HEAD` dan `LOKAL` **tidak sah** untuk `09`. `FORK_TESTNET` hanya sah bila `STATE.md` menyatakan proyek testnet/devnet.
+5. Fork wajib menyebut `chain`, `block`, `RPC` (§2b). Entri tanpa `block:` ditolak.
+6. `TANGGA_BUKTI: A-HEAD` **DILARANG** di `09` — itu milik `08`.
+7. `CYCLE: P1_PRE_DEPLOY` / `P2_TESTNET_ONLY` **DILARANG** di `09`.
 
 Wadah kasus `cases/<FIND-ID>/` wajib lengkap: `chat.md`, `laporan-teknis.md` (9 bagian), `poc.md` (5 bagian + Kontrol Positif).
 
