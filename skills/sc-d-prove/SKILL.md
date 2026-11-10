@@ -1,11 +1,11 @@
 ---
 name: sc-d-prove
-description: Eksekusi STAGE-D (Pembuktian Tiga Titik Segitiga dengan Sistem Rolling Batch Maksimal 5 Kandidat [ACTIVE] per Putaran) pada Wilayah Aktif R_i.
+description: Eksekusi STAGE-D (Pembuktian Tiga Titik Segitiga dengan Rolling Batch 3 Kandidat [ACTIVE] per Putaran, terikat satu wilayah & satu Batch ID) pada Wilayah Aktif R_i.
 ---
 
 # Skill sc-d-prove — Pembuktian Segitiga Rolling Batch (STAGE-D / L-PROVE)
 
-Anda menjalankan Tahap D (`L-PROVE`) untuk Wilayah Aktif R_i menggunakan mekanisme Rolling Batch (Maksimal 5 Kandidat `[ACTIVE]` sekaligus di `05-raw-leads.md`) agar kedalaman pembuktian mencapai 100% tanpa kompresi konteks.
+Anda menjalankan Tahap D (`L-PROVE`) untuk Wilayah Aktif R_i menggunakan mekanisme Rolling Batch (Maksimal 3 Kandidat `[ACTIVE]` sekaligus di `05-raw-leads.md`) agar kedalaman pembuktian mencapai 100% tanpa kompresi konteks.
 
 ---
 
@@ -15,9 +15,9 @@ Anda menjalankan Tahap D (`L-PROVE`) untuk Wilayah Aktif R_i menggunakan mekanis
 
        python3 tools/verify_segitiga.py --context-packet <audit-dir>
 
-2. Tarik Rolling Batch ke Meja Operasi (`<= 5 [ACTIVE]`):
+2. Tarik Rolling Batch ke Meja Operasi (`1..3 [ACTIVE]`, satu wilayah, satu `Batch ID`):
    - Periksa Bagian 2 (Tabel [QUEUED]) di 05-raw-leads.md untuk Wilayah Aktif R_i.
-   - Ambil maksimal 5 kandidat `[QUEUED]` dengan peringkat EV tertinggi (`P1` -> `P5`), ubah statusnya menjadi `[ACTIVE]`, dan buat kartu pembuktiannya di Bagian 3 (Blok Meja Operasi `[ACTIVE-BATCH]`) pada 05-raw-leads.md.
+   - Ambil maksimal 3 kandidat `[QUEUED]` **wilayah R_i** dengan peringkat EV tertinggi (`P1` -> `P5`), ubah statusnya menjadi `[ACTIVE]`, dan buat kartu pembuktiannya di Bagian 3 (Blok Meja Operasi `[ACTIVE-BATCH]`) pada 05-raw-leads.md.
    - **Sebelum menulis PoC, tetapkan kondisi live objek yang diserang.** Untuk SETIAP kartu `[ACTIVE]`
      jalankan deteksi terukur (satu perintah per lead, artefak bernama LEAD-ID):
 
@@ -42,14 +42,16 @@ Anda menjalankan Tahap D (`L-PROVE`) untuk Wilayah Aktif R_i menggunakan mekanis
      `--gate D` menolak kombinasi yang tidak konsisten (mis. proyek mainnet tetapi PoC memakai
      `FORK_TESTNET`, atau `SIKLUS: P4_LIVE_FULL` tetapi diuji `LOKAL`).
 
-   - Aturan Besi: Dilarang keras memiliki lebih dari 5 kandidat berstatus [ACTIVE] pada saat bersamaan. Biarkan kandidat ke-6 dan seterusnya tetap berstatus [QUEUED] untuk diproses pada batch berikutnya setelah batch ini selesai diadili di STAGE-E.
-   - Perbarui STATE.md (Current Stage: STAGE-D, Current Batch, Queued Leads Count, Active Leads Count).
+   - Aturan Besi: Dilarang keras memiliki lebih dari 3 kandidat berstatus [ACTIVE] pada saat bersamaan. Biarkan kandidat ke-4 dan seterusnya tetap berstatus [QUEUED] untuk diproses pada batch berikutnya setelah batch ini selesai diadili di STAGE-E.
+   - Setiap kartu WAJIB memuat `Batch ID: <R_i>-B<nn>` (mis. `R1-B01`); semua kartu dalam satu batch memakai `Batch ID` yang sama dan berprefiks wilayah aktif. Kartu wilayah lain → `--gate D` FAIL.
+   - Batch terakhir boleh berisi 1–2 kartu bila sisa `[QUEUED]` wilayah itu < 3 (contoh 7 lead → B01:3, B02:3, B03:1).
+   - Perbarui STATE.md (Current Stage: STAGE-D, Current Batch ID, Queued Leads Count, Active Leads Count).
 
 ---
 
 ## 2. Prosedur Pembuktian Tiga Titik Segitiga untuk Setiap Kandidat [ACTIVE]
 
-Untuk masing-masing kandidat [ACTIVE] di meja operasi (maksimal 5 kandidat):
+Untuk masing-masing kandidat [ACTIVE] di meja operasi (maksimal 3 kandidat):
 
 1. Lazy-Load Plugin Spesifik Kandidat:
    Baca berkas references/methods/M-xxx-*.md dan methodology/attack-forms/AF-xx-*.md (serta DOM-*/POV-*/CHAIN-* bila ada) yang ditugaskan pada kandidat tersebut.

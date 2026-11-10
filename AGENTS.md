@@ -34,7 +34,7 @@ Setiap sesi audit proyek target wajib memiliki direktori kerja terstruktur denga
 | `RADAR.md` | Radar Sinyal Lintas-Kontrak/Lintas-Modul. Menyimpan anomali dan efek samping dengan tag wajib [TOUCHES: KontrakAtauModul.variabelAtauFungsi] untuk merakit serangan berantai. |
 | `path-map.md` | Tabel Rekonsiliasi 100% Berkas Kode Sumber (Tier 1/2/3) & Peta 3-Edge per Wilayah. Menyimpan pembagian wilayah R_1 .. R_N, kapasitas nilai (Current Balance + Intended Capacity), serta jalur [EDGE-ASSET], [EDGE-VALUATION], dan [EDGE-CONTROL/LATENT]. |
 | `04-code-guarded.md` | Wadah Jalur Terjaga Kode (Tahap C). Menyimpan jalur/hipotesis awal di Tahap C (C1/C2) yang setelah diperiksa terbukti sudah dijaga rapat oleh kode (require, assert!, ensure!, modifier, *account constraint*, batas state, atau fakta di FACTS.md), lengkap dengan jangkar baris kode penjaganya. |
-| `05-raw-leads.md` | Antrean `[QUEUED]` & Meja Operasi Batch Aktif `[ACTIVE]` (Tahap C -> D -> E). Memiliki dua bagian per Wilayah R_i: (1) Tabel `[QUEUED]` untuk menyimpan semua kandidat kuat yang lolos saringan Tahap C tanpa batas plafon total, diurutkan menurut EV (SOUL.md §3), dan (2) Blok `[ACTIVE-BATCH]` yang menampung maksimal 5 kandidat `[ACTIVE]` dalam satu siklus pembuktian D -> E. Wajib kembali menjadi 0 ([QUEUED] == 0 dan [ACTIVE] == 0) sebelum Wilayah R_i ditutup. |
+| `05-raw-leads.md` | Antrean `[QUEUED]` & Meja Operasi Batch Aktif `[ACTIVE]` (Tahap C -> D -> E). Memiliki dua bagian per Wilayah R_i: (1) Tabel `[QUEUED]` untuk menyimpan semua kandidat kuat yang lolos saringan Tahap C tanpa batas plafon total, diurutkan menurut EV (SOUL.md §3), dan (2) Blok `[ACTIVE-BATCH]` yang menampung maksimal 3 kandidat `[ACTIVE]` dalam satu siklus pembuktian D -> E. Wajib kembali menjadi 0 ([QUEUED] == 0 dan [ACTIVE] == 0) sebelum Wilayah R_i ditutup. |
 | `06-refuted-invalid.md` | Wadah Kandidat Gugur pasca-Pembuktian (Tahap E). Untuk kandidat dari 05-raw-leads.md yang patah saat uji pembuktian Tahap D (beserta bukti eksak mengapa PoC/hitungan gagal). |
 | `07-needs-next-step.md` | Wadah Kandidat Butuh Langkah Lanjut (Tahap E). Untuk kandidat yang logikanya belum terbantahkan tetapi membutuhkan verifikasi lanjutan (misal pengecekan state on-chain spesifik, parameter deployment, atau komponen off-chain). |
 | `08-valid-not-eligible.md` | Wadah Valid tapi Tidak Memenuhi Syarat Klaim (Tahap E). Untuk isu/risiko desain yang secara teknis valid tetapi tidak masuk kualifikasi klaim program (*out-of-scope*, *known issue*, asumsi kepercayaan admin resmi, atau di bawah ambang severity). |
@@ -92,9 +92,12 @@ Ambil wilayah pertama yang berstatus [OPEN] di STATE.md, ubah menjadi [ACTIVE], 
 
 - Siklus Rolling Batch Tahap D (`Prove`) & Tahap E (`Verdict`) di Wilayah `R_i`:
   Selama masih ada kandidat berstatus [QUEUED] untuk Wilayah R_i di 05-raw-leads.md:
-  1. Penarikan Batch (Maksimal 5 Kandidat `[ACTIVE]`):
-     - Tarik maksimal 5 kandidat `[QUEUED]` dengan EV tertinggi ke blok `[ACTIVE-BATCH]` di 05-raw-leads.md dan ubah statusnya menjadi [ACTIVE].
-     - Dilarang keras memproses lebih dari 5 kandidat [ACTIVE] sekaligus dalam satu batch.
+  1. Penarikan Batch (Maksimal 3 Kandidat `[ACTIVE]`, Satu Wilayah):
+     - Tarik maksimal 3 kandidat `[QUEUED]` **wilayah R_i** dengan EV tertinggi ke blok `[ACTIVE-BATCH]` di 05-raw-leads.md dan ubah statusnya menjadi [ACTIVE].
+     - Dilarang keras memproses lebih dari 3 kandidat [ACTIVE] sekaligus dalam satu batch.
+     - Setiap kartu wajib menulis `Batch ID: <R_i>-B<nn>` (contoh `R1-B01`). Kartu berwilayah lain di batch R_i → `--gate D` FAIL.
+     - Batch terakhir boleh berisi 1–2 kartu bila sisa `[QUEUED]` wilayah itu < 3 (contoh 7 lead → `B01`:3, `B02`:3, `B03`:1).
+     - **Dilarang pindah wilayah** selama `[QUEUED]` wilayah R_i masih > 0; nomor batch di-reset ke `B01` saat wilayah berganti.
   2. Tahap D (`Prove Batch Aktif`):
      - Jalankan --context-packet untuk memuat @SLICE:STAGE-D beserta isi file plugin M-xxx & AF-xx yang ditugaskan pada kandidat di batch tersebut.
      - Untuk setiap kandidat [ACTIVE] di 05-raw-leads.md, bangun Bukti Segitiga:
@@ -111,7 +114,7 @@ Ambil wilayah pertama yang berstatus [OPEN] di STATE.md, ubah menjadi [ACTIVE], 
        - `09-confirmed-findings.md` (jika lulus Bukti Segitiga penuh).
      - Kunci dengan python3 tools/verify_segitiga.py --gate E <audit-dir> (memastikan jumlah kandidat [ACTIVE] di 05-raw-leads.md kembali menjadi `0`).
   4. Cek Sisa Antrean `[QUEUED]` Wilayah `R_i`:
-     - Jika di 05-raw-leads.md masih ada kandidat Wilayah R_i yang berstatus [QUEUED] > 0, kembali ke Langkah 1 (Tarik Batch Berikutnya, maksimal 5 kandidat) dan ulangi D -> E.
+     - Jika di 05-raw-leads.md masih ada kandidat Wilayah R_i yang berstatus [QUEUED] > 0, kembali ke Langkah 1 (Tarik Batch Berikutnya `R_i-B(n+1)`, maksimal 3 kandidat) dan ulangi D -> E — **jangan pindah wilayah lebih dulu**.
      - Jika [ACTIVE] == 0 DAN [QUEUED] == 0 untuk Wilayah R_i, lanjut ke Tahap F.
 
 - Tahap F (`Incremental Disclosure di 09-confirmed-findings.md & Penutupan Wilayah R_i`):
@@ -125,7 +128,7 @@ Ambil wilayah pertama yang berstatus [OPEN] di STATE.md, ubah menjadi [ACTIVE], 
 ### Fase III — Penutupan Global: Cross-Region Final Sweep (1x Setelah Semua Wilayah [CLOSED])
 1. Jalankan --context-packet saat seluruh wilayah sudah [CLOSED] untuk memuat @SLICE:FINAL-SWEEP.
 2. Periksa seluruh entri RADAR.md: apakah ada sinyal [TOUCHES: ...] yang baru ditemukan di wilayah-wilayah akhir (R_N) yang mematahkan asumsi di wilayah awal (R_1)?
-3. Jika ada rantai lintas-wilayah baru yang belum diuji, masukkan ke 05-raw-leads.md (maksimal 5 per batch) -> jalankan D -> E -> F.
+3. Jika ada rantai lintas-wilayah baru yang belum diuji, masukkan ke 05-raw-leads.md (maksimal 3 per batch) -> jalankan D -> E -> F.
 4. Jalankan gerbang pengunci akhir:
 
        python3 tools/verify_segitiga.py --final <audit-dir>
@@ -208,7 +211,7 @@ Setiap wadah menuntut **jenis bukti yang berbeda**. Wadah yang diisi tanpa bukti
 | python3 tools/verify_segitiga.py --gate B <dir> | Selesai Tahap B pada Wilayah R_i. | Wilayah R_i memiliki pemetaan [EDGE-ASSET], [EDGE-VALUATION], dan [EDGE-CONTROL/LATENT] di path-map.md. |
 | python3 tools/verify_segitiga.py --gate C1 <dir> | Selesai Tahap C Gelombang 1 (Blind Hunt) di R_i. | Jalur terjaga masuk ke 04-code-guarded.md, observasi awal masuk ke 05-raw-leads.md, dan sinyal lintas-kontrak tercatat dengan [TOUCHES: ...] di RADAR.md. |
 | python3 tools/verify_segitiga.py --gate C2 <dir> | Selesai Tahap C Gelombang 2 (Cross-Pollination) di R_i. | Hasil penyilangan tercatat, kandidat gugur awal masuk ke 04-code-guarded.md, dan setiap kandidat [QUEUED] di 05-raw-leads.md memiliki pasangan valid M-xxx & AF-xx serta urutan EV. |
-| python3 tools/verify_segitiga.py --gate D <dir> | Selesai Tahap D pada satu Batch di R_i. | Kandidat [ACTIVE] di 05-raw-leads.md berjumlah <= 5 dan semuanya memiliki 3 komponen Bukti Segitiga lengkap tanpa token kompresi. |
+| python3 tools/verify_segitiga.py --gate D <dir> | Selesai Tahap D pada satu Batch di R_i. | Kandidat [ACTIVE] di 05-raw-leads.md berjumlah 1..3, semuanya satu `Batch ID` berprefiks wilayah aktif (`R1-B01`), dan semuanya memiliki 3 komponen Bukti Segitiga lengkap tanpa token kompresi. |
 | python3 tools/verify_segitiga.py --gate E <dir> | Selesai Tahap E pada satu Batch di R_i. | Active Leads == 0, **plus** seluruh aturan wadah 06/07/08/09 (kelas + bukti) dan jejak lead: setiap lead yang keluar dari 05 wajib muncul di tepat satu wadah. |
 | `python3 tools/verify_segitiga.py --rules <dir>` | Sebelum/di luar gate, khusus memeriksa wadah | Aturan 04 (`TERSANGKAL` wajib 5 baris jalur J1–J5 berjangkar, `RULES-04`), 06 (`REJECTED_*` + `BUKTI_SIMULASI`/KS-n), 07 (`Disposition` + `PERCOBAAN`), 08 (`LOW_CLASS` + `POC_STATUS: PASS`), 09 (`TANGGA_BUKTI`/`LIVE_IDENTITY`/`POC_STATUS`), dan jejak lead (#11d). |
 | python3 tools/verify_segitiga.py --close-region <R_i> <dir> | Selesai Tahap F pada Wilayah R_i. | Di 05-raw-leads.md baik [ACTIVE] == 0 maupun [QUEUED] == 0 untuk R_i, dan seluruh temuan R_i di 09-confirmed-findings.md telah memiliki blok *Submission-Ready Disclosure*. |

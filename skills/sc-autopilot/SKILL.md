@@ -25,9 +25,9 @@ Selama sc-autopilot berjalan, Anda terikat pada 6 hukum mekanis yang tidak boleh
    Anda dilarang mengubah Current Stage di STATE.md ke tahap berikutnya sebelum perintah python3 tools/verify_segitiga.py --gate <tahap> <audit-dir> (atau --close-region / --final) mengembalikan status `PASS` (exit code 0). Jika FAIL, perbaiki kekurangan di berkas kerja saat itu juga dan jalankan ulang Gate.
 3. Selesaikan Satu Wilayah dari `A` sampai `F` Sebelum Pindah Wilayah:
    Dilarang keras menyentuh berkas Wilayah R_{i+1} selama Wilayah Aktif R_i belum melewati STAGE-F (Submission-Ready Disclosure di 09-confirmed-findings.md) dan belum lulus --close-region <R_i>.
-4. Kuras Habis Antrean `[QUEUED]` dengan *Rolling Batch* Maksimal 5 `[ACTIVE]`:
+4. Kuras Habis Antrean `[QUEUED]` dengan *Rolling Batch* Maksimal 3 `[ACTIVE]`:
    - Di STAGE-C2, masukkan seluruh kandidat yang lolos saringan Segitiga ke Tabel [QUEUED] di 05-raw-leads.md (tanpa plafon total, diurutkan menurut Prioritas EV SOUL.md §3: P1 s/d P5).
-   - Di STAGE-D, tarik maksimal 5 kandidat `[QUEUED]` menjadi [ACTIVE]. Buktikan di STAGE-D, lalu adili di STAGE-E ke wadah kanonik (06-refuted-invalid.md, 07-needs-next-step.md, 08-valid-not-eligible.md, atau 09-confirmed-findings.md) hingga [ACTIVE] == 0.
+   - Di STAGE-D, tarik maksimal 3 kandidat `[QUEUED]` menjadi [ACTIVE]. Buktikan di STAGE-D, lalu adili di STAGE-E ke wadah kanonik (06-refuted-invalid.md, 07-needs-next-step.md, 08-valid-not-eligible.md, atau 09-confirmed-findings.md) hingga [ACTIVE] == 0.
    - Ulangi putaran STAGE-D -> STAGE-E sampai `[QUEUED] == 0` DAN `[ACTIVE] == 0` untuk Wilayah R_i.
 5. Larangan Mutlak Token Kompresi Malas:
    Jangan pernah menulis ..., dll., dst., etc., and so on, rest of logic, atau rest of code di berkas audit mana pun. Setiap klaim wajib memiliki jangkar verbatim `Path/File.ext:Lxx-Lyy`.
@@ -96,7 +96,7 @@ Jalankan loop mesin status berikut secara terus-menerus hingga Current Stage == 
        python3 tools/verify_segitiga.py --gate 0 <audit-dir>
 
 5. Transisi ke Wilayah Pertama:
-   Ubah wilayah [OPEN] pertama (R_1) menjadi [ACTIVE] di STATE.md, set Active Region: R_1, Current Stage: STAGE-A, Current Batch: 0, dan lanjutkan ke STAGE-A.
+   Ubah wilayah [OPEN] pertama (R_1) menjadi [ACTIVE] di STATE.md, set Active Region: R_1, Current Stage: STAGE-A, Current Batch ID: NONE, dan lanjutkan ke STAGE-A.
 
 ---
 
@@ -153,17 +153,17 @@ Jalankan loop mesin status berikut secara terus-menerus hingga Current Stage == 
        python3 tools/verify_segitiga.py --gate C2 <audit-dir>
 
 5. Transisi:
-   - Jika terdapat kandidat [QUEUED] > 0 untuk Wilayah R_i: set Current Stage: STAGE-D, Current Batch: 1, perbarui Queued Leads Count di STATE.md, lalu lanjutkan ke STAGE-D.
+   - Jika terdapat kandidat [QUEUED] > 0 untuk Wilayah R_i: set Current Stage: STAGE-D, Current Batch ID: <R_i>-B01, perbarui Queued Leads Count di STATE.md, lalu lanjutkan ke STAGE-D.
    - Jika Queued Leads Count == 0 dan Active Leads Count == 0 (seluruh jalur di Wilayah R_i terbukti aman dan tercatat di 04-code-guarded.md): set Current Stage: STAGE-F di STATE.md dan lanjutkan ke STAGE-F.
 
 ---
 
-### STEP D — Jika Current Stage == STAGE-D (Pembuktian Segitiga Rolling Batch <= 5 [ACTIVE] di Wilayah R_i)
+### STEP D — Jika Current Stage == STAGE-D (Pembuktian Segitiga Rolling Batch <= 3 [ACTIVE] di Wilayah R_i)
 1. Re-Hydrate Konteks: Jalankan python3 tools/verify_segitiga.py --context-packet <audit-dir>.
-2. Penarikan Batch ke Meja Operasi (`<= 5 [ACTIVE]`):
-   - Jika saat ini Active Leads Count == 0 dan Queued Leads Count > 0 untuk Wilayah R_i: tarik maksimal 5 kandidat `[QUEUED]` dengan EV tertinggi ke Blok `[ACTIVE-BATCH]` di 05-raw-leads.md, ubah statusnya menjadi `[ACTIVE]`, dan perbarui STATE.md.
+2. Penarikan Batch ke Meja Operasi (`<= 3 [ACTIVE]`):
+   - Jika saat ini Active Leads Count == 0 dan Queued Leads Count > 0 untuk Wilayah R_i: tarik maksimal 3 kandidat `[QUEUED]` dengan EV tertinggi ke Blok `[ACTIVE-BATCH]` di 05-raw-leads.md, ubah statusnya menjadi `[ACTIVE]`, dan perbarui STATE.md.
 3. Eksekusi Tiga Titik Bukti Segitiga:
-   - Untuk setiap kandidat [ACTIVE] (maksimal 5), baca berkas plugin M-xxx dan AF-xx yang ditugaskan.
+   - Untuk setiap kandidat [ACTIVE] (maksimal 3), baca berkas plugin M-xxx dan AF-xx yang ditugaskan.
    - Lengkapi di 05-raw-leads.md:
      1. Titik 1 — Jejak Kode Eksak (`Path/File.ext:Lxx-Lyy`),
      2. Titik 2 — Bukti Eksekusi Test Runner (`forge test` / `cargo test` / `move test` / `snforge` / `pytest` / `go test`) atau Jejak Matematika Angka Konkret,
@@ -190,7 +190,7 @@ Jalankan loop mesin status berikut secara terus-menerus hingga Current Stage == 
 
 4. Keputusan Cabang Rolling Batch:
    - Jika masih ada kandidat `[QUEUED] > 0` untuk Wilayah `R_i` di `05-raw-leads.md`:
-     Naikkan Current Batch (+1), set Current Stage: STAGE-D, Active Leads Count: 0 di STATE.md, dan kembali ke STEP D untuk memproses batch berikutnya (maksimal 5 kandidat).
+     Naikkan Current Batch ID `R_i-B(n+1)` (jangan pindah wilayah selama [QUEUED] R_i > 0), set Current Stage: STAGE-D, Active Leads Count: 0 di STATE.md, dan kembali ke STEP D untuk memproses batch berikutnya (maksimal 3 kandidat).
    - Jika `[ACTIVE] == 0` DAN `[QUEUED] == 0` untuk Wilayah `R_i`:
      Set Current Stage: STAGE-F, Queued Leads Count: 0, Active Leads Count: 0, Last Passed Gate: GATE-E di STATE.md, dan lanjutkan ke STEP F.
 
@@ -208,7 +208,7 @@ Jalankan loop mesin status berikut secara terus-menerus hingga Current Stage == 
    - Di STATE.md, ubah status Wilayah R_i menjadi `[CLOSED]`.
    - Periksa Tabel Antrean Wilayah di STATE.md:
      - Jika masih ada Wilayah `R_{i+1}` yang berstatus `[OPEN]`:
-       Ubah status R_{i+1} menjadi `[ACTIVE]`, set Active Region: R_{i+1}, Current Stage: STAGE-A, Current Batch: 0, Queued Leads Count: 0, Active Leads Count: 0. Lakukan Hard Context Flush (lepaskan ingatan kode internal R_i) dan kembali ke STEP A untuk Wilayah `R_{i+1}`.
+       Ubah status R_{i+1} menjadi `[ACTIVE]`, set Active Region: R_{i+1}, Current Stage: STAGE-A, Current Batch ID: NONE (reset — batch berikutnya mulai B01), Queued Leads Count: 0, Active Leads Count: 0. Lakukan Hard Context Flush (lepaskan ingatan kode internal R_i) dan kembali ke STEP A untuk Wilayah `R_{i+1}`.
      - Jika seluruh Wilayah `R_1 .. R_N` telah berstatus `[CLOSED]`:
        Set Active Region: CROSS-REGION, Current Stage: FINAL-SWEEP di STATE.md, dan lanjutkan ke STEP FINAL-SWEEP.
 
@@ -218,7 +218,7 @@ Jalankan loop mesin status berikut secara terus-menerus hingga Current Stage == 
 1. Re-Hydrate Konteks: Jalankan python3 tools/verify_segitiga.py --context-packet <audit-dir>.
 2. Evaluasi Tabrakan `[TOUCHES: ...]` Lintas-Wilayah di `RADAR.md`:
    - Periksa seluruh entri RADAR.md dari R_1 hingga R_N. Apakah ada sinyal [TOUCHES: NamaModul.simbol] dari wilayah akhir yang mematahkan invariant atau berpasangan dengan sinyal di wilayah awal dan belum pernah diuji sebagai rantai?
-   - Jika ada kandidat lintas-wilayah baru: masukkan ke 05-raw-leads.md dengan Region CROSS-REGION, jalankan siklus `STAGE-D -> STAGE-E -> STAGE-F` (maksimal 5 per batch) hingga kembali bersih ([QUEUED] == 0 dan [ACTIVE] == 0).
+   - Jika ada kandidat lintas-wilayah baru: masukkan ke 05-raw-leads.md dengan Region CROSS-REGION, jalankan siklus `STAGE-D -> STAGE-E -> STAGE-F` (maksimal 3 per batch) hingga kembali bersih ([QUEUED] == 0 dan [ACTIVE] == 0).
 3. Jalankan Gerbang Pengunci Akhir (`--final`):
 
        python3 tools/verify_segitiga.py --final <audit-dir>

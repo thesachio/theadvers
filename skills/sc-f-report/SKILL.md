@@ -52,7 +52,7 @@ python3 tools/verify_segitiga.py --context-packet <audit-dir>
    - Periksa seluruh baris di RADAR.md: apakah ada sinyal [TOUCHES: NamaModul.simbol] yang baru ditemukan pada wilayah-wilayah akhir (R_N) yang mematahkan asumsi fakta atau menyentuh variabel yang sama di wilayah-wilayah awal (R_1)?
    - Jika ditemukan rantai lintas-wilayah baru yang belum pernah diuji:
      - Masukkan ke Tabel [QUEUED] di 05-raw-leads.md dengan Region CROSS-REGION,
-     - Jalankan siklus `sc-d-prove` -> `sc-e-verdict` -> `sc-f-report` (maksimal 5 kandidat per batch) hingga kembali bersih ([QUEUED] == 0 dan [ACTIVE] == 0).
+     - Jalankan siklus `sc-d-prove` -> `sc-e-verdict` -> `sc-f-report` (maksimal 3 kandidat per batch) hingga kembali bersih ([QUEUED] == 0 dan [ACTIVE] == 0).
 3. Jalankan Gerbang Pengunci Akhir (`--final`):
 
        python3 tools/verify_segitiga.py --final <audit-dir>

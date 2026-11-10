@@ -16,7 +16,7 @@ Seluruh proses audit hanya menggunakan berkas kerja kanonik berikut:
 5. `04-code-guarded.md`: Wadah jalur/hipotesis yang gugur di Tahap C (C1/C2) karena sudah dijaga rapat oleh kode (require, assert!, ensure!, modifier, pengecekan *signer/account constraint*, batas state, atau fakta di FACTS.md).
 6. `05-raw-leads.md`: Wadah kerja Wilayah Aktif R_i yang terbagi menjadi:
    - Tabel `[QUEUED]`: Menampung seluruh kandidat kuat hasil saringan Tahap C tanpa batas plafon jumlah, diurutkan menurut Prioritas EV (`SOUL.md §3`).
-   - Blok `[ACTIVE-BATCH]`: Menampung maksimal 5 kandidat `[ACTIVE]` yang ditarik dari [QUEUED] untuk dibuktikan dan diadili dalam satu putaran Batch D -> E.
+   - Blok `[ACTIVE-BATCH]`: Menampung maksimal 3 kandidat `[ACTIVE]` yang ditarik dari [QUEUED] untuk dibuktikan dan diadili dalam satu putaran Batch D -> E.
 7. `06-refuted-invalid.md`: Wadah kandidat dari 05-raw-leads.md yang patah/terbantahkan saat pembuktian Tahap D/E beserta bukti eksak penyebab kegagalannya.
 8. `07-needs-next-step.md`: Wadah kandidat yang logikanya belum patah tetapi membutuhkan verifikasi lanjutan (state on-chain live, parameter deployment eksternal, atau komponen off-chain tertutup).
 9. `08-valid-not-eligible.md`: Wadah perilaku/risiko yang secara teknis valid tetapi tidak memenuhi syarat kelayakan klaim (*out-of-scope*, *known issue*, asumsi kepercayaan admin resmi, atau di bawah ambang kebijakan).
@@ -126,11 +126,15 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
 ---
 
 <!-- @SLICE:STAGE-D:START -->
-### TAHAP D — Prove: Pembuktian Segitiga per Rolling Batch Maksimal 5 Kandidat (STAGE-D pada Wilayah Aktif R_i)
+### TAHAP D — Prove: Pembuktian Segitiga per Rolling Batch Maksimal 3 Kandidat (STAGE-D pada Wilayah Aktif R_i)
 - Tujuan: Membuktikan kandidat secara mendalam tanpa membuat memori agen penuh/terkompres.
-- Aturan Kapasitas Batch (`Rolling Batch <= 5`):
-  - Tarik maksimal 5 kandidat `[QUEUED]` dengan EV tertinggi dari tabel antrean Wilayah R_i ke dalam blok `[ACTIVE-BATCH]` di 05-raw-leads.md, dan ubah statusnya menjadi `[ACTIVE]`.
-  - Dilarang keras memiliki lebih dari 5 kandidat berstatus [ACTIVE] pada saat bersamaan.
+- Aturan Kapasitas Batch (`Rolling Batch <= 3`, terikat wilayah):
+  - Tarik maksimal 3 kandidat `[QUEUED]` **wilayah R_i** dengan EV tertinggi dari tabel antrean ke dalam blok `[ACTIVE-BATCH]` di 05-raw-leads.md, dan ubah statusnya menjadi `[ACTIVE]`.
+  - Dilarang keras memiliki lebih dari 3 kandidat berstatus [ACTIVE] pada saat bersamaan.
+  - Setiap kartu wajib menulis `Batch ID: <R_i>-B<nn>` (contoh `R1-B01`, `R1-B02`, `R2-B01`). Semua kartu dalam satu batch wajib memakai `Batch ID` yang **sama**, berprefiks wilayah aktif.
+  - `[ACTIVE]` dari wilayah lain **dilarang** ikut dalam batch R_i.
+  - Batch terakhir boleh berisi 1–2 kartu bila sisa `[QUEUED]` wilayah itu < 3 (contoh 7 lead → `B01`:3, `B02`:3, `B03`:1).
+  - **Dilarang pindah wilayah** selama `[QUEUED]` wilayah R_i masih > 0. Nomor batch di-reset ke `B01` saat wilayah berganti.
 - Prosedur Eksekusi untuk Setiap Kandidat `[ACTIVE]`:
   1. Baca file plugin spesifik references/methods/M-xxx-*.md dan methodology/attack-forms/AF-xx-*.md yang ditugaskan pada kandidat tersebut.
   2. Eksekusi dan tuliskan Tiga Titik Bukti Segitiga secara lengkap di 05-raw-leads.md:
@@ -155,7 +159,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
      - `08-valid-not-eligible.md`: Jika perilaku/risiko benar terjadi tetapi tidak memenuhi syarat kelayakan program (*out-of-scope*, *known issue*, asumsi admin terpercaya).
      - `09-confirmed-findings.md`: Jika dan hanya jika ketiga titik Bukti Segitiga terbukti utuh tanpa asumsi palsu.
   2. Setelah seluruh kandidat batch ini dipindahkan ([ACTIVE] == 0), periksa tabel `[QUEUED]` Wilayah R_i di 05-raw-leads.md:
-     - Jika masih ada `[QUEUED] > 0`: Kembali ke Tahap D (`STAGE-D`), tarik batch berikutnya (maksimal 5 kandidat [QUEUED] dengan EV tertinggi menjadi [ACTIVE]), dan ulangi siklus D -> E.
+     - Jika masih ada `[QUEUED] > 0`: Kembali ke Tahap D (`STAGE-D`), tarik batch berikutnya `R_i-B(n+1)` (maksimal 3 kandidat `[QUEUED]` wilayah yang sama dengan EV tertinggi menjadi `[ACTIVE]`), dan ulangi siklus D -> E. **Jangan pindah wilayah lebih dulu.**
      - Jika `[ACTIVE] == 0` DAN `[QUEUED] == 0`: Lanjutkan ke Tahap F (`STAGE-F`).
 - Syarat Lulus Gate (`python3 tools/verify_segitiga.py --gate E <audit-dir>`):
   - Jumlah kandidat berstatus [ACTIVE] di 05-raw-leads.md == `0`.
@@ -197,7 +201,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
   2. Periksa apakah ada sinyal [TOUCHES: ...] yang baru ditemukan pada wilayah-wilayah akhir (R_N) yang memengaruhi state atau mematahkan invariant di wilayah-wilayah awal (R_1).
   3. Jika ditemukan kombinasi lintas-wilayah baru yang belum pernah diuji:
      - Masukkan ke 05-raw-leads.md dengan label wilayah CROSS-REGION,
-     - Jalankan siklus Tahap D -> Tahap E -> Tahap F (maksimal 5 kandidat per batch) hingga kembali bersih (0).
+     - Jalankan siklus Tahap D -> Tahap E -> Tahap F (maksimal 3 kandidat per batch) hingga kembali bersih (0).
   4. Jalankan verifikasi final seluruh repositori audit:
 
          python3 tools/verify_segitiga.py --final <audit-dir>

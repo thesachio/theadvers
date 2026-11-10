@@ -19,7 +19,7 @@ STAGE-0   Global Partitioning & Rekonsiliasi 100% Berkas → 3 Tier → Wilayah 
    │     STAGE-B   L-PATH   : peta 3-edge ([EDGE-ASSET], [EDGE-VALUATION], [EDGE-CONTROL/LATENT])
    │     STAGE-C1  Gelombang 1 — Blind Adversarial Hunt (dilarang buka plugin)
    │     STAGE-C2  Gelombang 2 — Inversi FACTS + rantai RADAR + lazy-load _ROUTER → [QUEUED]
-   │     STAGE-D   Prove — Rolling Batch maksimal 5 [ACTIVE]
+   │     STAGE-D   Prove — Rolling Batch maksimal 3 [ACTIVE]
    │     STAGE-E   Verdict — 06 / 07 / 08 / 09
    │     STAGE-F   Disclosure — blok 09 + wadah cases/<FIND-ID>/ → --close-region R_i
    │
@@ -124,7 +124,7 @@ pelanggaran yang disuntikkan.
 1. **Jangkar verbatim.** Setiap fakta dan entri wajib memuat `Path/File.ext:Lxx-Lyy` (rentang), bukan satu baris.
 2. **Zero-compression.** Token `...`, `dll.`, `dst.`, `etc.`, `rest of logic` dilarang di berkas analisis; gerbang menolak otomatis.
 3. **Vertical region.** Dilarang membuka STAGE-A/B/C untuk `R_{i+1}` selama `R_i` masih `[QUEUED] > 0` atau `[ACTIVE] > 0`.
-4. **Rolling batch.** Maksimal 5 kandidat `[ACTIVE]`; kandidat `[QUEUED]` tidak dibuang karena kuota.
+4. **Rolling batch.** Maksimal 3 kandidat `[ACTIVE]`; kandidat `[QUEUED]` tidak dibuang karena kuota.
 5. **Write-ahead checkpoint.** Perbarui `STATE.md` **sebelum** memulai tahap berikutnya.
 6. **Bukti dari eksekusi nyata.** Blok `BUKTI_SIMULASI:` wajib berisi perintah `$ ...` beserta keluarannya; menulis dari ingatan = `FABRICATED_EVIDENCE`.
 7. **Drop-in plugin.** Tambah metode/serangan/domain/POV/chain cukup dengan 1 berkas baru + `--sync`, tanpa mengedit berkas lain.

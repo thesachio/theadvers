@@ -14,9 +14,10 @@
 - Total Scope Files Reconciled: 0
 - Active Region: NONE *(Isi NONE saat STAGE-0, R_1..R_N saat loop wilayah, atau CROSS-REGION saat FINAL-SWEEP)*
 - Current Stage: STAGE-0 *(Nilai valid: STAGE-0, STAGE-A, STAGE-B, STAGE-C1, STAGE-C2, STAGE-D, STAGE-E, STAGE-F, FINAL-SWEEP, COMPLETED)*
-- Current Batch: 0 *(Nomor batch siklus D -> E pada wilayah aktif)*
+- Current Batch ID: NONE *(Format `<R_i>-B<nn>`, mis. R1-B01. Di-reset ke B01 saat wilayah berganti)*
 - Queued Leads Count (Active Region): 0 *(Jumlah kandidat berstatus [QUEUED] di 05-raw-leads.md untuk wilayah aktif)*
-- Active Leads Count (Active Batch): 0 *(Wajib <= 5 saat STAGE-D, dan wajib 0 setelah STAGE-E & saat menutup wilayah)*
+- Active Leads Count (Active Batch): 0 *(Wajib 1..3 saat STAGE-D; 1–2 hanya bila batch terakhir wilayah; wajib 0 setelah STAGE-E & saat menutup wilayah)*
+- Batch Scope: Satu batch = satu wilayah *(kartu [ACTIVE] wilayah lain dilarang ikut)*
 - Last Passed Gate: NONE
 - Next Exact Action: Jalankan inventarisasi 100% berkas scope ke Tabel Rekonsiliasi di path-map.md dan kunci dengan --gate 0.
 
@@ -39,7 +40,7 @@
 | :--- | :--- | :--- |
 | `04-code-guarded.md` | 0 | Jalur/hipotesis yang terbukti sudah dijaga rapat oleh kode pada Tahap C |
 | `05-raw-leads.md` (`[QUEUED]`) | 0 | Antrean kandidat lolos Segitiga di wilayah aktif (wajib 0 saat wilayah ditutup) |
-| `05-raw-leads.md` (`[ACTIVE]`) | 0 | Meja operasi pembuktian batch aktif (maksimal 5 per batch, wajib 0 usai Tahap E) |
+| `05-raw-leads.md` (`[ACTIVE]`) | 0 | Meja operasi pembuktian batch aktif (maksimal 3 per batch, satu Batch ID, wajib 0 usai Tahap E) |
 | `06-refuted-invalid.md` | 0 | Kandidat yang patah/gugur saat pembuktian Tahap D/E |
 | `07-needs-next-step.md` | 0 | Kandidat yang membutuhkan verifikasi state live / komponen eksternal |
 | `08-valid-not-eligible.md` | 0 | Perilaku valid teknis tetapi di luar kelayakan klaim (*out-of-scope / known / admin*) |

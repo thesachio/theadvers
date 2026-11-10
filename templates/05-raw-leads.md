@@ -1,10 +1,11 @@
 # 05-RAW-LEADS — Antrean Kandidat [QUEUED] & Meja Operasi Batch Aktif [ACTIVE] (theadvers v2.0)
 > ATURAN BESI KAPASITAS & ROLLING BATCH:
 > 1. Bagian 2 (Tabel Antrean `[QUEUED]`): Menampung seluruh kandidat yang lolos saringan kualitas Segitiga pada `STAGE-C2` tanpa batas plafon total. Jangan pernah membuang kandidat valid hanya karena jumlahnya banyak. Urutkan berdasarkan Prioritas EV (`SOUL.md §3`: `P1` s/d `P5`) dan pasangkan dengan M-xxx serta AF-xx.
-> 2. Bagian 3 (Blok Meja Operasi `[ACTIVE-BATCH]`): Hanya boleh berisi maksimal 5 kandidat berstatus `[ACTIVE]` dalam satu siklus pembuktian STAGE-D -> STAGE-E.
-> 3. Setelah STAGE-E selesai mengadili batch aktif ke wadah 06 / 07 / 08 / 09, jumlah [ACTIVE] wajib kembali menjadi `0`. Jika masih ada [QUEUED] > 0 untuk Wilayah R_i, tarik batch berikutnya (maksimal 5 kandidat) hingga [QUEUED] == 0 dan [ACTIVE] == 0.
-> 4. Dilarang menulis token kompresi (..., dll., dst., etc., rest of logic). Wajib cantumkan Path/File.ext:Lxx-Lyy.
-> 5. **TARGET OBJEK & DEPLOY_PARITY WAJIB PER LEAD.** Sebelum menulis PoC, setiap kartu `[ACTIVE]` wajib menyatakan objek on-chain yang diserang (`TARGET_OBJEK`) dan membawa artefak `deploy_parity.py`. `MODE_UJI_POC` diturunkan dari `SIKLUS`, bukan dipilih bebas — PoC dibangun pada kondisi yang **relevan** dengan jaringan proyek (`INTEL.md §0`).
+> 2. **Formasi Batch 3 + Sisa, TERIKAT PER WILAYAH.** Bagian 3 (Blok Meja Operasi `[ACTIVE-BATCH]`) hanya boleh berisi **maksimal 3** kandidat `[ACTIVE]` dalam satu siklus STAGE-D -> STAGE-E. Jika sisa `[QUEUED]` wilayah itu kurang dari 3, batch terakhir boleh berisi 1–2 kartu (contoh: 7 lead → batch 3 + 3 + 1).
+> 3. **Satu batch = satu wilayah.** `[ACTIVE]` dari wilayah lain **DILARANG** ikut dalam batch wilayah R_i. Setelah STAGE-E mengadili batch ke wadah 06/07/08/09, jumlah `[ACTIVE]` wajib kembali `0`. Selama `[QUEUED]` wilayah R_i masih > 0, tarik batch berikutnya **wilayah yang sama** (maks 3) sampai `[QUEUED] == 0` dan `[ACTIVE] == 0` — **baru** pindah wilayah dan mulai `B01` lagi.
+> 4. **Penomoran batch:** `<R_i>-B<nn>` (contoh `R1-B01`, `R1-B02`, `R2-B01`). Nomor **di-reset ke `B01` saat wilayah berganti**, tetapi prefiks wilayah membuat ID unik lintas audit.
+> 5. Dilarang menulis token kompresi (..., dll., dst., etc., rest of logic). Wajib cantumkan Path/File.ext:Lxx-Lyy.
+> 6. **TARGET OBJEK & DEPLOY_PARITY WAJIB PER LEAD.** Sebelum menulis PoC, setiap kartu `[ACTIVE]` wajib menyatakan objek on-chain yang diserang (`TARGET_OBJEK`) dan membawa artefak `deploy_parity.py`. `MODE_UJI_POC` diturunkan dari `SIKLUS`, bukan dipilih bebas — PoC dibangun pada kondisi yang **relevan** dengan jaringan proyek (`INTEL.md §0`).
 >    | `SIKLUS` | `MODE_UJI_POC` sah | Syarat `INTEL.md §0` |
 >    | :--- | :--- | :--- |
 >    | `P4_LIVE_FULL` | `FORK_LIVE` | `MAINNET` |
@@ -39,14 +40,16 @@
 
 ---
 
-## 3. BLOK MEJA OPERASI PEMBUKTIAN ([ACTIVE-BATCH]) — MAKSIMAL 5 KANDIDAT [ACTIVE]
+## 3. BLOK MEJA OPERASI PEMBUKTIAN ([ACTIVE-BATCH]) — 3 KANDIDAT [ACTIVE] PER BATCH, PER WILAYAH
 
 - Active Region: R_1
-- Current Batch Number: 1
-- Current `[ACTIVE]` Leads Count: 0 *(Wajib <= 5 saat STAGE-D, dan wajib 0 setelah dipindahkan ke 06/07/08/09 pada STAGE-E)*
+- Current Batch ID: `R1-B01`
+- Current `[ACTIVE]` Leads Count: 0 *(Wajib 1..3 saat STAGE-D; 1–2 hanya sah bila itu batch terakhir wilayah ini; wajib 0 setelah dipindahkan ke 06/07/08/09 pada STAGE-E)*
+- `[QUEUED]` Sisa Wilayah Ini: 0 *(bila > 0 setelah batch ditutup, wajib tarik batch berikutnya wilayah yang sama sebelum pindah wilayah)*
 
-*Salin struktur kartu pembuktian di bawah ini hanya untuk kandidat yang sedang berstatus [ACTIVE] pada batch saat ini (maksimal 5 kartu). Setelah kandidat selesai diadili di STAGE-E, pindahkan seluruh isi kartunya ke wadah tujuan (06 / 07 / 08 / 09) dan kosongkan dari bagian ini.*
+*Salin struktur kartu pembuktian di bawah ini hanya untuk kandidat yang sedang berstatus [ACTIVE] pada batch saat ini (maksimal 3 kartu). Setelah kandidat selesai diadili di STAGE-E, pindahkan seluruh isi kartunya ke wadah tujuan (06 / 07 / 08 / 09) dan kosongkan dari bagian ini.*
 ### [CONTOH FORMAT KARTU SAAT STAGE-D — KOSONGKAN SETELAH STAGE-E]
+- Batch ID: [R1-B01] *(format `<R_i>-B<nn>`; reset ke B01 saat wilayah berganti)*
 - Lead ID & Judul: [LEAD-R1-01 — Judul Kandidat]
 - Status Saat Ini: [TEMPLATE-CONTOH — Ganti menjadi [ACTIVE] saat menarik kandidat dari tabel [QUEUED]]
 - Region & EV Rank: R_1 | P1

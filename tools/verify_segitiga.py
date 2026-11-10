@@ -132,6 +132,9 @@ COMMIT_RX = re.compile(r"Audited Commit\s*/?\s*Branch\s*[:=]\s*`?([^\n]+)")
 LIVE_PROOF_RX = re.compile(r"Bukti Live\s*[:=]\s*(.+)")
 INTEL_STATUS_RX = re.compile(r"Intel Status\s*[:=]\s*`?(COMPLETE|PARTIAL)")
 # --- Rekonsiliasi deployment (deteksi kondisi live) ---
+BATCH_MAX = 3
+BATCH_ID_RX = re.compile(r"Batch ID\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?(R\d+-B\d{2,})")
+
 SIKLUS_VALUES = ("P1_PRE_DEPLOY", "P2_TESTNET_ONLY", "P3_LIVE_PARTIAL", "P4_LIVE_FULL")
 ENTRYPOINT_VERDICTS = (
     "LIVE_MATCH",
@@ -1837,14 +1840,17 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
         )
         queued_now = [r for r in q_rows_d if "[QUEUED]" in r["status"]]
 
-        if len(active_cards) > 5:
+        if len(active_cards) > BATCH_MAX:
             errors.append(
-                f"[GATE-D] Pelanggaran Rolling Batch! Terdapat {len(active_cards)} kartu [ACTIVE] di 05-raw-leads.md (Maksimal 5 per Batch)."
+                f"[GATE-D] Pelanggaran Rolling Batch! Terdapat {len(active_cards)} kartu [ACTIVE] "
+                f"di 05-raw-leads.md (maksimal {BATCH_MAX} per batch)."
             )
         elif len(active_cards) == 0:
             if len(queued_now) > 0:
                 errors.append(
-                    f"[GATE-D] Masih ada {len(queued_now)} kandidat [QUEUED] untuk Wilayah {active_region}, tetapi 0 kartu [ACTIVE] di Bagian 3 05-raw-leads.md. Tarik maksimal 5 kandidat ke meja operasi terlebih dahulu."
+                    f"[GATE-D] Masih ada {len(queued_now)} kandidat [QUEUED] untuk Wilayah {active_region}, "
+                    f"tetapi 0 kartu [ACTIVE] di Bagian 3 05-raw-leads.md. Tarik maksimal {BATCH_MAX} kandidat "
+                    f"wilayah ini ke meja operasi terlebih dahulu."
                 )
             else:
                 cleaned_guarded_d = strip_template_boilerplate(guarded_text)
@@ -1852,12 +1858,53 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
                     errors.append(
                         f"[GATE-D] Wilayah {active_region} memiliki 0 lead, tetapi 04-code-guarded.md belum mencatat bukti jalur terjaga ':Lxx'."
                     )
+        batch_ids: Dict[str, List[str]] = {}
         for card in active_cards:
+            m_bid = BATCH_ID_RX.search(card)
+            m_lid = LEAD_ID_RX.search(card)
+            if m_lid:
+                lid = m_lid.group(1)
+            else:
+                # Kartu di 05 biasanya menaruh ID di heading `### LEAD-R1-01 — ...`,
+                # bukan di baris 'Lead ID & Judul:'. Ambil dari heading sebagai cadangan.
+                m_head = re.search(r"^#{2,3}\s+`?(LEAD-[A-Za-z0-9_\-]+)", card, re.MULTILINE)
+                lid = m_head.group(1) if m_head else "(kartu tanpa Lead ID)"
+            if not m_bid:
+                errors.append(
+                    f"[GATE-D] {lid} tanpa baris 'Batch ID: <R_i>-B<nn>' (mis. R1-B01). "
+                    f"Batch wajib berprefiks wilayah dan bernomor per wilayah."
+                )
+            else:
+                bid = m_bid.group(1)
+                batch_ids.setdefault(bid, []).append(lid)
+                # Wilayah ditulis `R_1`, Batch ID ditulis `R1-B01`: normalkan garis bawah.
+                region_pfx = active_region.replace("_", "")
+                if not bid.startswith(f"{region_pfx}-"):
+                    errors.append(
+                        f"[GATE-D] {lid} ber-Batch ID '{bid}' tetapi Wilayah Aktif adalah {active_region}. "
+                        f"Satu batch = satu wilayah; [ACTIVE] wilayah lain dilarang ikut."
+                    )
+                # Lead ID-nya sendiri juga wajib milik wilayah aktif: prefiks Batch ID saja
+                # tidak menahan lead wilayah lain yang diberi Batch ID wilayah aktif.
+                m_pfx = re.match(r"LEAD-([A-Za-z0-9]+)-", lid)
+                if m_pfx and m_pfx.group(1) != region_pfx:
+                    errors.append(
+                        f"[GATE-D] {lid} berasal dari wilayah {m_pfx.group(1)} tetapi masuk batch "
+                        f"wilayah aktif {active_region}. Satu batch = satu wilayah."
+                    )
             for titik in ("Titik 1", "Titik 2", "Titik 3"):
                 if titik not in card:
                     errors.append(f"[GATE-D] Kartu [ACTIVE] kehilangan komponen '{titik}' pada Bukti Segitiga.")
             if not ANCHOR_REGEX.search(card):
                 errors.append("[GATE-D] Kartu [ACTIVE] tidak memiliki jangkar kode Path/File.ext:Lxx.")
+
+        # Semua kartu aktif wajib berada pada Batch ID yang sama (satu siklus D->E).
+        if len(batch_ids) > 1:
+            rinci = ", ".join(f"{b}({len(v)})" for b, v in sorted(batch_ids.items()))
+            errors.append(
+                f"[GATE-D] Kartu [ACTIVE] tercampur beberapa Batch ID: {rinci}. "
+                f"Satu siklus STAGE-D -> STAGE-E hanya untuk satu Batch ID."
+            )
 
         # Per lead: objek on-chain + artefak deploy_parity + Mode Uji PoC yang relevan.
         errors.extend(validate_lead_deploy(audit_dir, active_cards))
