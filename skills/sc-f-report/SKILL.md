@@ -37,7 +37,7 @@ python3 tools/verify_segitiga.py --context-packet <audit-dir>
 4. Transisi Wilayah & *Hard Context Flush***:
    - Setelah `--close-region <R_i>` dinyatakan `PASS`, ubah status Wilayah `R_i` pada Tabel Antrean Wilayah di `STATE.md` menjadi [CLOSED].
    - Periksa Tabel Antrean Wilayah di `STATE.md`:
-     - **Jika masih ada wilayah berstatus `[OPEN]`: Ambil wilayah [OPEN] berikutnya dengan EV tertinggi (R_{i+1}), ubah statusnya menjadi [ACTIVE], set Active Region: R_{i+1}, Current Stage: STAGE-A, Current Batch: 0, lakukan Hard Context Flush (lupakan detail internal R_i yang tidak tertulis di FACTS.md/RADAR.md), dan mulai siklus baru untuk R_{i+1} menggunakan sc-a-scope.
+     - **Jika masih ada wilayah berstatus `[OPEN]`: Ambil wilayah [OPEN] berikutnya dengan EV tertinggi (R_{i+1}), ubah statusnya menjadi [ACTIVE], set Active Region: R_{i+1}, Current Stage: STAGE-A, Current Batch ID: NONE *(reset — batch pertama wilayah baru dimulai `R{i+1}-B01`)*, lakukan Hard Context Flush (lupakan detail internal R_i yang tidak tertulis di FACTS.md/RADAR.md), dan mulai siklus baru untuk R_{i+1} menggunakan sc-a-scope.
      - Jika seluruh wilayah `R_1 .. R_N` sudah berstatus `[CLOSED]`: Set Active Region: CROSS-REGION dan Current Stage: FINAL-SWEEP di STATE.md, lalu jalankan Bagian 3 di bawah ini.
 
 ---
@@ -52,7 +52,7 @@ python3 tools/verify_segitiga.py --context-packet <audit-dir>
    - Periksa seluruh baris di RADAR.md: apakah ada sinyal [TOUCHES: NamaModul.simbol] yang baru ditemukan pada wilayah-wilayah akhir (R_N) yang mematahkan asumsi fakta atau menyentuh variabel yang sama di wilayah-wilayah awal (R_1)?
    - Jika ditemukan rantai lintas-wilayah baru yang belum pernah diuji:
      - Masukkan ke Tabel [QUEUED] di 05-raw-leads.md dengan Region CROSS-REGION,
-     - Jalankan siklus `sc-d-prove` -> `sc-e-verdict` -> `sc-f-report` (maksimal 3 kandidat per batch) hingga kembali bersih ([QUEUED] == 0 dan [ACTIVE] == 0).
+     - Jalankan siklus `sc-d-prove` -> `sc-e-verdict` -> `sc-f-report` (maksimal 3 kandidat per batch, satu `Batch ID` `<R_i>-B<nn>` berprefiks wilayah yang sama) hingga kembali bersih ([QUEUED] == 0 dan [ACTIVE] == 0). **Jangan pindah wilayah** selama `[QUEUED]` wilayah aktif masih > 0.
 3. Jalankan Gerbang Pengunci Akhir (`--final`):
 
        python3 tools/verify_segitiga.py --final <audit-dir>
