@@ -21,6 +21,14 @@ Baca output yang tercetak di layar untuk mengetahui apakah posisi Current Stage 
 
 ## 2. Prosedur Jika Current Stage == STAGE-0 (Global Partitioning — 1x di Awal Audit)
 
+0. **Prasyarat INTEL (jangan dilewati):** `INTEL.md` wajib sudah sah sebelum STAGE-0 dikerjakan.
+
+       python3 tools/verify_segitiga.py --intel <audit-dir>
+
+   Bila FAIL, hentikan STAGE-0 dan jalankan skill `sc-pre-intel` lebih dulu. `Deployment Stage`
+   (`MAINNET`/`TESTNET`/`DEVNET`) dari INTEL menentukan `Mode Uji` di STAGE-D dan syarat `09`.
+   `--gate 0` akan menolak bila INTEL belum sah.
+
 1. Write-Ahead Checkpoint: Perbarui STATE.md (Current Stage: STAGE-0, status START).
 2. Rekonsiliasi 100% Berkas Sumber dalam Scope:
    - Daftarkan seluruh berkas sumber dalam *scope* pada bahasa/runtime apa pun (.sol, .vy, .rs, .move, .cairo, .go, .ts, .py, .circom, .nr, .fc, dll.) ke Bagian 1 (Tabel Rekonsiliasi 100% Berkas) di path-map.md.

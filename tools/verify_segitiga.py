@@ -26,6 +26,7 @@ SKILLS_DIR = REPO_ROOT / "skills"
 VERDICT_TEMPLATE = REPO_ROOT / "templates" / "VERDICT.md"
 
 CANONICAL_FILES = [
+    "INTEL.md",
     "STATE.md",
     "FACTS.md",
     "RADAR.md",
@@ -124,6 +125,12 @@ VERSION_RELATIONS = (
 )
 MODE_LIVE_OK = ("FORK_LIVE", "FORK_TESTNET")
 PROJECT_STAGE_RX = re.compile(r"Deployment Stage\s*[:=]\s*`?(MAINNET|TESTNET|DEVNET)", re.IGNORECASE)
+DEPLOYMENT_STAGES = ("MAINNET", "TESTNET", "DEVNET")
+BLOCK_REF_RX = re.compile(r"Blok Referensi\s*[:=]\s*`?(\d{4,})")
+REPO_URL_RX = re.compile(r"Specific GitHub Repo\s*[:=]\s*`?(\S+)")
+COMMIT_RX = re.compile(r"Audited Commit\s*/?\s*Branch\s*[:=]\s*`?([^\n]+)")
+LIVE_PROOF_RX = re.compile(r"Bukti Live\s*[:=]\s*(.+)")
+INTEL_STATUS_RX = re.compile(r"Intel Status\s*[:=]\s*`?(COMPLETE|PARTIAL)")
 
 PLUGIN_SPECS = [
     {
@@ -304,6 +311,12 @@ def check_zero_compression(file_path: Path) -> List[str]:
         if "[TOUCHES: ...]" in s or "<...>" in s or s.startswith("|") and "[Tulis " in s:
             continue
         if "Dilarang" in s or "DILARANG" in s or "token kompresi" in s or "FORBIDDEN" in s or "elipsis" in s:
+            continue
+        # Keluaran terminal nyata boleh terpotong: hex bytecode (0x6080604052...), hash (abc123...),
+        # atau baris "Bukti Live"/"BUKTI_SIMULASI" yang mengutip output apa adanya.
+        if re.search(r"(0x[0-9a-fA-F]{8,}|\.{3}\s*[\w\]]|\w{8,}\.\.\.)", s) and not re.search(r"\b(dll|dst|etc)\.", s, re.I):
+            continue
+        if re.match(r"^-?\s*(Bukti Live|BUKTI_SIMULASI|\$ )", s):
             continue
 
         for pattern, label in FORBIDDEN_COMPRESSION_PATTERNS:
@@ -886,15 +899,27 @@ def validate_lead_status(raw_leads_text: str) -> List[str]:
     return errors
 
 
+def deployment_stage(audit_dir: Path) -> Optional[str]:
+    """Baca Deployment Stage dari INTEL.md (primer); STATE.md hanya cadangan.
+
+    TIDAK ADA default diam-diam: stage yang tidak dinyatakan = None, dan gate harus menolak.
+    """
+    for fname in ("INTEL.md", "STATE.md"):
+        fp = audit_dir / fname
+        if not fp.exists():
+            continue
+        m = PROJECT_STAGE_RX.search(fp.read_text(encoding="utf-8"))
+        if m:
+            return m.group(1).upper()
+    return None
+
+
 def project_is_mainnet(audit_dir: Path) -> bool:
-    """Default MAINNET. Hanya STATE.md yang boleh menyatakan testnet/devnet."""
-    sp = audit_dir / "STATE.md"
-    if not sp.exists():
-        return True
-    m = PROJECT_STAGE_RX.search(sp.read_text(encoding="utf-8"))
-    if not m:
-        return True
-    return m.group(1).upper() == "MAINNET"
+    """True hanya bila Deployment Stage benar-benar dinyatakan MAINNET.
+
+    Stage yang tidak dinyatakan TIDAK dianggap mainnet; validate_intel() yang menolaknya.
+    """
+    return deployment_stage(audit_dir) == "MAINNET"
 
 
 def validate_fork_evidence(joined: str, body: List[str], label: str, mainnet: bool) -> List[str]:
@@ -959,6 +984,92 @@ def validate_eight_fork(text: str) -> List[str]:
             errors.append(
                 f"[08 VERSION] Entri '{title[:60]}' berkelas PRE_LIVE_SCOPE wajib "
                 f"VERSION_RELATION: HEAD_NEWER_THAN_LIVE."
+            )
+    return errors
+
+
+def validate_intel(audit_dir: Path) -> List[str]:
+    """INTEL.md = prasyarat --gate 0. Menagih identitas, jaringan, dan bukti live.
+
+    Dipanggil dari --gate 0 (bukan tahap baru), sesuai keputusan: INTEL diisi sekali di awal.
+    """
+    errors: List[str] = []
+    ip = audit_dir / "INTEL.md"
+    if not ip.exists():
+        errors.append(
+            "[INTEL MISSING] INTEL.md belum ada di root folder audit — INTEL adalah prasyarat STAGE-0 "
+            "(salin dari templates/INTEL.md lalu isi)."
+        )
+        return errors
+
+    text = ip.read_text(encoding="utf-8")
+    cleaned = strip_template_boilerplate(text)
+
+    # Batasi pembacaan ke blok §0 agar prosa aturan ("Deployment Stage DILARANG ...") tidak ikut terbaca.
+    sec0 = ""
+    lines_all = text.splitlines()
+    for idx, line in enumerate(lines_all):
+        if re.match(r"^#{2,3}\s*0\.\s*Deployment Stage", line.strip()):
+            for nxt in lines_all[idx + 1:]:
+                if re.match(r"^#{2,3}\s", nxt):
+                    break
+                sec0 += nxt + "\n"
+            break
+    m_stage = PROJECT_STAGE_RX.search(sec0)
+    if not m_stage:
+        errors.append(
+            "[INTEL STAGE] 'Deployment Stage' belum diisi — wajib MAINNET | TESTNET | DEVNET "
+            "(tidak ada default; nilai ini menentukan Mode Uji seluruh audit)."
+        )
+        stage = None
+    else:
+        stage = m_stage.group(1).upper()
+        if stage not in DEPLOYMENT_STAGES:
+            errors.append(f"[INTEL STAGE] Deployment Stage tidak sah: {stage}.")
+
+    # Resolusi repo & commit
+    m_repo = REPO_URL_RX.search(text)
+    if not m_repo or "TIDAK_DITEMUKAN" in m_repo.group(1) or m_repo.group(1).strip() in ("", "<URL"):
+        errors.append(
+            "[INTEL REPO] 'Specific GitHub Repo' wajib URL langsung (atau TIDAK_DITEMUKAN + alasan di §6)."
+        )
+    m_commit = COMMIT_RX.search(text)
+    if not m_commit or not re.search(r"\b[0-9a-f]{7,40}\b", m_commit.group(1)):
+        errors.append(
+            "[INTEL COMMIT] 'Audited Commit / Branch' wajib memuat hash commit nyata "
+            "(hasil git rev-parse), bukan 'latest'/'main'."
+        )
+
+    # Bukti live wajib, terutama untuk MAINNET
+    m_proof = LIVE_PROOF_RX.search(text)
+    proof_val = m_proof.group(1).strip() if m_proof else ""
+    # Bukti sah harus memuat artefak konkret: output hex 0x..., ukuran bytecode, atau angka lamport/akun.
+    proof_ok = (
+        bool(proof_val)
+        and "TIDAK_DITEMUKAN" not in proof_val
+        and re.search(r"(0x[0-9a-fA-F]{16,}|\b\d{3,}\s*(?:bytes|byte)\b|lamports?|non-?kosong|non-?empty)", proof_val) is not None
+    )
+    if not proof_ok:
+        errors.append(
+            "[INTEL LIVE] 'Bukti Live' kosong — wajib perintah cast code/eth_getCode + hasil ringkas "
+            "yang membuktikan kode ter-deploy."
+        )
+    elif stage == "MAINNET":
+        m_block = BLOCK_REF_RX.search(text)
+        if not m_block:
+            errors.append(
+                "[INTEL BLOCK] Deployment Stage MAINNET wajib mencantumkan 'Blok Referensi' "
+                "(nomor blok terakhir) — dipakai sebagai titik fork di STAGE-D."
+            )
+
+    # Konsistensi Intel Status dengan §6
+    m_status = INTEL_STATUS_RX.search(text)
+    if m_status and m_status.group(1).upper() == "COMPLETE":
+        rows = [l for l in text.splitlines() if l.strip().startswith("|") and "TIDAK_DITEMUKAN" in l]
+        if rows:
+            errors.append(
+                "[INTEL STATUS] 'Intel Status: COMPLETE' tidak sah — tabel §6 masih memuat "
+                "TIDAK_DITEMUKAN. Turunkan ke PARTIAL."
             )
     return errors
 
@@ -1243,6 +1354,9 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
             errors.extend(check_zero_compression(fpath))
 
     if gate == "0":
+        # INTEL.md = prasyarat STAGE-0 (bukan tahap baru)
+        errors.extend(validate_intel(audit_dir))
+
         # Cek Tabel Rekonsiliasi di path-map.md
         reconciled_rows = []
         tier3_rows = []
@@ -1531,6 +1645,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Penegak Mekanis & Context Injector Metode Segitiga (theadvers v2.0)"
     )
+    parser.add_argument("--intel", action="store_true", help="Audit khusus INTEL.md (prasyarat STAGE-0) tanpa gate tahap.")
     parser.add_argument("--rules", action="store_true", help="Audit khusus aturan wadah 06/07/08/09 + jejak lead (tanpa gate tahap).")
     parser.add_argument("--sync", action="store_true", help="Sinkronkan seluruh _ROUTER.md dan instal skill ke profil Hermes.")
     parser.add_argument("--context-packet", action="store_true", help="Cetak paket pemulihan konteks segar dari disk & @SLICE.")
@@ -1545,6 +1660,22 @@ def main() -> int:
 
     if args.sync:
         return sync_all_routers()
+
+    if args.intel:
+        target_intel = args.audit_dir_flag or args.audit_dir_pos
+        if not target_intel:
+            parser.print_help()
+            return 1
+        intel_dir = Path(target_intel).resolve()
+        intel_errors = validate_intel(intel_dir)
+        if intel_errors:
+            print(f"\n[INTEL FAIL] Ditemukan {len(intel_errors)} pelanggaran INTEL:", file=sys.stderr)
+            for e in intel_errors:
+                print(f"  - {e}", file=sys.stderr)
+            return 1
+        stage = deployment_stage(intel_dir)
+        print(f"[INTEL PASS] INTEL.md sah — Deployment Stage: {stage}.")
+        return 0
 
     if args.rules:
         target_rules = args.audit_dir_flag or args.audit_dir_pos

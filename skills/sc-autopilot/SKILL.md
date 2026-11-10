@@ -42,6 +42,7 @@ Saat sc-autopilot dipanggil, periksa direktori kerja <audit-dir>:
 
 1. Jika `<audit-dir>` belum memiliki berkas kerja kanonik:
    Buat direktori <audit-dir> dan <audit-dir>/notes/, lalu salin seluruh berkas dari templates/ ke <audit-dir>/:
+   - INTEL.md            <- PRASYARAT STAGE-0 (diisi sekali di awal, lihat skill `sc-pre-intel`)
    - STATE.md
    - FACTS.md
    - RADAR.md
@@ -52,12 +53,22 @@ Saat sc-autopilot dipanggil, periksa direktori kerja <audit-dir>:
    - 07-needs-next-step.md
    - 08-valid-not-eligible.md
    - 09-confirmed-findings.md
-2. Pastikan Indeks `_ROUTER.md` Sinkron:
+2. **PRE-STAGE-0 — Project Intelligence Brief (WAJIB sebelum STAGE-0):**
+   Jika `<audit-dir>/INTEL.md` belum sah, jalankan skill `sc-pre-intel` untuk mengisinya, lalu periksa:
+
+       python3 tools/verify_segitiga.py --intel <audit-dir>
+
+   INTEL **bukan tahap baru** — ia prasyarat `--gate 0`. `Deployment Stage`
+   (`MAINNET` | `TESTNET` | `DEVNET`) yang diisi di sini menentukan `Mode Uji` seluruh audit:
+   `MAINNET` -> `FORK_LIVE` wajib di `09`; `TESTNET`/`DEVNET` -> `FORK_TESTNET` wajib.
+   Jangan lanjut ke STAGE-0 selama `--intel` masih FAIL.
+
+3. Pastikan Indeks `_ROUTER.md` Sinkron:
    Jalankan sinkronisasi router plugin satu kali:
 
        python3 tools/verify_segitiga.py --sync
 
-3. Baca Posisi Kursor Saat Ini:
+4. Baca Posisi Kursor Saat Ini:
    Jalankan:
 
        python3 tools/verify_segitiga.py --context-packet <audit-dir>
