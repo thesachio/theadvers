@@ -73,6 +73,78 @@ Implementation yang **terpasang tapi belum di-`upgradeTo`** bukan live — ia mi
 
 ---
 
+### 2d. Rekonsiliasi Deployment — `deploy_parity.py` (WAJIB, satu perintah per kontrak)
+
+`VERSION_RELATION` di §2c **tidak boleh ditebak**. Ia dihasilkan oleh alat, bukan penilaian manual:
+
+```bash
+python3 tools/deploy_parity.py --paradigm <evm|solana|sui|aptos|ton|generic> \
+  --chain <mainnet|testnet|local> --addr <ALAMAT> --rpc <RPC> \
+  --entrypoints "<signature yang diserang PoC>" --repo <path repo> \
+  --out <audit-dir>/notes/deploy-parity-<ID>.json
+```
+
+**Aturan keras:** `bytecode identik` **DILARANG** dijadikan syarat. Build Foundry jarang
+reproducible (metadata hash, optimizer, versi solc) dan setiap repo punya siklus rilis berbeda.
+Yang diuji adalah **keberadaan & perilaku entrypoint yang diserang PoC**, bukan hash berkas.
+
+#### Empat Siklus Deployment (gerbang awal)
+
+| Siklus | Kondisi terukur | Konsekuensi |
+| :--- | :--- | :--- |
+| `P1_PRE_DEPLOY` | `cast code` = `0x` / akun tidak ada | PoC tetap wajib (`FORK_DEPLOYED_HEAD`/`LOKAL`) → `08` |
+| `P2_TESTNET_ONLY` | kode ada, chainId = testnet/devnet | `08` `TESTNET_ONLY` — **kecuali** INTEL §0 menyatakan proyek memang testnet/devnet |
+| `P3_LIVE_PARTIAL` | kode ada di mainnet, sebagian entrypoint tidak terbukti | lanjut ke verdict entrypoint |
+| `P4_LIVE_FULL` | semua entrypoint PoC terbukti ada & berperilaku | kandidat `09` |
+
+#### Empat Pra-Syarat sebelum menyimpulkan apa pun
+
+1. **Proxy** — baca slot EIP-1967 impl (`0x360894a1…2bbc`), beacon (`0xa3f0ad74…3d50`), admin (`0xb5312768…6103`). Bila proxy, yang dianalisis **implementation**, bukan proxy.
+2. **Fallback-router** — bila probe mengembalikan `MissingFallbackHandler` (selector `0x08c63e27`), entrypoint hidup di **handler**, bukan di kontrak titik serang → `ENTRYPOINT_RELOCATED`.
+3. **Library / delegatecall** — bila entrypoint hidup di callee, uji pada **callee** dan catat di artefak.
+4. **Multi-kontrak (router → hub → allocator)** — untuk attack-chain, **setiap** kontrak yang menjadi entrypoint diperiksa terpisah; satu artefak JSON per kontrak.
+
+#### Tujuh Verdict Entrypoint (jangan disatukan)
+
+| Verdict | Arti | Wadah |
+| :--- | :--- | :--- |
+| `LIVE_MATCH` | entrypoint PoC terbukti ada & berperilaku sama di objek live | **`09`** |
+| `HEAD_ONLY_PROVEN` | siklus `P1`, atau live tak tersedia | **`08`** `PRE_LIVE_SCOPE` |
+| `TESTNET_ONLY` | siklus `P2` pada proyek mainnet | **`08`** `TESTNET_ONLY` |
+| `ENTRYPOINT_RELOCATED` | entrypoint ada di handler/callee, bukan kontrak titik serang | **`08`** + catatan rute |
+| `REGRESSION_FIXED` | live lulus **dan** PoC di HEAD gagal (**dua** log eksekusi) | **`06`** `REJECTED_BY_DESIGN` |
+| `ENV_ERROR` / `UNVERIFIABLE` | RPC gagal 2×, rate-limit, revert tak terklasifikasi | **`07`** `TOOL_BLOCKED` |
+| `IDENTITY_ONLY` | rantai belum dikenal / entrypoint tak terbaca otomatis | **`07`** `NEXT_EXPLORE` |
+
+#### Anti-false-negative pada deteksi deployment
+
+- **`ENV_ERROR` tidak pernah menjadi bukti ketiadaan.** Rate-limit, 403 RPC, timeout, `revert 0x`
+  → `07` `TOOL_BLOCKED`, **bukan** `HEAD_ONLY_PROVEN` dan **bukan** `06`.
+- **`ENTRYPOINT_ABSENT` hanya sah** bila seluruh metode gagal **dan** ada bukti tambahan
+  (`git log -S` tidak menemukan fungsi tersebut). Untuk paradigma `generic`, `ABSENT` **dilarang
+  mutlak** — gunakan `IDENTITY_ONLY`.
+- **`REGRESSION_FIXED` wajib dua log**: live `[PASS]` + HEAD `[FAIL]`. Tanpa itu → `ENV_ERROR`.
+- **`DEPLOYMENT_MATCH` ≠ `LIVE_MATCH` padahal alamat live tersedia** → **DILARANG** langsung
+  menggeser ke `08`. Catat `RECHECK_REQUIRED` + `commit_ref` + `nearest_tag`, kembalikan ke
+  STAGE-D untuk **satu putaran PoC kedua** yang menembak objek live (via Factory resmi, atau
+  `vm.etch` bytecode live yang **dicatat sebagai deviasi**). Baru bila tetap tidak cocok → `08`.
+
+#### `DEPLOYMENT_REPORT` wajib di setiap entri `06`/`08`/`09`
+
+```
+DEPLOYMENT_REPORT : <audit-dir>/notes/deploy-parity-<ID>.json
+SIKLUS            : P1_PRE_DEPLOY | P2_TESTNET_ONLY | P3_LIVE_PARTIAL | P4_LIVE_FULL
+VERDICT_ENTRYPOINT: LIVE_MATCH | HEAD_ONLY_PROVEN | TESTNET_ONLY | ENTRYPOINT_RELOCATED | REGRESSION_FIXED | ENV_ERROR | IDENTITY_ONLY
+```
+
+Entri tanpa `DEPLOYMENT_REPORT` yang menunjuk artefak nyata **tidak sah** — penentuan wadah
+`06`/`08`/`09` tidak boleh berdiri di atas asumsi.
+
+> **Batas wewenang:** rekonsiliasi adalah pekerjaan **STAGE-E/F**, bukan STAGE-D. STAGE-D
+> **dilarang** menghentikan penulisan PoC hanya karena kontrak belum live atau versi repo berbeda.
+
+---
+
 ## 3. Matriks Keputusan Wadah Kanonik (04 / 06 / 07 / 08 / 09)
 
 | Kondisi Hasil Pemeriksaan | Wadah Tujuan Wajib | Kapan Dipindahkan | Bukti Minimum |

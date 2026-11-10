@@ -76,6 +76,20 @@ tulis `TIDAK_DITEMUKAN — README menyebut "audit by X" tanpa tautan (klaim tak 
 
   Tanpa artefak konkret (hex / ukuran bytecode / lamport / "non-kosong"), bagian ini **belum sah**.
 
+**Jalankan deteksi kondisi live dengan alat, bukan mata.** Satu perintah per kontrak:
+
+```bash
+python3 tools/deploy_parity.py --paradigm <evm|solana|sui|aptos|ton|generic> \
+  --chain <mainnet|testnet|local> --addr <ALAMAT> --rpc <RPC> \
+  --entrypoints "<signature yang akan diserang>" --repo <repo> \
+  --out <audit-dir>/notes/deploy-parity-INFRA.json
+```
+
+Simpan hasilnya; `SIKLUS` (`P1_PRE_DEPLOY` / `P2_TESTNET_ONLY` / `P3_LIVE_PARTIAL` /
+`P4_LIVE_FULL`) dan `VERDICT_ENTRYPOINT` dari artefak inilah yang **mengisi** `VERSION_RELATION`
+di §5. Jangan menyimpulkan `MAINNET` hanya dari nama domain atau README — bila `SIKLUS` bukan
+`P4_LIVE_FULL` sedangkan INTEL menyatakan `MAINNET`, hentikan dan periksa ulang.
+
 ### §6 — Catatan Ketiadaan
 Wajib diisi bila `Intel Status = PARTIAL`. Setiap `TIDAK_DITEMUKAN` **wajib** punya alasan + sumber
 yang sudah dicoba. `TIDAK_DITEMUKAN` tanpa alasan = INTEL **tidak jujur**.

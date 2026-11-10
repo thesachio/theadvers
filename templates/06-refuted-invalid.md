@@ -50,6 +50,9 @@ Di luar empat kondisi itu, seluruh kelas `REJECTED_*` **WAJIB** melampirkan `BUK
 - DEPLOYMENT_MATCH: [LIVE_MATCH | HEAD-only (PROVEN_ON_REPO_HEAD) | UNVERIFIED (<sumber yang gagal>)]
 - Mode Uji: [FORK_LIVE (chain, **block**, RPC) | FORK_DEPLOYED_HEAD | LOKAL] *(wajib menyebut `block:` — kegagalan pun harus terjadi pada state nyata, bukan state karangan)*
 - VERSION_RELATION: [LIVE_IS_DEPLOYED_COMMIT | LIVE_NEWER_THAN_HEAD | HEAD_NEWER_THAN_LIVE | LIVE_UNVERIFIED]
+- DEPLOYMENT_REPORT : <audit-dir>/notes/deploy-parity-<ID>.json *(artefak `deploy_parity.py`; wajib untuk vonis `REGRESSION_FIXED`)*
+- SIKLUS           : [P1_PRE_DEPLOY | P2_TESTNET_ONLY | P3_LIVE_PARTIAL | P4_LIVE_FULL]
+- VERDICT_ENTRYPOINT: [LIVE_MATCH | HEAD_ONLY_PROVEN | TESTNET_ONLY | ENTRYPOINT_RELOCATED | REGRESSION_FIXED | ENV_ERROR | IDENTITY_ONLY]
 - Plugin yang Diuji: [M-xxx, AF-xx]
 - Hipotesis Awal: [Ringkasan dugaan serangan sebelum diuji]
 - Jejak Kode & Titik Patah (`Path/File.ext:Lxx-Lyy`): [Kutipan kondisi kode atau urutan state yang mematahkan hipotesis]

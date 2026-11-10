@@ -131,6 +131,21 @@ REPO_URL_RX = re.compile(r"Specific GitHub Repo\s*[:=]\s*`?(\S+)")
 COMMIT_RX = re.compile(r"Audited Commit\s*/?\s*Branch\s*[:=]\s*`?([^\n]+)")
 LIVE_PROOF_RX = re.compile(r"Bukti Live\s*[:=]\s*(.+)")
 INTEL_STATUS_RX = re.compile(r"Intel Status\s*[:=]\s*`?(COMPLETE|PARTIAL)")
+# --- Rekonsiliasi deployment (deteksi kondisi live) ---
+SIKLUS_VALUES = ("P1_PRE_DEPLOY", "P2_TESTNET_ONLY", "P3_LIVE_PARTIAL", "P4_LIVE_FULL")
+ENTRYPOINT_VERDICTS = (
+    "LIVE_MATCH",
+    "HEAD_ONLY_PROVEN",
+    "TESTNET_ONLY",
+    "ENTRYPOINT_RELOCATED",
+    "REGRESSION_FIXED",
+    "ENV_ERROR",
+    "IDENTITY_ONLY",
+    "UNVERIFIABLE",
+)
+SIKLUS_RX = re.compile(r"SIKLUS\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Z0-9_]+)")
+VERDICT_EP_RX = re.compile(r"VERDICT_ENTRYPOINT\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Z_]+)")
+DEPLOY_REPORT_RX = re.compile(r"DEPLOYMENT_REPORT\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([^\n`]+)")
 
 PLUGIN_SPECS = [
     {
@@ -1074,6 +1089,55 @@ def validate_intel(audit_dir: Path) -> List[str]:
     return errors
 
 
+def validate_deployment_report(joined: str, body: List[str], label: str, audit_dir: Path,
+                               allow_siklus: Tuple[str, ...], allow_ep: Tuple[str, ...]) -> List[str]:
+    """DEPLOYMENT_REPORT wajib menunjuk artefak deploy_parity yang benar-benar ada.
+
+    Mencegah wadah 06/08/09 dipilih di atas asumsi 'kontrak belum live'.
+    """
+    errors: List[str] = []
+    head = joined.splitlines()[0][:60] if joined else "?"
+    m_rep = DEPLOY_REPORT_RX.search(joined)
+    if not m_rep:
+        errors.append(
+            f"[{label} DEPLOY] Entri '{head}' tanpa DEPLOYMENT_REPORT — jalankan "
+            f"tools/deploy_parity.py --out <audit-dir>/notes/deploy-parity-<ID>.json dulu."
+        )
+    else:
+        raw = m_rep.group(1).strip()
+        # Normalisasi: boleh path absolut, relatif audit-dir, atau relatif root.
+        cands = [Path(raw)]
+        if not Path(raw).is_absolute():
+            cands += [audit_dir / raw, REPO_ROOT / raw]
+        if not any(c.exists() for c in cands):
+            errors.append(
+                f"[{label} DEPLOY] Entri '{head}' menunjuk artefak yang tidak ada: {raw}"
+            )
+
+    m_s = SIKLUS_RX.search(joined)
+    if not m_s:
+        errors.append(f"[{label} DEPLOY] Entri '{head}' tanpa SIKLUS (P1..P4).")
+    elif m_s.group(1) not in SIKLUS_VALUES:
+        errors.append(f"[{label} DEPLOY] Entri '{head}' memakai SIKLUS tidak sah: {m_s.group(1)}.")
+    elif m_s.group(1) not in allow_siklus:
+        errors.append(
+            f"[{label} DEPLOY] Entri '{head}' memakai SIKLUS {m_s.group(1)} — wadah {label} hanya sah untuk "
+            f"{', '.join(allow_siklus)}."
+        )
+
+    m_ep = VERDICT_EP_RX.search(joined)
+    if not m_ep:
+        errors.append(f"[{label} DEPLOY] Entri '{head}' tanpa VERDICT_ENTRYPOINT.")
+    elif m_ep.group(1) not in ENTRYPOINT_VERDICTS:
+        errors.append(f"[{label} DEPLOY] Entri '{head}' memakai VERDICT_ENTRYPOINT tidak sah: {m_ep.group(1)}.")
+    elif m_ep.group(1) not in allow_ep:
+        errors.append(
+            f"[{label} DEPLOY] Entri '{head}' memakai VERDICT_ENTRYPOINT {m_ep.group(1)} — tidak sah untuk "
+            f"wadah {label} (sah: {', '.join(allow_ep)})."
+        )
+    return errors
+
+
 def validate_wadah_rules(audit_dir: Path) -> List[str]:
     """Jalankan seluruh aturan 06/07/08/09 + jejak lead."""
     errors: List[str] = []
@@ -1087,6 +1151,19 @@ def validate_wadah_rules(audit_dir: Path) -> List[str]:
     errors.extend(validate_nine(texts["09-confirmed-findings.md"]))
     errors.extend(validate_nine_fork(audit_dir, texts["09-confirmed-findings.md"]))
     errors.extend(validate_eight_fork(texts["08-valid-not-eligible.md"]))
+
+    # Rekonsiliasi deployment: 09 hanya LIVE_MATCH/P4; 08 hanya pre-live/testnet/relocated.
+    for title, body in split_entries(texts["09-confirmed-findings.md"], ("FIND",)):
+        errors.extend(validate_deployment_report(
+            "\n".join(body), body, "09", audit_dir,
+            allow_siklus=("P4_LIVE_FULL",), allow_ep=("LIVE_MATCH",),
+        ))
+    for title, body in split_entries(texts["08-valid-not-eligible.md"], ("VNE",)):
+        errors.extend(validate_deployment_report(
+            "\n".join(body), body, "08", audit_dir,
+            allow_siklus=("P1_PRE_DEPLOY", "P2_TESTNET_ONLY", "P3_LIVE_PARTIAL"),
+            allow_ep=("HEAD_ONLY_PROVEN", "TESTNET_ONLY", "ENTRYPOINT_RELOCATED"),
+        ))
     leads_text = (audit_dir / "05-raw-leads.md").read_text(encoding="utf-8") if (audit_dir / "05-raw-leads.md").exists() else ""
     errors.extend(validate_lead_status(leads_text))
     errors.extend(validate_lead_traceability(leads_text, texts))

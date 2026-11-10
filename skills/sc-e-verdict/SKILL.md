@@ -36,7 +36,32 @@ Periksa satu per satu kandidat berstatus [ACTIVE] di Bagian 3 ([ACTIVE-BATCH]) p
    - **Wajib:** `LOW_CLASS` tepat satu dari `PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)` | `ADMIN_ONLY` | `LOW_NUISANCE`, dampak kuantitatif terukur, dan `BUKTI_SIMULASI:` nyata.
    - Lead yang **belum teruji** lalu dilabeli Low adalah pelarian wadah (§11b) → kembalikan ke `07`.
    - Severity ditentukan **impact**, bukan siklus deployment.
-4. Pindahkan ke `09-confirmed-findings.md` apabila dan hanya apabila kandidat lulus Tiga Titik Bukti Segitiga utuh **dan** Sepuluh Pernyataan Keras (`templates/VERDICT.md` §8) **dan** Integritas #11 (§9).
+> **Rekonsiliasi deployment WAJIB sebelum memilih wadah** (`templates/VERDICT.md` §2d).
+> Jalankan sekali per kontrak yang diserang:
+>
+> ```bash
+> python3 tools/deploy_parity.py --paradigm <evm|solana|sui|aptos|ton|generic> \
+>   --chain <mainnet|testnet|local> --addr <ALAMAT> --rpc <RPC> \
+>   --entrypoints "<signature PoC>" --repo <repo> \
+>   --out <audit-dir>/notes/deploy-parity-<ID>.json
+> ```
+>
+> Lalu catat di setiap entri `06`/`08`/`09`:
+> `DEPLOYMENT_REPORT`, `SIKLUS` (`P1..P4`), `VERDICT_ENTRYPOINT`.
+>
+> | Hasil | Wadah |
+> | :--- | :--- |
+> | `P4_LIVE_FULL` + `LIVE_MATCH` | `09` |
+> | `P1_PRE_DEPLOY` / `HEAD_ONLY_PROVEN` | `08` `PRE_LIVE_SCOPE` |
+> | `P2_TESTNET_ONLY` | `08` `TESTNET_ONLY` |
+> | `ENTRYPOINT_RELOCATED` | `08` + catatan rute |
+> | `REGRESSION_FIXED` (2 log) | `06` `REJECTED_BY_DESIGN` |
+> | `ENV_ERROR` / `IDENTITY_ONLY` | `07` — **bukan** `08` |
+>
+> **`ENV_ERROR` bukan "tidak eligible".** RPC gagal/rate-limit berarti deteksi belum berhasil —
+> itu `07` dengan `PERCOBAAN:`, bukan `08`.
+
+4. Pindahkan ke `09-confirmed-findings.md` apabila dan hanya apabila kandidat lulus Tiga Titik Bukti Segitiga utuh **dan** Sepuluh Pernyataan Keras (`templates/VERDICT.md` §8) **dan** Integritas #11 (§9) **dan** `SIKLUS: P4_LIVE_FULL` + `VERDICT_ENTRYPOINT: LIVE_MATCH`.
    - **Wajib:** `TANGGA_BUKTI: A | B` (`A-HEAD` dilarang), `DEPLOYMENT_MATCH: LIVE_MATCH`, `LIVE_IDENTITY` terukur, `POC_STATUS: PASS`, `BUKTI_SIMULASI:` nyata.
    - `CYCLE: P1_PRE_DEPLOY` / `P2_TESTNET_ONLY` dilarang di `09`.
 

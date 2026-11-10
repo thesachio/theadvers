@@ -43,6 +43,9 @@
 - **ELIGIBILITY**: `LIVE_MATCH`
 - **LIVE_IDENTITY**: `[Terukur: alamat impl AKTIF dari slot EIP-1967 proxy 0x360894a1...382bbc, atau accountId() / sha256 ProgramData untuk non-EVM — bukan nama berkas repo]`
 - **VERSION_RELATION**: `[LIVE_IS_DEPLOYED_COMMIT | LIVE_NEWER_THAN_HEAD | HEAD_NEWER_THAN_LIVE]` *(`LIVE_UNVERIFIED` dilarang di `09`)*
+- **DEPLOYMENT_REPORT**: `notes/deploy-parity-<ID>.json` *(artefak `deploy_parity.py`; wajib — `SIKLUS: P4_LIVE_FULL` + `VERDICT_ENTRYPOINT: LIVE_MATCH`)*
+- **SIKLUS**: `P4_LIVE_FULL`
+- **VERDICT_ENTRYPOINT**: `LIVE_MATCH`
 - **POC_STATUS**: `PASS`
 - **Mode Uji**: `FORK_LIVE (chain: <...>, block: <...>, RPC: <...>)` *(wajib — proyek mainnet; `FORK_DEPLOYED_HEAD`/`LOKAL` tidak sah di `09`. `FORK_TESTNET` hanya bila STATE.md menyatakan testnet/devnet)*
 - **File:Baris**: `[Path/File.ext:Lxx-Lyy]` *(wajib rentang awal-akhir)*

@@ -6,6 +6,9 @@
 >    - **`PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`** — dampak finansial nyata (Critical/High/Medium), PoC `[PASS]` pada `FORK_DEPLOYED_HEAD`, tetapi kode tersebut **lebih baru dari live dan belum aktif** (`HEAD_NEWER_THAN_LIVE`), atau kontraknya belum terdaftar di halaman alamat bounty. **Syarat mutlak:** `Mode Uji` wajib `FORK_DEPLOYED_HEAD` + `VERSION_RELATION: HEAD_NEWER_THAN_LIVE`. Implementation yang **terpasang tapi belum di-`upgradeTo`** di balik proxy live juga masuk kelas ini — ia belum dieksekusi siapa pun.
 >    - **`ADMIN_ONLY`** — bug mekanis nyata pada fungsi khusus admin, tanpa jalur eksploitasi eksternal.
 >    - **`LOW_NUISANCE`** — DoS tanpa kehilangan dana, kerugian kecil terbatas (*capped*), atau griefing non-finansial (Severity Low / S4).
+>    - **`TESTNET_ONLY`** — PoC `[PASS]`, tetapi kode yang diserang hanya ada di testnet/devnet (`SIKLUS: P2_TESTNET_ONLY`) sedangkan proyek sudah mainnet per `INTEL.md §0`.
+>    - **`ENTRYPOINT_RELOCATED`** — entrypoint yang diserang hidup di handler/callee, bukan di kontrak titik serang (`VERDICT_ENTRYPOINT: ENTRYPOINT_RELOCATED`); rute wajib dicatat.
+> 3b. **`ENV_ERROR` BUKAN alasan masuk `08`.** RPC gagal, rate-limit, 403, atau timeout berarti deteksi **belum berhasil** — itu milik `07` `TOOL_BLOCKED` dengan `PERCOBAAN:`, bukan `08`. Menaruhnya di `08` = mengubah "belum diperiksa" menjadi "sudah diperiksa dan tidak eligible".
 > 3. **Severity ditentukan IMPACT, bukan siklus deployment.** Menurunkan severity karena alasan "masih HEAD-only" / "hanya testnet" adalah pelanggaran; yang berubah hanya wadah (`09` vs `08`).
 > 4. **DILARANG memakai `PRE_LIVE_SCOPE` untuk kode yang SUDAH LIVE.** Apabila `VERSION_RELATION` menunjukkan kode itu aktif di proxy mainnet (`LIVE_IS_DEPLOYED_COMMIT` / `LIVE_NEWER_THAN_HEAD`), temuan **wajib** ke `09`, bukan `08`. Menaruhnya di `08` = menurunkan temuan live menjadi "belum live" — pelanggaran yang sama beratnya dengan menaikkan severity tanpa bukti.
 > 4. Wajib menyertakan jangkar verbatim `Path/File.ext:Lxx-Lyy`, `TANGGA_BUKTI`, dan `DEPLOYMENT_MATCH`. Dilarang memakai token kompresi (..., dll., dst., etc., rest of logic).
@@ -47,6 +50,9 @@
 - TANGGA_BUKTI: [A-HEAD | B] *(A yang sudah `LIVE_MATCH` wajib masuk `09`, bukan `08`)*
 - DEPLOYMENT_MATCH: [HEAD-only (PROVEN_ON_REPO_HEAD) | UNVERIFIED (<sumber yang gagal>)]
 - VERSION_RELATION: [HEAD_NEWER_THAN_LIVE] *(wajib untuk `PRE_LIVE_SCOPE`; bila live sudah memuat kode ini → pindah ke `09`)*
+- DEPLOYMENT_REPORT : <audit-dir>/notes/deploy-parity-<ID>.json *(wajib — artefak `deploy_parity.py`)*
+- SIKLUS           : [P1_PRE_DEPLOY | P2_TESTNET_ONLY | P3_LIVE_PARTIAL]
+- VERDICT_ENTRYPOINT: [HEAD_ONLY_PROVEN | TESTNET_ONLY | ENTRYPOINT_RELOCATED]
 - Mode Uji: [FORK_DEPLOYED_HEAD (chain, block, RPC) | LOKAL (<alasan>)] *(proyek mainnet: `FORK_LIVE` di sini = salah wadah)*
 - Jangkar Kode Eksak (`Path/File.ext:Lxx-Lyy`): [Kutipan lokasi dan perilaku teknis]
 - Dampak Kuantitatif: [Angka eksak + satuan aset; biaya serangan bila relevan]
