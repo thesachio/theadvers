@@ -217,8 +217,11 @@ def read_text(path: Path) -> str:
 
 
 PLACEHOLDER_MARKERS = (
-    "[WAVE-2-CROSS] [CROSS-R1-01]",
-    "[WAVE-1-BLIND] [OBS-R1-01]",
+    # Catatan: ID contoh ([CROSS-R1-01], [OBS-R1-01]) SENGAJA tidak dimasukkan sebagai penanda.
+    # ID tidak membuktikan kebasian; yang membuktikan adalah sisa token kurung-siku template
+    # seperti "[Jelaskan" / "[Path/File" / "[Tulis ". Memasukkan ID membuat agen yang menulis
+    # ID contoh di template (persis seperti contohnya) selalu dianggap placeholder.
+
     "[Fact ID F-R1-xx",
     "[Contoh:",
     "[Tulis ",
@@ -1247,11 +1250,17 @@ JALUR_IDS = ("J1", "J2", "J3", "J4", "J5")
 
 
 def _table_rows(text: str, header_probe: str) -> List[List[str]]:
-    """Ambil baris tabel markdown yang berada setelah baris header memuat header_probe."""
+    """Ambil baris tabel markdown setelah header memuat header_probe — BERHENTI di heading berikutnya.
+
+    Tanpa berhenti di heading, tabel bagian 3 (5 kolom) ikut tertelan ke daftar baris
+    bagian 2 (8 kolom) dan memicu salah baca jumlah kolom.
+    """
     rows: List[List[str]] = []
     inside = False
     for line in text.splitlines():
         s = line.strip()
+        if inside and s.startswith("#"):
+            break
         if s.startswith("|") and header_probe in s:
             inside = True
             continue
@@ -1263,6 +1272,36 @@ def _table_rows(text: str, header_probe: str) -> List[List[str]]:
                 continue
             rows.append([c.strip() for c in s.strip("|").split("|")])
     return rows
+
+
+def _guard_table_rows(text: str) -> List[Tuple[List[str], bool]]:
+    """Baris tabel GUARD di bagian 2, beserta penanda apakah headernya punya kolom Status.
+
+    Dua tabel memakai awalan "Guard ID" (bagian 2 dan bagian 3), jadi probe harus
+    membedakan lewat kolom lain: bagian 2 punya kolom Status/Metode, bagian 3 punya 'Jalur'.
+    """
+    out: List[Tuple[List[str], bool]] = []
+    inside = False
+    has_status = False
+    for line in text.splitlines():
+        s = line.strip()
+        if inside and s.startswith("#"):
+            break
+        if s.startswith("|") and "Guard ID" in s:
+            if "Jalur" in s:
+                inside = False
+                continue
+            inside = True
+            has_status = "Status" in s
+            continue
+        if inside:
+            if not s.startswith("|"):
+                inside = False
+                continue
+            if ":---" in s:
+                continue
+            out.append(([c.strip() for c in s.strip("|").split("|")], has_status))
+    return out
 
 
 def validate_four(guarded_text: str) -> List[str]:
@@ -1277,11 +1316,18 @@ def validate_four(guarded_text: str) -> List[str]:
 
     # 1. Tabel utama: Guard ID + Status
     guards: Dict[str, str] = {}
-    for cols in _table_rows(guarded_text, "Guard ID"):
-        if len(cols) < 8:
-            continue
+    for cols, probe_hit_status in _guard_table_rows(guarded_text):
         gid = cols[0].strip("`* ")
         if not re.fullmatch(r"GUARD-(?:R\d+-)?\d+", gid):
+            continue
+        if not probe_hit_status or len(cols) < 8:
+            # Format lama (tanpa kolom Status) dilarang dilewati diam-diam: entri seperti itu
+            # tidak pernah mengklaim TERSANGKAL, tetapi juga tidak pernah membuktikannya.
+            errors.append(
+                f"[RULES-04] {gid}: tabel utama hanya punya {len(cols)} kolom tanpa kolom Status, "
+                f"wajib 8 (… | Status | Metode). Tambahkan kolom Status "
+                f"(TERSANGKAL / TEMBUS-J1..J5) dan tabel Uji 5 Jalur di bagian 3."
+            )
             continue
         status = cols[6].strip("`* ").upper()
         guards[gid] = status
