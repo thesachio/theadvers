@@ -15,3 +15,11 @@ Saat Modul A menyerahkan kendali eksekusi ke luar (melalui pengiriman koin nativ
    - Pada arsitektur berbasis akun seperti Solana/Rust, buktikan bahwa setelah CPI mengubah saldo akun di *storage*, fungsi pemanggil masih menggunakan nilai *deserialized struct* di memori yang belum di-reload().
 3. Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan jika pola *Checks-Effects-Interactions* (CEI) sudah dipatuhi penuh, pengunci *mutex* bersifat global lintas-modul yang berinteraksi, atau aset yang ditransfer terbukti tidak memiliki mekanisme hook/callback sama sekali.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-07] Penyerahan Kontrol di Tengah State Timpang** — baca-ke-lokal → interaksi eksternal/CPI/callback → tulis-balik lokal basi. PoC wajib urutan baca→interaksi→tulis-balik.
+- **[BENTUK-04] Racun State Dulu, Korban Eksekusi Terakhir** — bila `nonReentrant` lokal menutup jalur reentrancy, racuni state lebih dulu lewat jalur permissionless, lalu biarkan aktor berizin (keeper/relayer) menjalankan rutinitasnya. **Tidak butuh reentrancy sama sekali.**
+- **[BENTUK-03] Bundler Transaksi** — N sub-panggilan dalam satu konteks luar (multicall/PTB).
+
+Rujuk `M-005` Jalur 3, `M-009`, `POV-CALL-01`.

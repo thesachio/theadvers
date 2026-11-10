@@ -17,3 +17,11 @@ Penyerang memanfaatkan urutan eksekusi transaksi dalam satu blok (atau urutan pe
    Buktikan dengan angka konkret bahwa hasil yang ditarik pada Tx3 dikurangi modal Tx1 dan biaya protokol bernilai positif (Net Profit > 0).
 3. Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan jika reward didistribusikan secara linear berbasis waktu (*streaming vesting*), terdapat *cooldown/lockup period* yang mengikat modal, atau biaya masuk/keluar (*entry/exit fee*) lebih besar dari porsi reward yang bisa dicuri.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-08] Desinkron Temporal & Akrual** — indeks akrual (`globalIndex`/`userIndex`), fee berbasis waktu, staleness oracle. Setup: `vm.warp` / Δt=0, dua pembacaan pada blok berbeda, bandingkan delta ekspektasi vs aktual.
+- **[BENTUK-09] Penyisipan Lintas-Transaksi** — sandwich: dua tx dalam blok/jendela yang sama, masuk tepat sebelum dan keluar tepat sesudah transaksi target.
+- **[BENTUK-04] Racun State Dulu** — nilai reward/indeks diracuni sebelum distribusi rutin dijalankan aktor sah.
+
+Rujuk `POV-MATH-01`, `POV-relayer-mev`.

@@ -47,12 +47,13 @@ SOUL.md                     identitas + hukum kognitif + prioritas EV
 AGENTS.md                   konstitusi operasional
 methodology/
   METHODOLOGY-SEGITIGA.md   mesin alur (@SLICE: STAGE-0, A, B, C1, C2, D, E, F, FINAL-SWEEP)
-  attack-forms/             AF-01..AF-10 — bentuk serangan uji (1 berkas = 1 bentuk)
-  domains/                  DOM-* — heuristik domain (vault, lending, amm, oracle, staking, bridge, governance)
+  attack-forms/             AF-01..AF-10 — kelas kerentanan + 10 Bentuk Serangan (cara menyerang)
+  domains/                  DOM-* — 7 domain (vault, lending, amm, oracle, staking, bridge, governance)
+                            + siklus aliran, invarian senyap, aktor off-chain
 references/
-  methods/                  M-001..M-010 — metode bedah universal
-  pov/                      POV-* — sudut pandang aktor (unprivileged, liquidator, relayer-mev, griefer, integrator)
-  chains/                   CHAIN-* — pola serangan berantai (reentrancy, desync, oracle, rounding, offchain)
+  methods/                  M-001..M-010 — metode bedah universal (nama & isi v1)
+  pov/                      POV-* — 15 sudut pandang aktor (5 aktor + 6 domain + 4 rantai)
+  chains/                   CHAIN-* — 10 plugin: 5 pola rantai + 4 tooling per-rantai + 1 detektor
 templates/                  wadah kerja audit + standar laporan
   STATE.md FACTS.md RADAR.md path-map.md
   04-code-guarded.md 05-raw-leads.md 06-refuted-invalid.md

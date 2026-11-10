@@ -12,3 +12,11 @@
 ## 2. Pertanyaan Bedah di STAGE-C2 & STAGE-D
 1. Eksploitasi Saat Panggilan Keluar: Ketika baris kode di Path/File.ext:Lxx-Lyy memanggil transfer/callback ke alamat saya, variabel state apa yang belum diperbarui dan modul mana di RADAR.md yang bisa saya panggil untuk membaca state basi tersebut?
 2. Tipuan Kontrak/Akun Pasangan: Jika saya memasukkan pasangan [TokenAsli, TokenPalsuBuatanSaya] ke dalam pool/router/lending, dapatkah saya menguras TokenAsli menggunakan valuasi semu dari TokenPalsuBuatanSaya?
+
+## 3. Mengapa Bisa Lolos & Batas Realitas (STAGE-D)
+
+**Blindspot:** auditor memakai token/kontrak "normal" (ERC-20 standar) di harness, sehingga jalur callback dan nilai balik palsu tidak pernah terpicu.
+
+- **Gugur** bila protokol hanya berinteraksi dengan aset yang alamatnya di-*whitelist* dan **whitelist divalidasi per-pasangan**, serta tidak ada panggilan keluar ke alamat yang disuplai pengguna.
+- **Wajib PoC** memakai mock pihak ketiga yang **meniru perilaku nyata** (callback yang benar-benar memanggil balik, nilai balik yang secara sah bisa dihasilkan). Mock yang mengarang payload mustahil hanya menopang bukti struktural (`TANGGA_BUKTI C`), tidak sah untuk `09`.
+- Selisih nilai wajib diukur: aset asli keluar vs aset palsu masuk.

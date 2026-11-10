@@ -16,3 +16,11 @@ Penyerang mengeksploitasi jeda waktu (*latency*), perbedaan aturan validasi, ata
    - Eksekusi bukti *off-chain* tadi pada state $S_2$ dan buktikan bahwa modul *on-chain* tidak memverifikasi ulang prasyarat $S_1$.
 3. **Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan jika modul *on-chain* melakukan validasi ulang terhadap seluruh invariant state kritis pada saat transaksi dieksekusi dan mengikat snapshot versi state di dalam bukti.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-02] Transaktor Pemicu** — relayer/keeper sah menjalankan rutinitasnya; yang dirancang penyerang adalah **state yang dibacanya**.
+- **[BENTUK-04] Racun State Dulu, Korban Eksekusi Terakhir** — kronologis: attacker meracuni state (tx 1) → korban/relayer menjalankan rutin (tx 2) → hasil tx korban dibajak. Kerugian di tx **korban** wajib terukur.
+- **[BENTUK-09] Penyisipan Lintas-Transaksi (Async)** — dua pesan asinkron saling menyusup tanpa `pending-lock`.
+
+Rujuk `M-008`, `POV-TON-01`, `POV-relayer-mev`.

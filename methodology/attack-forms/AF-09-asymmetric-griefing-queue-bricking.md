@@ -17,3 +17,11 @@ Penyerang menyisipkan satu entri beracun berbiaya sangat murah ke dalam antrean,
    - Uji apakah batas kuota antrean global dapat dipenuhi oleh ribuan transaksi mikro bernilai `1 wei`.
 3. **Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan jika kegagalan satu elemen diisolasi (dilewati/dicatat sebagai klaim tertunda), terdapat batas minimum ekonomi (*minimum deposit/stake*) yang mahal bagi penyerang, dan pengatur waktu hanya berubah jika dipanggil oleh pemilik akun sendiri.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-01] Serangan Langsung** — daftarkan 1 item antrean yang mengarah ke kontrak penolak transfer; biaya 1 wei.
+- **[BENTUK-05] Hentikan Siklus di Tengah** — biarkan posisi pending permanen; reset timer korban berulang (`depositFor(korban,1)`).
+- **[BENTUK-10] Kebingungan Whitelist & Pause Asimetris** — `whenNotPaused` memblokir penyelamatan diri (`repay`/`cancel`) tetapi membiarkan penalti (`liquidate`/`slash`).
+
+Rujuk `M-009`, `POV-griefer`, `M-005` Jalur 4.

@@ -18,3 +18,14 @@
   - Pada likuiditas terkonsentrasi (CLMM) atau kurva khusus: apakah penyeberangan batas *tick/bin* memperbarui pertumbuhan fee (feeGrowthOutside) dengan arah tanda yang benar di Path/File.ext:Lxx-Lyy?
 - `[EDGE-CONTROL/LATENT]`:
   - Apakah operasi internal protokol (seperti *auto-compounding*, *buyback*, atau likuidasi otomatis) melakukan swap di AMM dengan amountOutMin == 0 atau menggunakan block.timestamp sebagai deadline sehingga dapat di-*sandwich* (AF-05)?
+
+## 3. Siklus Aliran & Invarian Senyap (dari Registry Domain v1)
+
+- **Domain:** `LP / AMM`
+- **Siklus aliran (L-PATH):** tambah likuiditas → swap → akrual fee → arbitrase balik → hapus likuiditas; loop flashloan
+- **Invarian senyap (asumsi yang TIDAK di-assert — target serangan):** «k konstan (xy=k)»; «fee monoton, non-decreasing»; «callback token tidak reenter di state timpang»; «LP token mint/burn persis proporsional»
+- **Aktor off-chain:**
+
+  bot arbitrase, quoter (harga off-chain vs pool on-chain = AF-10)
+
+Rujuk `FACTS.md` domain terkait untuk mencatat mana dari invarian senyap ini yang **terbukti ditegakkan** oleh kode dan mana yang **TIDAK ditegakkan**.

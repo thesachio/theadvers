@@ -16,3 +16,14 @@
   - Apa yang terjadi pada akumulasi waktu ketika totalStaked == 0? Apakah lastUpdateTime tetap dimajukan, atau reward selama periode kosong melompat sekaligus ke penyetor pertama yang masuk (AF-03 + AF-05)?
 - `[EDGE-CONTROL/LATENT]`:
   - Apakah penyerang dapat memanggil stakeFor(korban, 1) untuk mereset waktu tunggu penarikan (*cooldown/lockup timer*) korban tanpa batas (AF-09)?
+
+## 3. Siklus Aliran & Invarian Senyap (dari Registry Domain v1)
+
+- **Domain:** `STAKING / REWARDS`
+- **Siklus aliran (L-PATH):** stake → akrual (indeks) → claim → unstake (cooldown) → withdraw
+- **Invarian senyap (asumsi yang TIDAK di-assert — target serangan):** «indeks akrual tak bisa di-smear sebelum stake»; «cooldown window tak bisa di-bypass»; «reward claim idempoten»
+- **Aktor off-chain:**
+
+  validator/orchestrator penghitung reward
+
+Rujuk `FACTS.md` domain terkait untuk mencatat mana dari invarian senyap ini yang **terbukti ditegakkan** oleh kode dan mana yang **TIDAK ditegakkan**.

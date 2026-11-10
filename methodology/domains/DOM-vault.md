@@ -19,3 +19,14 @@
   - Periksa apakah keuntungan hasil panen (*harvest yield*) langsung masuk ke totalAssets secara instan sehingga dapat di-*sandwich* (AF-05).
 - `[EDGE-CONTROL/LATENT]`:
   - Saat modul dalam kondisi paused atau strategi ditarik darurat (*emergency withdraw*), apakah akuntansi utang/share antara vault induk dan sub-strategi tetap sinkron?
+
+## 3. Siklus Aliran & Invarian Senyap (dari Registry Domain v1)
+
+- **Domain:** `VAULT / POOL SHARE`
+- **Siklus aliran (L-PATH):** setor aset → cetak share → alokasi ke strategi → akrual yield → konversi balik → tarik aset → (bila gagal) sosialisasi kerugian
+- **Invarian senyap (asumsi yang TIDAK di-assert — target serangan):** «withdraw(deposit(x)) ≤ x pada blok yang sama»; «penyetor pertama tidak bisa mencetak share tak terbatas saat totalSupply == 0»; «nilai strategi tidak dihitung ganda maupun hilang saat merugi»
+- **Aktor off-chain:**
+
+  manajer strategi (diam = kelas ketiadaan-aksi), keeper harvest
+
+Rujuk `FACTS.md` domain terkait untuk mencatat mana dari invarian senyap ini yang **terbukti ditegakkan** oleh kode dan mana yang **TIDAK ditegakkan**.

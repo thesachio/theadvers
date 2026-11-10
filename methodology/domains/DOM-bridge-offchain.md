@@ -15,3 +15,14 @@
   - Pada sistem berbasis *intent/solver/relayer*: apakah biaya relayer atau kurs penyelesaian dapat dimanipulasi oleh eksekutor karena parameter batas minimum tidak ikut ditandatangani oleh pengguna (AF-08 + AF-10)?
 - `[EDGE-CONTROL/LATENT]`:
   - Pada penerima pesan lintas-rantai (lzReceive, ccipReceive, onRecvPacket, handler relayer): apakah fungsi memeriksa keduanya, yaitu alamat *endpoint/router* lokal DAN identitas kontrak pengirim terpercaya di rantai asal (sourceChainId + trustedRemoteAddress) (AF-07)?
+
+## 3. Siklus Aliran & Invarian Senyap (dari Registry Domain v1)
+
+- **Domain:** `BRIDGE (cross-chain intents)`
+- **Siklus aliran (L-PATH):** deposit → fill → bundel worker → propose(bond) → jendela dispute → eksekusi → relay root → refund leaf → bridge-back
+- **Invarian senyap (asumsi yang TIDAK di-assert — target serangan):** «leaf tak pernah membayar melebihi pot»; «msg.value dipakai ATAU dikembalikan»; «slot root identik antar-chain adalah desain»; «handler selalu kosong di antara fill» — *(invarian generik bridge; verifikasi ulang terhadap desain protokol yang diaudit)*
+- **Aktor off-chain:**
+
+  data worker (bundel), disputer (jendela 2 jam — kelas «ketiadaan aksi»), relayer (pricing)
+
+Rujuk `FACTS.md` domain terkait untuk mencatat mana dari invarian senyap ini yang **terbukti ditegakkan** oleh kode dan mana yang **TIDAK ditegakkan**.

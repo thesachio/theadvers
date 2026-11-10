@@ -17,3 +17,11 @@ Penyerang memicu cabang logika khusus yang hanya aktif saat modul kosong (0), sa
    - Panggil fungsi dua-pihak dengan akun/objek yang sama (A == B) dan lacak bagaimana variabel memori sementara menulis ulang state penyimpanan.
 3. Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan jika terdapat penjaga eksplisit (require(amount > 0), require(from != to), atau penguncian *dead shares* permanen saat inisialisasi) di jalur tersebut.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-01] Serangan Langsung** — input `0`/`1`/`MAX`; posisi pertama/terakhir tanpa pendahulu.
+- **[BENTUK-04] Racun State Dulu, Korban Eksekusi Terakhir** — penyerang mengisi state kosong lebih dulu, lalu korban menjadi "pengguna kedua" yang menerima perlakuan berbeda.
+- **[BENTUK-06] Panen Pasif State Sisa** — state kosong terjadi setelah migrasi/penarikan massal; baca state live dulu, jangan berasumsi.
+
+Rujuk `M-007`, `M-010`.

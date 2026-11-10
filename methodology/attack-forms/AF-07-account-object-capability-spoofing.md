@@ -17,3 +17,11 @@ Penyerang memanggil fungsi publik/eksternal dengan menyuplai alamat kontrak, aku
    - Arahkan parameter target dan calldata pada fungsi router untuk memanggil token.transferFrom(korban, penyerang, jumlah) memanfaatkan *allowance* korban.
 3. Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan jika target/akun sudah dikunci melalui daftar putih (*whitelist*), derivasi alamat deterministik (PDA/CREATE2) yang terverifikasi, atau pemeriksaan pemilik/otoritas yang lengkap.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-01] Serangan Langsung** — kirim akun/objek palsu langsung ke fungsi hilir, melewati hulu.
+- **[BENTUK-03] Bundler Transaksi** — pada PTB/Move: buat objek palsu → cetak receipt → pakai pada kontainer asli, semuanya dalam satu bundel.
+- **[BENTUK-10] Kebingungan Whitelist & Partial Subcall** — `isWhitelisted[x]` tanpa cek pasangan aset (`pool.token() ≠ asset`); callback tanpa verifikasi `initiator`/`srcSender`.
+
+Rujuk `M-008`, `POV-MOVE-01`, `POV-SOL-01`.

@@ -17,3 +17,14 @@
   - Periksa konversi desimal pada rumus collateralAmount * collateralPrice / debtPrice: jika kolateral berdesimal 6 dan aset pinjaman berdesimal 18, apakah faktor skala sudah tepat di Path/File.ext:Lxx-Lyy?
 - `[EDGE-CONTROL/LATENT]`:
   - Uji kondisi di mana harga kolateral jatuh tajam: apakah pemeriksaan di dalam liquidate() justru *revert* ketika posisi mengalami insolvensi (*underwater*), sehingga utang macet terkunci selamanya (M-006 + AF-06 + AF-09)?
+
+## 3. Siklus Aliran & Invarian Senyap (dari Registry Domain v1)
+
+- **Domain:** `LENDING`
+- **Siklus aliran (L-PATH):** suplai → pinjam → update harga → likuidasi → lelang/bad-debt → bayar → tarik
+- **Invarian senyap (asumsi yang TIDAK di-assert — target serangan):** «kolateral tak pernah < utang tanpa jalur likuidasi tersedia»; «oracle tak bisa di-flashloan»; «share/debt tak bocor oleh pembulatan»; «bad debt tak tersosialisasi murah»
+- **Aktor off-chain:**
+
+  keeper likuidasi (diam = kelas ketiadaan-aksi), relayer oracle
+
+Rujuk `FACTS.md` domain terkait untuk mencatat mana dari invarian senyap ini yang **terbukti ditegakkan** oleh kode dan mana yang **TIDAK ditegakkan**.

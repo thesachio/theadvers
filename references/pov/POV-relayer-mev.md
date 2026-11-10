@@ -12,3 +12,11 @@
 ## 2. Pertanyaan Bedah di STAGE-C2 & STAGE-D
 1. Sandwich & Front-Run: Jika saya masuk tepat sebelum transaksi harvest/distributeReward/rebalance di Path/File.ext:Lxx-Lyy dan keluar tepat sesudahnya, berapa bagian nilai pengguna lama yang berpindah ke saya?
 2. Manipulasi Parameter Relayer: Saat pengguna menyerahkan tanda tangan izin (*permit/intent*), parameter apa di fungsi tujuan yang dapat saya ubah (misal alamat penerima, besaran fee relayer, jalur swap) tanpa membatalkan validitas tanda tangan tersebut?
+
+## 3. Mengapa Bisa Lolos & Batas Realitas (STAGE-D)
+
+**Blindspot:** auditor menguji fungsi dengan asumsi "dipanggil sekali, sendirian", tanpa membayangkan ada transaksi lain disisipkan sebelum dan sesudahnya dalam blok yang sama.
+
+- **Gugur** bila jalur yang diamati tidak bergantung pada urutan (mis. hasilnya deterministik terhadap input), atau bila `deadline`/`minOut` dikunci ketat relatif terhadap nilai pra-transaksi.
+- **Wajib PoC** bila parameter fungsi tujuan **tidak tercakup tanda tangan** pengguna. PoC wajib mengeksekusi urutan: sisip → transaksi target → back-run, di satu blok (`vm.roll`/`vm.warp` tetap pada blok yang sama).
+- Untuk relayer signer: uji apakah `initiator`/`srcSender` diperiksa selain `msg.sender` (`M-008` §2 butir 3).

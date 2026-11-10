@@ -16,3 +16,11 @@ Penyerang memilih ukuran input spesifik tepat di bawah atau di atas ambang pemba
 3. Kondisi Gugur ke `06-refuted-invalid.md` atau `08-valid-not-eligible.md`:
    - Gugurkan ke 06-refuted-invalid.md jika kode sudah menggunakan pembulatan ke atas (mulDivUp / ceil) untuk kewajiban pengguna dan pembulatan ke bawah (mulDivDown / floor) untuk hak pengguna.
    - Pindahkan ke 08-valid-not-eligible.md jika kebocoran maksimal hanya 1 wei token berdesimal 18 per transaksi dan biaya gas/eksekusi untuk mengulanginya jauh melampaui nilai yang didapat tanpa adanya mekanisme amplifikasi.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-01] Serangan Langsung** — input ekstrem (`0`, `1`, `MAX`) dari EOA polos.
+- **[BENTUK-03] Bundler Transaksi** — pecah menjadi N panggilan kecil dalam satu bundel lalu gabungkan hasilnya; uji salami-slicing vs bulk.
+- **[BENTUK-05] Hentikan Siklus di Tengah** — biarkan posisi di status pending lalu picu konversi, agar pembulatan terjadi pada state setengah jadi.
+
+Rujuk `M-007`, `M-009`.

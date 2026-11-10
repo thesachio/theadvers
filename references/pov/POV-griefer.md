@@ -11,3 +11,11 @@
 ## 2. Pertanyaan Bedah di STAGE-C2 & STAGE-D
 1. Sabotase Antrean & Batch: Di Path/File.ext:Lxx-Lyy, jika saya mendaftarkan 1 item antrean yang mengarah ke kontrak penolak transfer (atau akun token *blacklisted*), apakah seluruh fungsi processBatch() / settle() milik ratusan pengguna lain ikut *revert*?
 2. Sabotase Timer & Prasyarat Korban: Dapatkah saya memanggil depositFor(korban, 1) atau delegate(korban, 1) untuk mereset waktu tunggu penarikan (*unlock timestamp*) korban selamanya?
+
+## 3. Mengapa Bisa Lolos & Batas Realitas (STAGE-D)
+
+**Blindspot:** auditor menganggap DoS sebagai "hanya gangguan" sehingga tidak dihitung sebagai kerugian, padahal dana yang terkunci permanen adalah kerugian finansial penuh.
+
+- **Gugur** bila biaya sabotase ≥ nilai yang berhasil dibekukan, atau bila ada jalur keluar darurat yang tidak bisa disabotase.
+- **Wajib PoC** dengan biaya sabotase terukur (1 wei / 1 unit terkecil) vs nilai yang berhasil dibekukan.
+- Fuzz wajib mengacak: jumlah entri antrean, frekuensi reset timer, dan posisi korban dalam batch.

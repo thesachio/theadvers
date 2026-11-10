@@ -14,3 +14,12 @@ Penyerang memanipulasi komponen penentu valuasi ([EDGE-VALUATION]) atau memanfaa
    - Ketika rasio agunan posisi berada di antara `100%` dan `100% + liquidationBonus`, uji apakah pemilik posisi (melalui akun kedua) dapat melikuidasi dirinya sendiri untuk menyita `100%` agunan hanya dengan membayar sebagian utang, lalu membiarkan sisa utangnya menjadi kerugian protokol.
 3. **Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan jika sumber harga tidak dapat dimanipulasi secara ekonomis dan rumus likuidasi membatasi penyitaan sekaligus melakukan sosialisasi/penutupan *bad debt* dengan benar.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-09] Penyisipan Lintas-Transaksi** — valuasi membaca Sumber A (oracle/TWAP) tetapi eksekusi dikirim ke Sumber B (pool spot): distorsi B → panggil protokol → pulihkan B.
+- **[BENTUK-02] Transaktor Pemicu** — seeding posisi korban lebih dulu (`vm.prank(victim)`), lalu likuidasi/premanen.
+- **[BENTUK-03] Bundler Transaksi** — flashloan modal besar + likuidasi + pemulihan posisi dalam satu blok.
+- **[BENTUK-01] Serangan Langsung** — self-liquidation dua identitas (`Attacker_A` borrower, `Attacker_B` liquidator).
+
+Rujuk `POV-DEFI-01`, `POV-DEFI-02`, `M-003`.

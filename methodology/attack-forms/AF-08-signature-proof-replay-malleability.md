@@ -17,3 +17,11 @@ Penyerang mengambil tanda tangan atau bukti kriptografis (Merkle/ZK) yang sah, l
    - Sebaliknya, jika fungsi utama mewajibkan `permit` dalam satu transaksi tanpa blok `try/catch`, uji apakah penyerang dapat melakukan *front-run* mengeksekusi tanda tangan `permit` tersebut lebih dulu agar transaksi utama korban gagal karena nonce sudah terpakai.
 3. **Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan jika seluruh parameter sensitif, domain separator (chainId + alamat modul), dan nonce satu-kali-pakai terikat penuh di dalam digest kriptografis.
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+- **[BENTUK-09] Penyisipan Lintas-Transaksi** — ambil tanda tangan dari mempool, eksekusi lebih dulu (permit front-running DoS), lalu transaksi utama korban `revert`.
+- **[BENTUK-02] Transaktor Pemicu** — pakai tanda tangan korban yang sudah ada (approve/permit aktif) sebagai bahan serangan.
+- **[BENTUK-06] Panen Pasif State Sisa** — otorisasi tertunda (`allowance`/`permit`/`delegated authority`) yang belum dicabut.
+
+Rujuk `M-008`, `M-010`, `POV-relayer-mev`.

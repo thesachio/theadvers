@@ -18,3 +18,13 @@ Penyerang menggunakan modal besar sesaat (pinjaman kilat / *flash loan*) atau me
    - Langkah 4: Tarik kembali share/likuiditas penyerang dan hitung selisih saldo akhir.
 3. Kondisi Gugur ke `06-refuted-invalid.md`:
    Gugurkan kandidat jika modul menggunakan pelacakan saldo internal murni (*internal accounting*) yang mengabaikan donasi langsung, atau menerapkan *virtual shares/assets offset* yang membuat biaya donasi penyerang selalu lebih besar daripada nilai yang berhasil diekstrak (Attack Cost > Extracted Value).
+
+## 3. Bentuk Serangan (Cara Menyerang) — dari Registry v1
+
+Kelas kerentanan di atas dapat dieksekusi dengan beberapa **bentuk**. Untuk injeksi likuiditas & inflasi share, bentuk yang wajib diuji:
+
+- **[BENTUK-01] Serangan Langsung** — EOA polos menembak sink; kontrol positif jalur sah wajib hidup.
+- **[BENTUK-02] Transaktor Pemicu** — seeding pihak pemicu dulu (`vm.prank(victim)` transaksi normal) — deposit/approve/isi pesanan — **lalu** penyerang menyerang. Kontrol positif = pemicu berhasil menjalankan alurnya.
+- **[BENTUK-03] Bundler Transaksi** — 1 bundel atomik (multicall/batch/flashloan/PTB) berisi manipulasi + eksekusi; uji `f(a+b) ≠ f(a)+f(b)`.
+
+Rujuk `M-001`, `M-007`, `M-008`.
