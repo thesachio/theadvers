@@ -4,6 +4,14 @@
 > 2. Bagian 3 (Blok Meja Operasi `[ACTIVE-BATCH]`): Hanya boleh berisi maksimal 5 kandidat berstatus `[ACTIVE]` dalam satu siklus pembuktian STAGE-D -> STAGE-E.
 > 3. Setelah STAGE-E selesai mengadili batch aktif ke wadah 06 / 07 / 08 / 09, jumlah [ACTIVE] wajib kembali menjadi `0`. Jika masih ada [QUEUED] > 0 untuk Wilayah R_i, tarik batch berikutnya (maksimal 5 kandidat) hingga [QUEUED] == 0 dan [ACTIVE] == 0.
 > 4. Dilarang menulis token kompresi (..., dll., dst., etc., rest of logic). Wajib cantumkan Path/File.ext:Lxx-Lyy.
+> 5. **TARGET OBJEK & DEPLOY_PARITY WAJIB PER LEAD.** Sebelum menulis PoC, setiap kartu `[ACTIVE]` wajib menyatakan objek on-chain yang diserang (`TARGET_OBJEK`) dan membawa artefak `deploy_parity.py`. `MODE_UJI_POC` diturunkan dari `SIKLUS`, bukan dipilih bebas — PoC dibangun pada kondisi yang **relevan** dengan jaringan proyek (`INTEL.md §0`).
+>    | `SIKLUS` | `MODE_UJI_POC` sah | Syarat `INTEL.md §0` |
+>    | :--- | :--- | :--- |
+>    | `P4_LIVE_FULL` | `FORK_LIVE` | `MAINNET` |
+>    | `P2_TESTNET_ONLY` | `FORK_TESTNET` | `TESTNET` / `DEVNET` |
+>    | `P3_LIVE_PARTIAL` | `FORK_LIVE` | `MAINNET` (sebagian entrypoint belum terbukti) |
+>    | `P1_PRE_DEPLOY` | `FORK_DEPLOYED_HEAD` atau `LOKAL` | bebas — tidak ada objek live untuk di-fork |
+>    `--gate D` menolak kombinasi yang tidak konsisten dan menolak kartu tanpa artefak yang benar-benar ada di disk.
 
 ---
 
@@ -43,6 +51,12 @@
 - Status Saat Ini: [TEMPLATE-CONTOH — Ganti menjadi [ACTIVE] saat menarik kandidat dari tabel [QUEUED]]
 - Region & EV Rank: R_1 | P1
 - Assigned Plugins Loaded: M-xxx (references/methods/M-xxx-*.md) + AF-xx (methodology/attack-forms/AF-xx-*.md)
+- TARGET_OBJEK: [chain:alamat kontrak/program/module yang diserang lead ini — mis. ethereum:0xAbC…123 / solana:<pubkey>]
+- DEPLOY_REPORT: notes/deploy-parity-[LEAD-R1-01].json *(artefak `deploy_parity.py`; wajib ada di disk sebelum --gate D)*
+- SIKLUS: [P1_PRE_DEPLOY | P2_TESTNET_ONLY | P3_LIVE_PARTIAL | P4_LIVE_FULL]
+- VERDICT_ENTRYPOINT: [LIVE_MATCH | HEAD_ONLY_PROVEN | TESTNET_ONLY | ENTRYPOINT_RELOCATED | ENV_ERROR | IDENTITY_ONLY]
+- MODE_UJI_POC: [FORK_LIVE | FORK_TESTNET | FORK_DEPLOYED_HEAD | LOKAL] *(diturunkan dari SIKLUS + INTEL §0, lihat Aturan 5)*
+- Fork PoC: [chain, block: <n>, RPC] *(wajib bila MODE_UJI_POC = FORK_LIVE / FORK_TESTNET)*
 - Titik 1 — Jejak Kode Eksak (`Exact Code Trace`):
   - Entry Point: [Path/File.ext:Lxx-Lyy — NamaModul.fungsiMasuk]
   - Alur Panggilan & Mutasi: [Path/File.ext:Lxx-Lyy — Urutan perubahan state/saldo dan alasan mengapa penjaga kode berhasil dilewati]

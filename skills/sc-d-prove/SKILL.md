@@ -18,6 +18,30 @@ Anda menjalankan Tahap D (`L-PROVE`) untuk Wilayah Aktif R_i menggunakan mekanis
 2. Tarik Rolling Batch ke Meja Operasi (`<= 5 [ACTIVE]`):
    - Periksa Bagian 2 (Tabel [QUEUED]) di 05-raw-leads.md untuk Wilayah Aktif R_i.
    - Ambil maksimal 5 kandidat `[QUEUED]` dengan peringkat EV tertinggi (`P1` -> `P5`), ubah statusnya menjadi `[ACTIVE]`, dan buat kartu pembuktiannya di Bagian 3 (Blok Meja Operasi `[ACTIVE-BATCH]`) pada 05-raw-leads.md.
+   - **Sebelum menulis PoC, tetapkan kondisi live objek yang diserang.** Untuk SETIAP kartu `[ACTIVE]`
+     jalankan deteksi terukur (satu perintah per lead, artefak bernama LEAD-ID):
+
+     ```bash
+     python3 tools/deploy_parity.py --paradigm <evm|solana|sui|aptos|ton|generic> \
+       --chain <mainnet|testnet|local> --addr <TARGET_OBJEK> --rpc <RPC> \
+       --entrypoints "<signature yang diserang>" --repo <repo> \
+       --out <audit-dir>/notes/deploy-parity-<LEAD-ID>.json
+     ```
+
+     Lalu isi di kartu: `TARGET_OBJEK`, `DEPLOY_REPORT`, `SIKLUS`, `VERDICT_ENTRYPOINT`,
+     `MODE_UJI_POC`, dan baris `Fork PoC` (chain + block + RPC).
+
+     **`MODE_UJI_POC` diturunkan, bukan dipilih bebas** — PoC wajib dibangun pada kondisi yang relevan:
+
+     | `INTEL.md §0` | `SIKLUS` | `MODE_UJI_POC` |
+     | :--- | :--- | :--- |
+     | `MAINNET` | `P4_LIVE_FULL` / `P3_LIVE_PARTIAL` | `FORK_LIVE` + blok |
+     | `TESTNET` / `DEVNET` | `P2_TESTNET_ONLY` | `FORK_TESTNET` + blok |
+     | apa pun | `P1_PRE_DEPLOY` | `FORK_DEPLOYED_HEAD` atau `LOKAL` |
+
+     `--gate D` menolak kombinasi yang tidak konsisten (mis. proyek mainnet tetapi PoC memakai
+     `FORK_TESTNET`, atau `SIKLUS: P4_LIVE_FULL` tetapi diuji `LOKAL`).
+
    - Aturan Besi: Dilarang keras memiliki lebih dari 5 kandidat berstatus [ACTIVE] pada saat bersamaan. Biarkan kandidat ke-6 dan seterusnya tetap berstatus [QUEUED] untuk diproses pada batch berikutnya setelah batch ini selesai diadili di STAGE-E.
    - Perbarui STATE.md (Current Stage: STAGE-D, Current Batch, Queued Leads Count, Active Leads Count).
 

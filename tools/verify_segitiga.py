@@ -146,6 +146,12 @@ ENTRYPOINT_VERDICTS = (
 SIKLUS_RX = re.compile(r"SIKLUS\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Z0-9_]+)")
 VERDICT_EP_RX = re.compile(r"VERDICT_ENTRYPOINT\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Z_]+)")
 DEPLOY_REPORT_RX = re.compile(r"DEPLOYMENT_REPORT\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([^\n`]+)")
+# --- Per-lead: objek live & mode PoC (STAGE-D) ---
+TARGET_OBJEK_RX = re.compile(r"TARGET_OBJEK\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([^\n`]+)")
+DEPLOY_REPORT_LEAD_RX = re.compile(r"DEPLOY_REPORT\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([^\n`]+)")
+MODE_UJI_POC_RX = re.compile(r"MODE_UJI_POC\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?(FORK_LIVE|FORK_TESTNET|FORK_DEPLOYED_HEAD|LOKAL)\b")
+FORKPOC_BLOCK_RX = re.compile(r"Fork PoC\s*(?:\*\*)?\s*:\s*[^\n]*?block\s*[:=]\s*`?(\d{4,})")
+LEAD_ID_RX = re.compile(r"Lead ID\s*&\s*Judul\s*:\s*\[?(LEAD-[A-Za-z0-9_\-]+)")
 
 PLUGIN_SPECS = [
     {
@@ -1138,6 +1144,103 @@ def validate_deployment_report(joined: str, body: List[str], label: str, audit_d
     return errors
 
 
+# SIKLUS -> MODE_UJI_POC yang sah (PoC dibangun pada kondisi yang relevan)
+SIKLUS_TO_MODE = {
+    "P4_LIVE_FULL": ("FORK_LIVE",),
+    "P3_LIVE_PARTIAL": ("FORK_LIVE",),
+    "P2_TESTNET_ONLY": ("FORK_TESTNET",),
+    "P1_PRE_DEPLOY": ("FORK_DEPLOYED_HEAD", "LOKAL"),
+}
+# MODE_UJI_POC yang sah menurut Deployment Stage proyek (INTEL §0)
+STAGE_TO_MODE = {
+    "MAINNET": ("FORK_LIVE", "FORK_DEPLOYED_HEAD", "LOKAL"),
+    "TESTNET": ("FORK_TESTNET", "FORK_DEPLOYED_HEAD", "LOKAL"),
+    "DEVNET": ("FORK_TESTNET", "FORK_DEPLOYED_HEAD", "LOKAL"),
+}
+
+
+def validate_lead_deploy(audit_dir: Path, active_cards: List[str]) -> List[str]:
+    """Per lead [ACTIVE]: TARGET_OBJEK + artefak deploy_parity + MODE_UJI_POC konsisten.
+
+    Tujuan: PoC dibangun pada kondisi yang RELEVAN — mainnet->FORK_LIVE, testnet/devnet->
+    FORK_TESTNET, pre-deploy->FORK_DEPLOYED_HEAD/LOKAL.
+    """
+    errors: List[str] = []
+    stage = deployment_stage(audit_dir)
+    if stage is None:
+        errors.append(
+            "[GATE-D DEPLOY] Deployment Stage belum dinyatakan di INTEL.md §0 — Mode Uji PoC "
+            "tidak dapat diverifikasi. Jalankan skill sc-pre-intel lebih dulu."
+        )
+        return errors
+
+    for chunk in active_cards:
+        body = chunk.splitlines()
+        joined = "\n".join(body)
+        head = body[0][:70] if body else "?"
+        m_id = LEAD_ID_RX.search(joined)
+        lead_id = m_id.group(1) if m_id else "LEAD-?"
+
+        # a. objek on-chain yang diserang
+        m_obj = TARGET_OBJEK_RX.search(joined)
+        obj = (m_obj.group(1).strip() if m_obj else "")
+        if not obj or "[" in obj or "<" in obj:
+            errors.append(
+                f"[GATE-D DEPLOY] {lead_id} tanpa TARGET_OBJEK — sebutkan chain:alamat objek yang diserang "
+                f"(mis. ethereum:0xAbC…123) agar PoC dibangun pada objek nyata."
+            )
+
+        # b. artefak deploy_parity per lead wajib ADA di disk
+        m_rep = DEPLOY_REPORT_LEAD_RX.search(joined)
+        if not m_rep:
+            errors.append(
+                f"[GATE-D DEPLOY] {lead_id} tanpa DEPLOY_REPORT — jalankan tools/deploy_parity.py "
+                f"--out <audit-dir>/notes/deploy-parity-{lead_id}.json sebelum --gate D."
+            )
+        else:
+            raw = m_rep.group(1).strip()
+            cands = [Path(raw)]
+            if not Path(raw).is_absolute():
+                cands += [audit_dir / raw, REPO_ROOT / raw]
+            if not any(c.exists() for c in cands):
+                errors.append(f"[GATE-D DEPLOY] {lead_id} menunjuk artefak yang tidak ada: {raw}")
+
+        # c. SIKLUS wajib & sah
+        m_s = SIKLUS_RX.search(joined)
+        siklus = m_s.group(1) if m_s else None
+        if not siklus:
+            errors.append(f"[GATE-D DEPLOY] {lead_id} tanpa SIKLUS (P1..P4).")
+        elif siklus not in SIKLUS_VALUES:
+            errors.append(f"[GATE-D DEPLOY] {lead_id} memakai SIKLUS tidak sah: {siklus}.")
+
+        # d. MODE_UJI_POC wajib & konsisten dengan SIKLUS
+        m_mode = MODE_UJI_POC_RX.search(joined)
+        mode = m_mode.group(1) if m_mode else None
+        if not mode:
+            errors.append(f"[GATE-D DEPLOY] {lead_id} tanpa MODE_UJI_POC.")
+        elif siklus in SIKLUS_TO_MODE and mode not in SIKLUS_TO_MODE[siklus]:
+            errors.append(
+                f"[GATE-D DEPLOY] {lead_id}: SIKLUS {siklus} menuntut MODE_UJI_POC "
+                f"{' / '.join(SIKLUS_TO_MODE[siklus])}, bukan {mode}."
+            )
+
+        # e. MODE_UJI_POC wajib konsisten dengan Deployment Stage proyek
+        if mode and stage in STAGE_TO_MODE and mode not in STAGE_TO_MODE[stage]:
+            errors.append(
+                f"[GATE-D DEPLOY] {lead_id}: Deployment Stage {stage} (INTEL §0) tidak mengizinkan "
+                f"MODE_UJI_POC {mode} — PoC akan dibangun pada kondisi yang tidak relevan."
+            )
+
+        # f. fork wajib menyebut blok bila mode fork live/testnet
+        if mode in ("FORK_LIVE", "FORK_TESTNET") and not FORKPOC_BLOCK_RX.search(joined):
+            errors.append(
+                f"[GATE-D DEPLOY] {lead_id}: MODE_UJI_POC {mode} tanpa nomor blok pada baris "
+                f"'Fork PoC' (butuh block: <n>)."
+            )
+
+    return errors
+
+
 def validate_wadah_rules(audit_dir: Path) -> List[str]:
     """Jalankan seluruh aturan 06/07/08/09 + jejak lead."""
     errors: List[str] = []
@@ -1257,8 +1360,11 @@ def parse_leads_table_and_cards(raw_leads_text: str, region: Optional[str] = Non
         for chunk in card_chunks[1:]:
             if "[TEMPLATE-CONTOH" in chunk:
                 continue
-            if re.search(r"Status Saat Ini\*\*:\s*`?\[ACTIVE\]`?", chunk):
-                if region is None or re.search(rf"Region\s*&\s*EV\s*Rank\*\*:\s*`?{re.escape(region)}\b", chunk):
+            # Toleran terhadap format bold maupun tidak: "- Status Saat Ini: [ACTIVE]" / "- **Status Saat Ini**: [ACTIVE]"
+            if re.search(r"Status Saat Ini\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?\[ACTIVE\]`?", chunk):
+                if region is None or re.search(
+                    rf"Region\s*&\s*EV\s*Rank\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?{re.escape(region)}\b", chunk
+                ):
                     active_cards.append("### " + chunk.strip())
 
     return queued_rows, active_cards
@@ -1607,6 +1713,9 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
                     errors.append(f"[GATE-D] Kartu [ACTIVE] kehilangan komponen '{titik}' pada Bukti Segitiga.")
             if not ANCHOR_REGEX.search(card):
                 errors.append("[GATE-D] Kartu [ACTIVE] tidak memiliki jangkar kode Path/File.ext:Lxx.")
+
+        # Per lead: objek on-chain + artefak deploy_parity + Mode Uji PoC yang relevan.
+        errors.extend(validate_lead_deploy(audit_dir, active_cards))
 
     elif gate == "E":
         if not gate_passed_before("GATE-D", state_text):
