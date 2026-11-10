@@ -1,57 +1,58 @@
 # 09 — Confirmed Findings (Bounty-Ready / Live Production Only)
 
-<!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
-> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
-> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
-> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
-> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+> **Penerapan Segitiga & Wadah Kasus (`cases/<ID>/`)**:
+> 1. Wadah murni untuk temuan berstatus `VALID_ELIGIBLE` yang lolos **kesebelas** Pernyataan di `verify/VERDICT.md`, terbukti lewat eksekusi simulasi PoC tanpa curang (`POC_STATUS: PASS`), membuktikan bahaya finansial nyata (`CRITICAL` / `HIGH` / `MEDIUM`, atau `LOW` dengan pemicu *permissionless*), **DAN** terbukti eksis pada bytecode/kontrak produksi aktif (`DEPLOYMENT_MATCH: LIVE_MATCH`).
+> 2. **Gerbang Pemisahan `09` (LIVE) vs `08` (HEAD-ONLY / PRE-LIVE) di Tahap F**:
+>    - **Masuk ke `09` ini**: PoC `[PASS]` pada state produksi nyata (`Mode Uji: FORK_LIVE`, atau `FORK_DEPLOYED_HEAD` yang entrypoint-nya terverifikasi eksis & berperilaku identik pada objek live melalui `deploy_parity.py` -> `LIVE_MATCH`).
+>    - **Pindahkan ke `08-valid-not-eligible.md`** (`LOW_CLASS: PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`): Apabila PoC terbukti `[PASS]` di atas kode repositori (`FORK_DEPLOYED_HEAD` / `LOKAL`), namun pada Rekonsiliasi Langkah 0 Tahap F terbukti bahwa kontrak/fungsi tersebut belum di-deploy ke mainnet (`HEAD-only` / `P1_PRE_DEPLOY`) atau belum masuk daftar alamat bounty aktif (`[REPO_STAGED]`).
+> 3. **Pemisahan Indeks `09` dan Wadah Kasus `cases/<ID>/`**:
+>    - Berkas `09-confirmed-findings.md` ini menyimpan **Tabel Indeks** dan **Blok Metadata + Tiga Titik Bukti Segitiga** untuk setiap temuan `VALID_ELIGIBLE`.
+>    - Seluruh detail naratif 9-bagian, paket PoC berkontrol positif, dan naskah komunikasi/pengantar disimpan di dalam satu folder per temuan pada **`cases/<ID>/`** yang wajib berisi 3 berkas:
+>      1. `cases/<ID>/chat.md` (berbasis `SUBMISSION-EMAIL.md` + ringkasan diskusi/verdict `lead-<id>.md`)
+>      2. `cases/<ID>/laporan-teknis.md` (berbasis 9 bagian wajib `TECHNICAL-REPORT.md`)
+>      3. `cases/<ID>/poc.md` (berbasis 5 bagian wajib & aturan Kontrol Positif `POC-PACKAGE.md`)
 
-Wadah murni untuk temuan berstatus `VALID_ELIGIBLE` yang lolos **kesebelas** Pernyataan di `verify/VERDICT.md`, terbukti lewat eksekusi simulasi PoC tanpa curang (`[PASS]`), membuktikan bahaya finansial nyata (Critical / High / Medium), **DAN** terbukti eksis pada bytecode/kontrak produksi aktif (`DEPLOYMENT_MATCH: LIVE_MATCH`).
+---
 
-> **GERBANG PEMISAHAN `09` (LIVE) VS `08` (HEAD-ONLY / PRE-LIVE) DI FASE 4:**
-> - **Masuk ke `09` ini:** PoC `[PASS]` pada state produksi nyata (`Mode Uji: FORK_LIVE`, atau `FORK_DEPLOYED_HEAD` yang kodenya terverifikasi 100% identik dengan bytecode produksi aktif) dan kontrak masuk cakupan aktif (`LIVE_MATCH`). Istilah "100% identik" di sini **bukan** berarti hash bytecode sama persis — yang diuji adalah **keberadaan & perilaku entrypoint yang diserang PoC** (lihat `VERDICT.md` §0.2b).
-> - **Pindahkan ke `08-valid-not-eligible.md`** (`LOW_CLASS: PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`): Apabila di Tahap D PoC eksploitasi sudah terbukti `[PASS]` di atas kode repositori (`FORK_DEPLOYED_HEAD` / `LOKAL`), namun pada Rekonsiliasi Langkah 0 Tahap F terbukti bahwa kontrak/fungsi tersebut belum di-deploy ke mainnet (`HEAD-only`) atau belum masuk daftar alamat bounty aktif (`[REPO_STAGED]`), Hakim Tahap F **WAJIB** memindahkan temuan tersebut (lengkap dengan kode PoC utuhnya) ke `08-valid-not-eligible.md` — **BUKAN** dibiarkan di `09` dan **BUKAN** diparkir di `07`!
+## 1. TABEL INDEKS TEMUAN VALID TERKONFIRMASI (`STAGE-E` / `STAGE-F`)
 
-## Field wajib per entri
+| Finding ID | Asal Lead ID | Region (`R_i`) | Severity (`CRITICAL` / `HIGH` / `MEDIUM` / `LOW`) | EV Rank (`P1`–`P5`) | Verbatim Anchor (`Path/File.ext:awal-akhir`) | Modul & Fungsi Terdampak | Plugin Pembuktian (`M-xxx` + `AF-xx`) | Wadah Case (`STAGE-F`) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `FIND-001` | `LEAD-R1-01` | `R_1` | `HIGH` | `P1` | `[Path/File.ext:L60-L95]` | `[NamaModul.namaFungsi]` | `M-001 + AF-01` | `cases/FIND-001` |
 
-```markdown
-## [LEAD-001] Judul Kerentanan & Lokasi
-ID                  : LEAD-001
-SEVERITY            : CRITICAL | HIGH | MEDIUM          <- DARI IMPACT, bukan dari siklus
-VERDICT             : VALID_ELIGIBLE
-TARGET_FILE         : 09-confirmed-findings.md
-TANGGA_BUKTI        : A   (A-HEAD DILARANG di sini — A-HEAD = HEAD-only)
-DEPLOYMENT_MATCH    : LIVE_MATCH
-CYCLE               : P4_LIVE_FULL | P3_LIVE_PARTIAL     <- WAJIB; P1/P2 DILARANG di 09
-ELIGIBILITY         : LIVE_MATCH                         <- WAJIB; nilai lain -> 08
-LIVE_IDENTITY       : <identitas TERUKUR: accountId()/sha256 ProgramData/bytecode hash>
-POC_STATUS          : PASS                               <- WAJIB literal PASS
-Mode Uji            : FORK_LIVE (chain: <...>, block: <...>, RPC: <...>)
-File:Baris          : <path/to/File.sol:Baris>
-Metode / POV        : <M-00X / [POV-XX]>
-Invarian Dilanggar  : <invarian inti dari PIN.md>
-DAMPAK KUANTITATIF  : <profit bersih penyerang / kerugian protokol dalam angka eksak>
-```
+---
 
-> **`LIVE_IDENTITY` wajib TERUKUR, bukan disimpulkan.** Contoh sah: `accountId()` = `biconomy.nexus.1.3.3`; `sha256(ProgramData)` = `8190d3f7…` untuk Solana; hash bytecode impl EIP-1967. Nilai ini diambil dari artefak `deploy_parity` (`audit/notes/deploy-parity-<ID>.json`). **Tanpa `LIVE_IDENTITY` terukur, `LIVE_MATCH` ditolak** (Pernyataan #2 + `VERDICT.md` §0.2).
->
-> **`TANGGA_BUKTI: A-HEAD` DILARANG di `09`.** A-HEAD berarti PoC dijalankan pada kode repo, bukan kontrak live — temuan semacam itu milik `08`. Kombinasi `A-HEAD` + `LIVE_MATCH` adalah kontradiksi yang ditolak otomatis oleh `verify/ingest.py`.
->
-> **`CYCLE: P1_PRE_DEPLOY` / `P2_TESTNET_ONLY` DILARANG di `09`** — belum/tidak live di mainnet.
+## 2. BLOK METADATA WAJIB & REKAM BUKTI PER ENTRI (`09`)
 
-## Bagian Naratif & Bukti Teknis Wajib (di bawah blok metadata tiap entri)
+> **Aturan Keras Field Metadata (`VERDICT.md` & `SCHEMA.md`)**:
+> - **`LIVE_IDENTITY` wajib TERUKUR, bukan disimpulkan.** Contoh sah: `accountId()` = `...`; `sha256(ProgramData)` = `...` untuk Solana; hash bytecode impl EIP-1967 dari artefak `deploy-parity-<ID>.json`. Tanpa `LIVE_IDENTITY` terukur, `LIVE_MATCH` ditolak.
+> - **`TANGGA_BUKTI: A-HEAD` DILARANG di `09`.** `A-HEAD` berarti PoC dijalankan pada kode repo HEAD-only (milik `08`). Kombinasi `A-HEAD` + `LIVE_MATCH` adalah kontradiksi yang ditolak otomatis.
+> - **`CYCLE: P1_PRE_DEPLOY` / `P2_TESTNET_ONLY` DILARANG di `09`.**
 
-1. **Validasi Realitas Produksi & Identitas Deployment:**
-   Bukti alamat kontrak aktif di mainnet, nilai parameter/storage produksi saat diuji (`cast call` / `cast storage`), dan konfirmasi tidak ada asumsi *Fantasy Mock* maupun *Empty-Pool Mirage*.
-2. **Akar Masalah (*Root Cause*) & Urutan Eksploitasi:**
-   Penjelasan presisi baris kode yang cacat beserta langkah transaksi dari *Victim Lifecycle Seeding* hingga ekstraksi nilai.
-3. **Kode PoC Utuh yang Dapat Direproduksi:**
-   Kode test lengkap (`foundry` / `cargo test` / `sui move test` / `@ton/sandbox`) tanpa *cheatcode* terlarang (`vm.store`, `vm.etch` state protokol, `vm.prank(admin)`).
-4. **Perintah Eksekusi & Log Terminal `[PASS]`:**
-   Perintah eksak (`FOUNDRY_JOBS=1 forge test --match-test ... -vvv`) beserta kutipan log yang mencetak saldo sebelum/sesudah dan `[PASS]`.
-5. **Rekomendasi Perbaikan (*Patch Diff*):**
-   Blok diff minimal pada kontrak sumber yang menutup akar masalah tanpa merusak invarian lain.
-
-_(kosong)_
+### `FIND-001` (Eks `LEAD-R1-01`) — `[Judul Satu Baris Tanpa Sensasi & Lokasi]`
+- **ID**: `FIND-001`
+- **Asal Lead & Provenance**: `LEAD-R1-01 | [LAPIS: VALUE|PATH|FLOW] | [CLASS-A|B|C] | [AF-xx]`
+- **Region & EV Rank**: `R_1 | [P1..P5]`
+- **SEVERITY**: `[CRITICAL | HIGH | MEDIUM | LOW]` *(dari IMPACT sesuai `verify/SEVERITY-RUBRIC.md`, bukan dari siklus deploy)*
+- **Rujukan Severity**: `[Platform + URL atau Matriks Universal (verify/SEVERITY-RUBRIC.md Bagian 4)]`
+- **VERDICT**: `VALID_ELIGIBLE`
+- **TARGET_FILE**: `09-confirmed-findings.md`
+- **TANGGA_BUKTI**: `[A | B]` *(`A-HEAD` dilarang di `09`)*
+- **DEPLOYMENT_MATCH**: `LIVE_MATCH`
+- **CYCLE**: `[P4_LIVE_FULL | P3_LIVE_PARTIAL]` *(`P1`/`P2` dilarang di `09`)*
+- **ELIGIBILITY**: `LIVE_MATCH`
+- **LIVE_IDENTITY**: `[Identitas terukur dari deploy_parity: accountId() / sha256 ProgramData / bytecode hash impl EIP-1967]`
+- **POC_STATUS**: `PASS`
+- **Mode Uji**: `[FORK_LIVE (chain: <...>, block: <...>, RPC: <...>) | LOKAL (<alasan non-EVM>)]`
+- **File:Baris**: `[Path/File.ext:Lxx-Lyy]` *(wajib rentang awal-akhir)*
+- **Metode / POV**: `[M-xxx / AF-xx / POV-xx]`
+- **Invarian Dilanggar**: `[INV-Ri-xx — rumus invarian inti dari FACTS.md / path-map.md]`
+- **DAMPAK KUANTITATIF**: `[Profit bersih penyerang / kerugian protokol dalam angka eksak + satuan aset]`
+- **Wadah Kasus Lengkap (`STAGE-F`)**: `cases/FIND-001/` (`chat.md`, `laporan-teknis.md`, `poc.md`)
+- **Titik 1 — Jejak Kode Eksak (`Exact Code Trace`)**:
+  - `[Path/File.ext:Lxx-Lyy — Urutan dari entrypoint publik hingga sink mutasi state yang melewati guard]`
+- **Titik 2 — Bukti Simulasi (`BUKTI_SIMULASI`)**:
+  - `$ [Perintah eksak yang dijalankan, misal: FOUNDRY_JOBS=1 forge test --match-test test_FIND001 -vvv]`
+  - `[Kutipan keluaran nyata yang mencetak saldo sebelum/sesudah dan literal [PASS]]`
+- **Titik 3 — Delta Nilai & Invariant yang Pecah (`Value Delta & Broken Invariant`)**:
+  - `[State Sebelum vs Sesudah dalam angka eksak; detail lengkap 9-bagian ada di cases/FIND-001/laporan-teknis.md dan kode PoC utuh di cases/FIND-001/poc.md]`

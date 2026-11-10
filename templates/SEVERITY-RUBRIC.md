@@ -1,12 +1,10 @@
 # SEVERITY RUBRIC — Standar Penilaian Severity Lintas Platform
 
-<!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
-> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
-> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
-> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
-> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+<!-- theadvers v2.0 — dipakai di STAGE-E (verdict) & STAGE-F (cases/<ID>/laporan-teknis.md). -->
+> **Penerapan (theadvers v2.0).** Berkas ini dipakai saat **STAGE-E** menetapkan `SEVERITY`
+> pada Tabel Indeks `09-confirmed-findings.md`, dan dirujuk ulang oleh
+> `cases/<ID>/laporan-teknis.md` Bagian 1 (`Rujukan Severity`).
+> Severity ditentukan oleh **IMPACT**, bukan oleh siklus deployment.
 
 > **Berlaku untuk seluruh audit, semua project.**
 > Lokasi: `verify/SEVERITY-RUBRIC.md` — **satu folder dengan `VERDICT.md`**, dirujuk oleh
@@ -63,7 +61,7 @@ menguntungkan diri sendiri secara diam-diam.
 
 ### 2.1 OWASP Risk Rating — *dipakai sebagian program (mis. program yang menyatakan OWASP di docs bounty)*
 
-- **Sumber:** halaman bug-bounty resmi program target (isi sendiri di `audit/INTEL.md` §3)
+- **Sumber:** halaman bug-bounty resmi program target (isi sendiri pada `STATE.md` field `Target Project / Repo` + aturan scope program)
 - **Kutipan:** *"Severity is calculated according to the OWASP risk rating model based on Impact and Likelihood."*
 - **Struktur:** Risk = Impact x Likelihood, masing-masing berskala Low/Medium/High.
 - **Reward:** isi dari tier program target — **jangan** mengasumsikan angka; ambil dari docs bounty.
@@ -255,7 +253,7 @@ temuan kategori ini **WAJIB** menyebut platform; satu label tanpa rujukan tidak 
 | Code4rena | High/Medium/QA | 2.6 |
 | Self-hosted tanpa rujukan | **Kriteria Universal Bagian 4** | 4 |
 
-**Cara mengisi:** setiap `INTEL.md` **wajib** menyebut baris ini, mis.
+**Cara mengisi:** setiap entri `09-confirmed-findings.md` **wajib** menyebut baris ini, mis.
 `Severity Basis : OWASP — <URL bounty target> (rubrik 2.1)`.
 
 ---

@@ -1,0 +1,14 @@
+# _ROUTER — Indeks Otomatis Pola Serangan Berantai Universal (`references/chains/`)
+
+> **ATURAN LAZY-LOADING (`STAGE-C2` & `STAGE-D`)**:
+> 1. Berkas ini di-generate secara otomatis oleh `python3 tools/verify_segitiga.py --sync` dari 4 baris header setiap berkas `CHAIN-*.md` di dalam folder `references/chains/`.
+> 2. **Dilarang membuka seluruh berkas `CHAIN-*` sekaligus**. Cocokkan kolom **Trigger Symptom** dengan gejala kode di Wilayah Aktif `R_i`, lalu panggil `read_file` hanya pada berkas plugin yang relevan.
+> 3. Untuk menambah item baru, cukup buat 1 berkas `references/chains/CHAIN-<slug>.md` dengan 4 baris header standar lalu jalankan `python3 tools/verify_segitiga.py --sync`.
+
+| ID | Nama Plugin & Berkas (`references/chains/`) | Classes | Trigger Symptom *(Kapan Wajib Di-load?)* | Paired Items |
+| :--- | :--- | :--- | :--- | :--- |
+| **`CHAIN-flash-oracle-liquidation`** | `CHAIN-flash-oracle-liquidation.md`<br/>Rantai: Modal Kilat -> Distorsi Harga/Indeks -> Pinjaman/Likuidasi Paksa | FLASH-LOAN, ORACLE-MANIPULATION, LIQUIDATION-CASCADE | Sumber harga/indeks di [EDGE-VALUATION] bergantung pada state on-chain yang dapat digerakkan sesaat untuk memicu [EDGE-CONTROL/LATENT]. | M-004, M-006, AF-01, AF-06, DOM-oracle, DOM-lending |
+| **`CHAIN-offchain-sign-onchain-mutate`** | `CHAIN-offchain-sign-onchain-mutate.md`<br/>Rantai: Penerbitan Bukti Off-Chain -> Mutasi State On-Chain -> Eksekusi Bukti Basi | OFFCHAIN-DESYNC, SIGNATURE-REPLAY, STALE-STATE-EXECUTION | Bukti/tanda tangan/kuotasi dibuat secara *off-chain* berdasarkan state $S_1$, sementara pengguna dapat mengubah state *on-chain* menjadi $S_2$ sebelum bukti dieksekusi. | M-008, M-010, AF-08, AF-10, DOM-bridge-offchain |
+| **`CHAIN-reentrancy-valuation`** | `CHAIN-reentrancy-valuation.md`<br/>Rantai: Panggilan Keluar -> Pembacaan Valuasi Basi Lintas-Modul | READ-ONLY-REENTRANCY, VALUATION-DESYNC, CROSS-MODULE | Modul A melakukan panggilan keluar/transfer/CPI sebelum memperbarui saldo/share, dan Modul B di RADAR.md membaca kurs/saldo Modul A. | M-003, M-004, M-010, AF-04, POV-malicious-integrator |
+| **`CHAIN-rounding-amplification-drain`** | `CHAIN-rounding-amplification-drain.md`<br/>Rantai: State Kosong/Desimal -> Amplifikasi Kurs -> Kuras Pool via Pembulatan | PRECISION-AMPLIFICATION, FIRST-DEPOSITOR, ROUNDING-DRAIN | Kombinasi state awal/kosong (M-007) atau donasi langsung (AF-01) memperbesar nilai 1 unit share, lalu diikuti pemotongan pembulatan berulang (AF-02). | M-002, M-007, AF-01, AF-02, AF-03, DOM-vault |
+| **`CHAIN-shared-state-desync`** | `CHAIN-shared-state-desync.md`<br/>Rantai: Mutasi State Bersama ([TOUCHES]) -> Bypass Invariant Modul Kedua | SHARED-STATE, ACCOUNTING-DESYNC, TOUCHES-COLLISION | Dua fungsi/modul di RADAR.md memiliki tag [TOUCHES: NamaModul.simbol] yang sama dengan asumsi sinkronisasi berbeda. | M-001, M-010, AF-05, DOM-staking, DOM-lending |

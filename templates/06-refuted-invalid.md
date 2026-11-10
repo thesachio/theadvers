@@ -1,52 +1,24 @@
-# 06 — Refuted / Invalid (Gugur Permanen)
+# 06-REFUTED-INVALID — Wadah Kandidat Gugur Pasca-Pembuktian (STAGE-E)
 
-<!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
-> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
-> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
-> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
-> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
-
-Temuan yang **gugur mutlak** per `verify/VERDICT.md`. Setiap entri wajib **diawali heading `## [ID] Judul`** dan memuat:
-`ID`, `VERDICT`, `Pernyataan Dilanggar (#1-#10)`, `File:Baris`, `TANGGA_BUKTI`, `DEPLOYMENT_MATCH`, `Mode Uji`, dan **`BUKTI_SIMULASI`** (atau **`BUKTI_STATIS`** khusus untuk salah baca kode literal).
-
-(`TANGGA_BUKTI` dan `DEPLOYMENT_MATCH` wajib ada meski vonisnya gugur — tanpa keduanya, vonis dianggap belum sah dan entri harus dikembalikan ke penulisnya.)
-
-## GERBANG ANTI-PAPER-REFUTATION (Pernyataan #11e — `PAPER_REFUTATION_DETECTED`)
-
-Wadah `06` **DILARANG KERAS** dipakai untuk membuang lead secara malas hanya dengan hitungan kertas atau alasan teks!
-
-Untuk kelas vonis `REJECTED_POC_FAILS`, `REJECTED_NEGATIVE_EV`, dan `REJECTED_DUST`, entri **WAJIB** menyertakan blok `BUKTI_SIMULASI:` yang berisi:
-
-1. **Perintah eksekusi test nyata** (`$ forge test --match-test ...` / `$ cargo test ...` / `$ sui move test ...`),
-2. **Ringkasan kode setup** yang membuktikan telah dilakukannya *Victim Lifecycle Seeding* dan *3-Way EV Amplification*,
-3. **Log hasil Strike 3 Mandatory Fuzzing** (`testFuzz_... (runs: 256, ...)` / `proptest` / `halmos`) yang membuktikan invarian tetap tidak tertembus.
-
-Entri `REJECTED_POC_FAILS` / `REJECTED_NEGATIVE_EV` / `REJECTED_DUST` tanpa log eksekusi test dan fuzz di atas adalah pelanggaran **Pernyataan #11e (`PAPER_REFUTATION_DETECTED`)** → **laporan DITOLAK** di Tahap F dan lead dikembalikan ke **Tahap D**!
-
-## Kelas yang sah di wadah ini
-
-**Wajib `BUKTI_SIMULASI` (Log Test + Strike 3 Fuzz):**
-`REJECTED_POC_FAILS`, `REJECTED_NEGATIVE_EV`, `REJECTED_DUST`.
-
-**Sah dengan `BUKTI_STATIS` (Kutipan Baris Kode / Dokumen Resmi / On-Chain Bytecode):**
-`REJECTED_FANTASY_MOCK` (bukan quirk nyata Kasta 2 dan bukan *Cross-Whitelist Confusion*), `REJECTED_CHEATCODE`, `REJECTED_GENESIS_MIRAGE` (hanya bila pool tunggal live permanen terisi & tanpa factory/withdraw-all), `REJECTED_PRIVILEGED_FANTASY` (hanya bila menuntut admin/oracle berbuat jahat di luar pemicu *permissionless*), `REJECTED_NON_LIVE_INIT` (hanya bila proxy & implementation sudah terkunci), `REJECTED_NO_VICTIM` (bukan *attacker donation/balance-skew*), `REJECTED_BY_DESIGN` (dilarang dipakai bila menghasilkan pencurian dana Positive-EV, insolvensi, atau pembekuan dana permanen), `REJECTED_MISMATCH`, `REJECTED_UNPROVEN_DEPLOYMENT`.
-
-## Field wajib per entri
-
-```markdown
-## [L-XX] Contoh Penolakan
-ID                  : L-XX
-VERDICT             : REJECTED_POC_FAILS | REJECTED_NEGATIVE_EV | REJECTED_DUST | REJECTED_MISMATCH | ...
-Pernyataan Dilanggar: <#1-#6, #7a/#8a/#9a/#10a bila relevan>
-File:Baris          : <path/Kontrak.sol:Baris>
-TANGGA_BUKTI        : A | A-HEAD | B | C | D
-DEPLOYMENT_MATCH    : LIVE_MATCH | HEAD-only (PROVEN_ON_REPO_HEAD) | UNVERIFIED
-Mode Uji            : FORK_LIVE | FORK_DEPLOYED_HEAD | LOKAL | STRUKTURAL
-BUKTI_SIMULASI / BUKTI_STATIS:
-  $ <perintah test & log hasil Strike 1-3 + testFuzz_..., atau kutipan baris kode statis>
-ALASAN              : <1-2 kalimat tegas>
-```
+> ATURAN PENGISIAN (`ZERO-COMPRESSION LAW`):
+> 1. Wadah ini menampung kandidat dari meja operasi 05-raw-leads.md yang gugur saat uji pembuktian di `STAGE-D` / `STAGE-E` (misal: eksekusi test gagal/revert, perhitungan angka konkret membuktikan tidak ada pencurian/kerusakan nilai, atau tertahan penjaga kode di modul lain yang baru terlihat saat penelusuran penuh).
+> 2. Setiap kandidat yang digugurkan wajib menyertakan jangkar verbatim `Path/File.ext:Lxx-Lyy` dan alasan teknis eksak mengapa ia patah. Dilarang memakai token kompresi (..., dll., dst., etc., rest of logic).
 
 ---
+
+## 1. TABEL RINGKASAN KANDIDAT GUGUR (06-REFUTED-INVALID)
+
+| Refuted ID | Asal Lead ID | Region (R_i) | Titik Masuk (NamaModul.namaFungsi) | Jangkar Kode Penahan / Pembantah (Path/File.ext:Lxx-Lyy) | Ringkasan Mengapa Eksploitasi Gagal Saat Pembuktian |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| REF-R1-01 | LEAD-R1-xx | R_1 | [NamaModul.namaFungsi] | [Path/File.ext:L112-L128] | [Jelaskan secara eksak mengapa PoC revert atau mengapa hitungan matematis tidak menghasilkan delta nilai positif/kerusakan] |
+
+---
+
+## 2. ARSIP DETAIL PEMBUKTIAN YANG TERBANTAHKAN
+
+### REF-R1-01 (Eks LEAD-R1-xx) — [Judul Kandidat yang Gugur]
+- Region & EV Awal: R_1 | [P1..P5]
+- Plugin yang Diuji: [M-xxx, AF-xx]
+- Hipotesis Awal: [Ringkasan dugaan serangan sebelum diuji]
+- Jejak Kode & Titik Patah (`Path/File.ext:Lxx-Lyy`): [Kutipan kondisi kode atau urutan state yang mematahkan hipotesis]
+- Bukti Kegagalan PoC / Perhitungan Konkret: [Log revert dari test runner atau hitungan angka konkret yang membuktikan invariant tetap terjaga]

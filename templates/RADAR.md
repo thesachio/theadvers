@@ -1,156 +1,23 @@
-# RADAR — Sinyal Celah Lintas-Domain (Append-Only)
+# RADAR — Sinyal Lintas-Modul & Pemicu Serangan Berantai (theadvers v2.0)
 
-<!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
-> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
-> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
-> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
-> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
-
-Wadah untuk **sinyal yang belum layak jadi lead**: sesuatu yang janggal, presisi lokasinya,
-tetapi belum ada bukti eksploitasi — dan **bukan** milik unit yang sedang dibedah.
-
-> **Mengapa file ini ada.** Tahap C hanya punya dua keluaran: `LEAD_GENERATED` dan
-> `ATTESTED_CLEAN`. Sinyal "ini mencurigakan tapi saya belum bisa membuktikan apa pun"
-> tidak punya rumah, sehingga dibuang bersama konteks subagent. Padahal justru kelas
-> sinyal inilah yang paling sering menjadi temuan bernilai setelah dirangkai lintas-domain.
-
-## Hukum Mutlak
-
-1. **APPEND-ONLY.** Tidak ada satu baris pun yang boleh diedit setelah ditulis. Status
-   dinyatakan sebagai **baris kejadian baru**, bukan dengan mengubah baris lama.
-   Alasan: `04-code-guarded.md` pernah terpotong 0 byte dan ~286 entri hilang permanen.
-   RADAR menyimpan insight yang **tidak bisa diregenerasi** dari kode — kerugiannya lebih besar.
-2. **DILARANG memarkir bukti di sini.** Begitu ada PoC `[PASS]`, sinyal **wajib** naik jadi
-   lead di `05` saat itu juga. RADAR yang menampung bukti berubah jadi tempat pembuangan
-   dan lead berharga akan mati tanpa pernah masuk antrean Tahap D.
-3. **Satu penulis: Parent.** Subagent hanya **mengusulkan** — maks 2 kandidat per unit,
-   ditulis ke **`audit/notes/radar-<item>.md`** (satu file per item), **bukan** ke `RADAR.md`,
-   **bukan** ke manifest/ringkasan balasan, dan **bukan** ke staging item. Parent membaca file
-   itu, menilai dengan 3-Uji lalu `append` ke `RADAR.md`. Alasan: `Pemicu` harus dinilai
-   dengan pandangan lintas-unit yang tidak dimiliki subagent.
-   File `radar-<item>.md` **tidak dihapus** setelah merge — ia arsip penyusun entri RADAR,
-   karena kandidat sering menunjuk berkas di luar unit yang dibedah.
-4. **Indeks sebenarnya adalah `Lokasi`, bukan `Tujuan`.** Saat menulis, agent belum tahu
-   seluruh permukaan proyek — daftar `Tujuan` adalah **hipotesis**, bukan himpunan lengkap.
-   Karena itu penarikan sinyal wajib berbasis **path file**, bukan ID unit.
+> ATURAN WAJIB TAG `[TOUCHES: ...]`:
+> 1. Setiap kali membedah Wilayah R_i (terutama pada Gelombang 1 STAGE-C1), catat setiap fungsi, variabel state, akun, objek, atau penyimpanan bersama yang dapat memengaruhi atau dipengaruhi oleh modul/wilayah lain.
+> 2. Setiap entri wajib memuat minimal satu tag dengan sintaks eksak: `[TOUCHES: NamaModul.namaVariabelAtauFungsi]`.
+> 3. Pada Gelombang 2 (STAGE-C2) dan FINAL-SWEEP, dua atau lebih baris radar yang memiliki tag [TOUCHES: ...] yang sama wajib diadu untuk merakit Serangan Berantai (*Chained Exploit*).
 
 ---
 
-## Gerbang 3-Uji (wajib lolos ketiganya sebelum ditulis)
+## 1. LOG SINYAL RADAR LINTAS-MODUL / LINTAS-WILAYAH
 
-| Uji | Pertanyaan | Gagal → |
-|---|---|---|
-| **Presisi** | Ada `File:Baris` konkret? | buang |
-| **Asimetri** | Bisa menyebut *yang seharusnya* vs *yang terjadi*? | buang |
-| **Pemicu** | Kondisi terukur apa yang mengubahnya jadi lead? | buang |
-
-"Feels wrong" bukan sinyal. "Modifier dipakai 3 tempat, 1 tempat bypass lewat jalur berbeda"
-adalah sinyal.
+| Radar ID | Asal Wilayah (R_i) | Jangkar Kode Asal (Path/File.ext:Lxx-Lyy) | Tag Sentuhan Wajib ([TOUCHES: NamaModul.simbol]) | Perilaku / Efek Samping yang Diamati (Verbatim) | Hipotesis Serangan Berantai (*Cross-Pollination di STAGE-C2 / FINAL-SWEEP*) | Status Uji ([OPEN-SIGNAL] / [PROMOTED-TO-05] / [GUARDED-IN-04]) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| RAD-001 | R_1 | [Path/File.ext:L55-L72] | [TOUCHES: NamaModul.namaState] | [Jelaskan secara eksak bagaimana baris kode ini mengubah/membaca state tanpa sinkronisasi atau membuka callback] | [Jelaskan modul/fungsi lain mana yang mengasumsikan state tersebut tidak berubah, dan apa dampak nilainya jika digabungkan] | [OPEN-SIGNAL] |
 
 ---
 
-## Lapis 1 — Observasi (ditulis SEKALI, tidak pernah disentuh)
+## 2. MATRIKS PASANGAN RANTAI ([TOUCHES] COLLISION MATRIX)
 
-```markdown
-## [R-012] <asimetri satu baris>
-Lokasi   : <BerkasA.sol:340> -> <BerkasB.sol:918>
-Domain   : <D-nama>
-Tujuan   : <unit/stage yang memakai sinyal ini>
-Asimetri : <validasi ada di X, tidak ada di Y>
-Pemicu   : <kondisi konkret yang membuatnya relevan>
-Unit Asal: <unit tempat sinyal ditemukan>
-```
-
-- `Lokasi` — **wajib** `File:Baris` dengan **nama berkas lengkap ber-ekstensi pada SETIAP hop**.
-  `<Berkas>:918` (tanpa ekstensi) **DILARANG** — hanya `<Berkas>.sol:918` yang bisa ditemukan
-  oleh grep berbasis path.
-  Ini bukan soal gaya: grep path adalah satu-satunya jalur penarikan yang dijamin (lihat "Cara Membaca").
-  Bila rantai lebih dari dua hop, tulis semuanya: `A.sol:12 -> B.sol:88 -> C.sol:340`.
-- `Domain` — domain tempat sinyal ditemukan (bukan domain tujuan).
-- `Tujuan` — unit yang **diduga** perlu memeriksa. Boleh tidak lengkap; lihat `TARGET-ADDED`.
-- `Asimetri` — wajib menyebut harapan vs kenyataan, bukan opini.
-- `Pemicu` — **wajib**. Kondisi konkret, bukan "mungkin nanti berguna".
-- `Unit Asal` — unit yang sedang dibedah saat sinyal ditemukan.
-
-**Verifikasi pasca-tulis (wajib, 1 perintah):** setiap berkas yang disebut di `Lokasi` harus
-benar-benar bisa ditemukan oleh grep. Tanpa ini, sinyal tersimpan tetapi tidak akan pernah tertarik.
-```bash
-grep -c "NamaBerkas.sol" audit/RADAR.md     # harus >= 1 untuk SETIAP berkas di Lokasi
-```
-
----
-
-## Lapis 2 — Kejadian (append, satu baris per perubahan)
-
-```markdown
-[R-012/S-14] PROMOTED -> L-19
-[R-012/S-14] RESOLVED-REFUTED L-19 -> guard _requireAdminSender ternyata menutup jalur
-[R-012/S-22] PROMOTED -> L-31
-[R-012/+S-40] TARGET-ADDED lokasi S-40 juga menyentuh <BerkasB.sol:918>
-[R-012/S-14] REOPENED -> L-27 pemicu-baru: jalur refund S-31 memanggil <BerkasB.sol:918> lebih dulu
-```
-
-| Kejadian | Kapan |
-|---|---|
-| `PROMOTED -> L-nn` | sinyal naik jadi lead |
-| `RESOLVED-CONFIRMED L-nn` | lead jadi temuan (`09`/`08`) |
-| `RESOLVED-REFUTED L-nn -> <alasan 1 baris>` | lead gugur di `06` |
-| `TARGET-ADDED` | ditemukan unit lain yang juga relevan |
-| `REOPENED -> L-nn` | penolakan dibuka ulang dengan **pemicu berbeda** |
-| `EXHAUSTED` | seluruh target sudah `RESOLVED` |
-
-> **`RESOLVED-REFUTED` WAJIB memuat alasan 1 baris.** Ini satu-satunya cara sah menyimpan
-> alasan penolakan, karena `AGENTS.md` melarang membaca ulang `06`/`08`. Tanpa alasan di sini,
-> unit berikutnya akan mengulang jalan buntu yang sama — atau menunjuk verdict yang tak boleh dibuka.
-
-### Aturan REOPENED
-- Wajib **pemicu baru** yang berbeda dari aslinya.
-- Wajib **lead ID baru** (`L-27`, bukan `L-19` lagi) — `L-19` sudah punya verdict di `06`.
-- Maksimal **2×** per target. Lebih dari itu → tandai `CHURN` dan naikkan jadi unit tersendiri.
-
----
-
-## Cara Membaca (dua grep, ±150 token)
-
-**Saat MEMULAI unit** — tarik semua sinyal yang menyentuh berkas yang akan dibaca:
-```bash
-grep -n -B1 -A6 "<nama-berkas>.sol" audit/RADAR.md
-```
-Ini **jalur yang dijamin**: menemukan sinyal walau `Tujuan`-nya tidak menyebut unit ini.
-
-**Jalur cepat** (bila `Tujuan` sudah benar):
-```bash
-grep -n -A6 "S-22" audit/RADAR.md
-```
-
-**Status terkini per target** — ambil kejadian terakhir:
-```bash
-grep "\[R-012/S-14\]" audit/RADAR.md | tail -1
-```
-
-**Saat MENUTUP unit** — cek pemicu yang mungkin terpenuhi:
-```bash
-grep -n "Pemicu" audit/RADAR.md
-```
-
----
-
-## Batas & Penutupan
-
-- **Target 10–25 observasi per proyek.** Lebih dari itu = gerbang 3-Uji sedang dilonggarkan.
-- Maksimal **2 kandidat per unit**; subagent wajib memilih yang terbaik, bukan menuang semua.
-- Entri `EXHAUSTED` hilang dari grep penarikan, tetapi **tetap tersimpan** sebagai jejak audit.
-- **Sweep wajib di akhir Tahap C putaran sintesis** (sintesis lintas-unit): saat seluruh `03` sudah diketahui,
-  lengkapi `Tujuan` yang terlewat lewat `TARGET-ADDED`.
-
-## Penjaga Integritas
-
-- Entri yang `Lokasi`-nya tersentuh unit lain tetapi **tidak pernah** mendapat baris kejadian
-  → itu **bukti sweep gagal**, bukan bukti tidak relevan. Wajib diperiksa satu per satu.
-- Entri yang `Tujuan`-nya tidak pernah cocok dan `Lokasi`-nya juga tidak pernah tersentuh
-  → aman, cukup `EXHAUSTED`.
-- Kode di dalam repo yang ditandai `[STATELESS/INTERFACE]` di `00b` tetapi ternyata reachable
-  → sinyal masuk RADAR dengan `Tujuan` unit yang memakainya; bila terbukti, **promosikan
-  berkas itu jadi unit baru di `03`** dan catat koreksi inventaris.
+*Diisi pada STAGE-C2 dan FINAL-SWEEP ketika ditemukan >= 2 sinyal RADAR yang menyentuh simbol [TOUCHES: ...] yang sama.*
+| Chain Pair ID | Tag [TOUCHES: ...] yang Beririsan | Radar ID Pengubah (*Writer / Mutator*) | Radar ID Pembaca / Korban (*Reader / Consumer*) | Mekanisme Serangan Gabungan & Dampak Nilai (L-VALUE) | ID Kandidat di 05-raw-leads.md (atau 04-code-guarded.md) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| CPAIR-01 | [TOUCHES: NamaModul.namaState] | RAD-001 (Path/FileA.ext:L55) | RAD-002 (Path/FileB.ext:L110) | [Uraikan urutan panggil langkah demi langkah untuk memanipulasi state di A lalu mengeksploitasinya di B] | [LEAD-R1-01 / GUARD-R1-01] |

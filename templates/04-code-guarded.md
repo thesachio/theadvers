@@ -1,46 +1,14 @@
-# 04 — Code-Guarded (Khusus Guard Statis / Struktural — Umpan Metode 5 Tahap C putaran sintesis)
+# 04-CODE-GUARDED — Wadah Jalur & Hipotesis Terjaga Kode (STAGE-C1 & STAGE-C2)
 
-<!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
-> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
-> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
-> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
-> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+> ATURAN PENGISIAN (`ZERO-COMPRESSION LAW`):
+> 1. Wadah ini mencatat setiap jalur ([EDGE-ASSET], [EDGE-VALUATION], [EDGE-CONTROL/LATENT]) atau hipotesis serangan di Tahap C (C1 maupun C2) yang setelah diperiksa terbukti sudah dijaga secara rapat oleh kode.
+> 2. Mencatat jalur terjaga secara presisi mencegah agen atau Subagent berikutnya memeriksa ulang jalur buntu yang sama di putaran lain.
+> 3. Setiap entri wajib menyertakan jangkar verbatim `Path/File.ext:Lxx-Lyy` dan ekspresi kode penjaganya. Dilarang memakai token kompresi (..., dll., dst., etc., rest of logic).
 
-Wadah murni untuk hipotesis Tahap C yang berhenti di **guard izin atau struktural statis** (`onlyOwner`, `onlyRole`, `msg.sender == router`, `nonReentrant`, `whenNotPaused`, atau pengecekan alamat `address != address(0)`).
+---
 
-> **GERBANG PEMISAHAN GUARD STATIS VS DINAMIS (WAJIB):**
-> - **Guard Statis (Masuk ke `04` ini):** Guard yang variabel pembentuknya hanya berupa alamat pemanggil (msg.sender), role/whitelist tetap, atau flag mutex/boolean sederhana — **DAN berstatus `TERSANGKAL`**, yaitu tidak tembus oleh **5 Jalur Permissionless** di bawah ini.
-> - **Guard Dinamis / Matematis (DILARANG masuk `04` — WAJIB masuk `05-raw-leads.md`!):** Apabila ekspresi `require` / `if (...) revert` / `assert!` melibatkan perhitungan aritmetika, pembulatan (`mulDiv`), saldo token (`balanceOf`), rasio pool (`totalAssets`/`totalSupply`), akumulator waktu/indeks, batas LTV/likuidasi, atau panjang array, hipotesis tersebut **DILARANG diparkir di `04`!** Masukkan langsung ke `05-raw-leads.md` (dengan tag `M-005`) agar diuji secara mekanis menggunakan fuzzer di Tahap D.
+## 1. TABEL JALUR TERJAGA KODE PER WILAYAH (R_1 .. R_N)
 
-## Field wajib per entri
-
-```markdown
-## [R-001] Contoh Guard Statis
-ID                  : R-001
-File:Baris          : <path/Kontrak.sol:Baris>
-Ekspresi Guard      : <require(msg.sender == router) / onlyRole(...)>
-Variabel Pembentuk  : <router / role mapping / flag>
-Penulis Variabel    : <setRouter(...) onlyOwner / konstruktor>
-Hipotesis Dihentikan: <hipotesis yang terhenti di guard ini>
-Status Tahap C putaran sintesis    : TERSANGKAL | TEMBUS | BELUM
-```
-
-- `TERSANGKAL` — variabel guard terbukti hanya bisa diubah admin sah (lolos **Jalur 1**) **DAN** lolos keempat pemeriksaan rute *Permissionless* lainnya (**Jalur 2 s/d Jalur 5**):
-  1. Entitas yang diizinkan oleh guard tersebut **bukan** kontrak/program/modul hulu yang dapat dipicu oleh pengguna tak berizin (**lolos Jalur 2**), **DAN**
-  2. Fungsi tersebut **tidak** memproses state/antrean/saldo yang dapat diracuni terlebih dahulu oleh pengguna tak berizin untuk menyabotase/membajak eksekusi rutin seperti harvest, settle, rebalance, liquidate, atau relay (**lolos Jalur 3**), **DAN**
-  3. Untuk `nonReentrant` / `whenNotPaused`: tidak ada penyerahan kontrol saat state berpasangan belum sinkron yang dapat dibaca lintas-kontrak, dan tidak ada asimetri pause yang memblokir fungsi penyelamatan (`repay`/`addCollateral`/`cancel`) sembari meloloskan likuidasi/penalti (**lolos Jalur 4**), **DAN**
-  4. Untuk guard whitelist / callback: sudah memverifikasi ikatan pasangan aset secara ketat (`pool.token() == expectedAsset`) dan sudah memverifikasi `initiator` / `srcSender` pada callback (**lolos Jalur 5**).
-- `TEMBUS` — meskipun variabel permission-nya sendiri tidak bisa dimanipulasi (mis. `immutable` atau dikunci admin), guard ini **TETAP DINYATAKAN `TEMBUS`** dan **WAJIB dipromosikan ke `05-raw-leads.md`** apabila memenuhi salah satu dari **5 jalur Permissionless** berikut:
-  1. **Jalur 1 (Mutasi Variabel Guard — `M-005`):** Ada jalur tak berizin untuk mengubah variabel pembentuk guard itu sendiri; **ATAU**
-  2. **Jalur 2 (Pemicuan Lewat Kontrak/Modul Hulu — `M-008`):** Permission mengunci pemanggil ke suatu kontrak/program/objek hulu (Router, Manager, Hub, Vault, Forwarder), namun kontrak hulu tersebut memiliki fungsi publik yang dapat dipanggil penyerang tak berizin untuk meneruskan eksekusi/parameter ke fungsi ini; **ATAU**
-  3. **Jalur 3 (*Unprivileged State Poisoning* pada Eksekusi Rutin — `M-005`/`M-009`):** Permission mengunci pemanggil ke aktor operasional rutin (Keeper, Relayer, Solver, Operator), tetapi penyerang tak berizin dapat memanipulasi state, antrean, atau saldo likuiditas di fungsi publik lain sehingga ketika aktor rutin menjalankan fungsi ini secara normal, terjadi kebocoran nilai atau *DoS revert* permanen!
-  4. **Jalur 4 (Eskalasi Lintas-Kontrak pada `nonReentrant` / Asimetri `whenNotPaused` — `[POV-CALL-01]` / `M-009`):**
-     - Untuk guard **`nonReentrant`**: fungsi memang mengunci mutex lokalnya, **TETAPI** di tengah eksekusi (sebelum seluruh variabel berpasangan sinkron) fungsi menyerahkan kontrol keluar dan ada kontrak pasangan / fungsi `view` / modul lain yang **membaca state timpang** tersebut **tanpa memeriksa mutex yang sama**!
-     - Untuk guard **`whenNotPaused`**: status pause dipasang secara **asimetris** — memblokir fungsi penyelamatan diri pengguna (`repay`, `addCollateral`, `exit`/`cancel`) sementara fungsi penalti/likuidasi (`liquidate`, `slash`, atau akrual bunga/denda) tetap berjalan atau langsung mengeksekusi penyitaan begitu kontrak di-*unpause*!
-  5. **Jalur 5 (*Cross-Whitelist Confusion* & *Unchecked Callback Initiator* — `M-008`):**
-     - Guard memeriksa `isWhitelisted[addr]` atau `msg.sender == validPool`, **TETAPI** (a) tidak memverifikasi kecocokan pasangan aset (`pool.token() == expectedAsset`), sehingga penyerang dapat memasukkan entitas A yang sah di whitelist ke dalam alur entitas B; **atau** (b) pada fungsi callback/hook (`onFlashLoan`, `swapCallback`, `onERC721Received`, `lzReceive`), guard hanya memeriksa `msg.sender == pool`/`endpoint` tetapi **tidak memeriksa `initiator` / `srcSender`**, sehingga penyerang dapat memicu Pool/Endpoint resmi untuk memanggil callback kontrak ini!
-- `BELUM` — belum diperiksa terhadap kelima jalur di atas; memblokir penandaan unit `[HUNTED]`.
-
-**Aturan:** **DILARANG menandai `TERSANGKAL` hanya karena variabel alamat (`router`/`manager`/`keeper`) bersifat `immutable` atau hanya bisa diubah oleh `onlyOwner`!** Wajib periksa **Jalur 2** (apakah entitas yang diizinkan adalah kontrak hulu yang bisa dipanggil publik), **Jalur 3** (apakah state yang dibaca di dalam fungsi ini bisa diracuni secara *permissionless*), **Jalur 4** (apakah `nonReentrant` hanya mengunci lokal sementara pembaca lain membaca state timpang, atau `whenNotPaused` memblokir jalur penyelamatan tetapi meloloskan jalur penalti), dan **Jalur 5** (apakah whitelist memeriksa pasangan aset, dan apakah callback memeriksa `initiator`/`srcSender` dan bukan hanya `msg.sender`). Jangan menyalin kode utuh; cukup ekspresi guard dan jalan masuknya.
+| Guard ID | Region (R_i) | Gelombang (C1-BLIND / C2-CROSS) | Titik Masuk & Simbol (NamaModul.namaFungsi) | Hipotesis Serangan yang Diuji | Jangkar Penjaga Kode (Path/File.ext:Lxx-Lyy) | Ekspresi Penjaga Kode Asli & Alasan Mengapa Serangan Tertahan (Verbatim) |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| GUARD-R1-01 | R_1 | C1-BLIND | [NamaModul.namaFungsi] | [Contoh: Mencoba menarik melebihi saldo share melalui pembulatan ke atas] | [Path/File.ext:L88-L94] | [Kutipan ekspresi require/assert/constraint/pembulatan ke bawah yang secara matematis mengunci celah tersebut] |

@@ -1,57 +1,27 @@
-# 08 — Valid but Not Eligible (Terbukti Secara Mekanis, Terkendala Eligibilitas / Pre-Live / Low)
+# 08-VALID-NOT-ELIGIBLE — Wadah Isu Valid Teknis di Luar Kelayakan Klaim (STAGE-E)
 
-<!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
-> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
-> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
-> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
-> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
+> ATURAN PENGISIAN (`ZERO-COMPRESSION LAW`):
+> 1. Wadah ini menampung kandidat dari 05-raw-leads.md yang perilakunya terbukti valid secara teknis, namun tidak memenuhi kriteria sebagai temuan utama yang *eligible* karena salah satu alasan berikut:
+>    - Menyentuh modul/berkas di luar *scope* resmi (*Out-of-Scope*),
+>    - Sudah dideklarasikan secara eksplisit di dokumentasi/audit sebelumnya (*Known Issue*),
+>    - Bergantung penuh pada tindakan jahat dari peran yang dideklarasikan terpercaya (*Trusted Admin / Governance Centralization Risk*) tanpa adanya bypass otorisasi, atau
+>    - Dampak ekonominya berada di bawah ambang batas minimal kebijakan program (misal kehilangan presisi 1 wei tanpa akumulasi).
+> 2. Wajib menyertakan jangkar verbatim `Path/File.ext:Lxx-Lyy` dan bebas dari token kompresi (..., dll., dst., etc., rest of logic).
 
-Mekanisme **nyata dan terbukti** lewat eksekusi simulasi PoC (`[PASS]`), tetapi dipisahkan oleh Hakim Tahap F (`verify/VERDICT.md`) agar tidak masuk `09` karena berada dalam batas eligibilitas:
+---
 
-- **`PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)` (#2 & #7b):** Kerentanan berdampak finansial nyata (Critical/High/Medium) yang PoC eksploitasinya terbukti `[PASS]` pada kode repositori (`Mode Uji: FORK_DEPLOYED_HEAD` atau `LOKAL`), tetapi kontrak/fitur tersebut belum *live* di mainnet, berbeda dari bytecode produksi saat ini (`HEAD-only`), atau belum terdaftar di halaman alamat Bug Bounty.
-- **`ADMIN_ONLY` (#8b):** Bug mekanis nyata pada fungsi khusus admin, tanpa jalur eksploitasi eksternal.
-- **`LOW_NUISANCE` (#10b):** DoS tanpa kehilangan dana, kerugian kecil terbatas (*capped*), atau griefing non-finansial (Severity Low / S4).
+## 1. TABEL ISU VALID NON-ELIGIBLE (08-VALID-NOT-ELIGIBLE)
 
-> **Gerbang masuk:**
-> 1. Kata "nyata dan terbukti" bersifat **harfiah** (`[PASS]` di simulator). Wadah ini **bukan** tempat menyimpan lead yang belum diuji (lead belum teruji wajib di `07` dengan `PERCOBAAN:`, Pernyataan #11b).
-> 2. Wadah `08` ini **HANYA** boleh diisi oleh **Hakim Tahap F**, bukan oleh Subagent Tahap D.
+| Non-Eligible ID | Asal Lead ID | Region (R_i) | Kategori (OUT-OF-SCOPE / KNOWN-ISSUE / TRUSTED-ROLE / DUST-IMPACT) | Jangkar Kode (Path/File.ext:Lxx-Lyy) | Ringkasan Mekanisme Teknis & Alasan Ketidaklayakan |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| VNE-R1-01 | LEAD-R1-xx | R_1 | TRUSTED-ROLE | [Path/File.ext:L30-L58] | [Fungsi setParameter oleh admin tidak memiliki batas atas, namun peran admin dinyatakan sepenuhnya trusted dalam aturan scope] |
 
-## Field wajib per entri
+---
 
-```markdown
-## [L-XX] Contoh Pre-Live/Low
-ID                  : L-XX
-VERDICT             : VALID_NOT_ELIGIBLE
-LOW_CLASS           : PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN) | ADMIN_ONLY | LOW_NUISANCE
-TARGET_FILE         : 08-valid-not-eligible.md
-ALASAN              : <mengapa valid secara mekanis namun masuk batas eligibilitas 08>
-BUKTI MEKANISME     : <kode PoC & log eksekusi [PASS]>
-POC_STATUS          : PASS                       <- WAJIB literal PASS; selain itu -> 07
-TANGGA_BUKTI        : A-HEAD | B | C            (D tidak sah di sini)
-DEPLOYMENT_MATCH    : HEAD-only (PROVEN_ON_REPO_HEAD) | LIVE_MATCH | UNVERIFIED
-CYCLE               : P1_PRE_DEPLOY | P2_TESTNET_ONLY | P3_LIVE_PARTIAL | P4_LIVE_FULL
-ELIGIBILITY         : HEAD_ONLY_PROVEN | TESTNET_ONLY | ENTRYPOINT_RELOCATED | LIVE_MATCH
-Mode Uji            : FORK_DEPLOYED_HEAD | LOKAL | FORK_LIVE
-SEVERITY            : Critical | High | Medium | Low      <- DARI IMPACT, bukan dari siklus
-DAMPAK KUANTITATIF  : <angka kerugian/profit terukur dari log PoC>
-```
+## 2. RINCIAN TEKNIS & CATATAN ARSITEKTURAL
 
-**`BUKTI MEKANISME` dan `DAMPAK KUANTITATIF` wajib berisi hasil eksekusi PoC dan angka terukur.** Khusus untuk `PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`, **kode PoC dan patch perbaikan wajib disertakan secara utuh** karena temuan ini bernilai tinggi bagi tim pengembang sebelum mereka melakukan deployment/upgrade ke mainnet. Menulis *"dampaknya kecil"* tanpa angka = entri ditolak dan lead kembali ke `07`.
-
-> **`SEVERITY` ditentukan oleh IMPACT, BUKAN oleh `CYCLE`/`ELIGIBILITY`.** Temuan yang terbukti mencuri dana tanpa syarat **tetap ditulis `Critical`** meski `CYCLE: P1_PRE_DEPLOY`. Menuliskan `Low`/`Medium` di `08` hanya karena "belum live" adalah pelanggaran `VERDICT.md` §0.3 dan akan ditolak `verify/ingest.py`.
->
-> **`POC_STATUS` wajib literal `PASS`.** `08` berarti *valid tetapi tidak eligible* — bila PoC belum bisa dijalankan (RPC mati, rantai tak dikenal, toolchain absen), tempatnya **`07`**, bukan `08`.
->
-> **`CYCLE` dan `ELIGIBILITY` diisi dari artefak `deploy_parity`:** `python3 tools/deploy_parity.py … --out audit/notes/deploy-parity-<ID>.json`. Bila artefak tidak ada, entri `08` ditolak.
-
-## Kelas yang sah
-
-| `LOW_CLASS` | Arti | Pernyataan |
-|---|---|---|
-| `PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)` | Eksploitasi terbukti `[PASS]` di atas kode repo (`FORK_DEPLOYED_HEAD`/`LOKAL`), namun kontrak/fitur masih pre-live, paused, HEAD-only, atau di luar daftar alamat bounty aktif | #2 & #7b |
-| `ADMIN_ONLY` | Bug mekanis nyata pada fungsi khusus admin, tanpa jalur eksploitasi eksternal | #8b |
-| `LOW_NUISANCE` | DoS tanpa kehilangan dana, kerugian kecil terbatas, atau griefing non-finansial | #10b |
-
-**Bukan kelas yang sah di sini:** hipotesis yang gagal diuji (→ `07` dengan `PERCOBAAN:`), hipotesis gugur mutlak (→ `06` dengan `BUKTI_SIMULASI:`), dan temuan berdampak finansial nyata pada kontrak produksi aktif (→ `09`).
+### VNE-R1-01 (Eks LEAD-R1-xx) — [Judul Isu]
+- Region & Modul: R_1 | [NamaModul.namaFungsi]
+- Jangkar Kode Eksak (`Path/File.ext:Lxx-Lyy`): [Kutipan lokasi dan perilaku teknis]
+- Bukti Perilaku Teknis: [Penjelasan konkret mengapa perilaku ini nyata]
+- Alasan Klasifikasi ke `08-valid-not-eligible.md`: [Rujukan aturan scope/dokumen yang mengecualikan isu ini dari `09-confirmed-findings.md]`

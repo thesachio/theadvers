@@ -1,68 +1,56 @@
-# AUDIT EXECUTION STATE (CHECKPOINT — SEGITIGA + OFFCHAIN)
+# STATE — Kursor Memori Kerja, Antrean Wilayah, & Write-Ahead Checkpoint (theadvers v2.0)
 
-<!-- SEGITIGA-BINDING -->
-> **Penerapan segitiga.** Berkas ini dipakai di **Tahap C (`L-FLOW`)** sebagai generator
-> hipotesis. Padanan istilah: `Fase 2` → **Tahap C**, `Fase 3` → **Tahap D**,
-> `Fase 4` → **Tahap F**, `Fase 1` → **Tahap A/B**, `Fase 0` → **Tahap A0**,
-> `Putaran 1/2` → **Tahap C**, `unit S-n` → **pot/jahitan**.
-> Rujukan berkas lama (`00b`, `01`, `02`, `03`) tidak dipakai lagi — lihat
-> `references/_INDEX-SEGITIGA.md`. Tiga sumbu lead: `[LAPIS]` × `[CLASS-x]` × `[AF-xx]`.
-
-- Target Repo: `<org/repo>` @ `<commit>` (lihat `target/PIN.md`)
-- Last Updated: `<timestamp atau step>`
-- Active Phase: `A_LVALUE` | `B_LPATH` | `C_LFLOW` | `D_SIMULASI` | `E_OFFCHAIN` | `F_VERDICT`
-- Active Sub-Stage: `A0_BOOTSTRAP` | `A1_CENSUS` | `B1_PATHMAP` | `C1_AUDIT` | `D1_POC` | `E1_BLACKBOX` | `F1_JUDGE`
-
-## 1. Cursor Position (Titik Lanjut Eksak)
-- Last Completed Item: `<item> -> hasil 1 baris`
-- CURRENT_ACTIVE_ITEM: `<item aktif — hanya satu>`
-- Active Files in Scope: `<BerkasA.sol>, <BerkasB.sol>` (path nyata, bukan nama generik)
-- Active Strike Count: `0/3` (2 Manual + 1 Mandatory Fuzz; kosongkan sebelum Tahap D)
-- Cognitive Load: NORMAL | FATIGUE (≥2 kegagalan mekanis berturut → WAJIB checkpoint & sesi baru)
-- Lead Sequence Basis: EV_DESC (lead EV tertinggi WAJIB dikerjakan paling awal)
-
-## 2. Gate Meter (GATE-A s/d GATE-F — wajib PASS sebelum naik tahap)
-| Gate | Syarat | Status |
-|---|---|---|
-| GATE-A | census nilai live tiap kontrak bernilai + konfigurasi live | PENDING |
-| GATE-B | tiap jahitan punya EV = max(balance_now, throughput_path); zero-balance di jalur tetap diburu | PENDING |
-| GATE-C | tiap lead `05` bawa `[LAPIS]` + `[AF-xx]` + kutip rentang baris utuh | PENDING |
-| GATE-D | tidak ada verdict negatif tanpa eksekusi; 3-Stage; target `07` = 0 | PENDING |
-| GATE-E | offchain hanya bila terpicu anomali / scope bounty; bukti on-chain ada | N/A |
-| GATE-F | 11 Pernyataan + PAPER_REFUTATION + LAZY_BAILOUT + coverage PASS | PENDING |
-
-## 3. Guardrail Low (wajib diisi tiap gate — kosong hanya boleh dengan alasan tertulis)
-- GATE-A: `-` | GATE-B: `-` | GATE-C: `-` | GATE-D: `-` | GATE-E: `-` | GATE-F: `-`
-
-## 4. Working Memory Scratchpad (Maks 10 Baris — Konteks Sementara Item Aktif)
-- `<Berkas>.sol:L142 — <observasi konkret yang membuat item ini perlu perhatian khusus>.`
-
-## 5. Do-Not-Reopen List (Sudah Final, Dilarang Dibaca Ulang)
-- Completed Items: `-`
-- Dead-End Leads (06): `-`
-- Verified Leads (08): `-`
-- Confirmed (09): `-`
+> ATURAN BESI (`ZERO-COMPRESSION & WRITE-AHEAD`):
+> 1. Berkas ini adalah sumber kebenaran tunggal untuk posisi eksekusi agen dan sc-autopilot.
+> 2. Perbarui blok CURSOR AKTIF dan LOG WRITE-AHEAD CHECKPOINT sebelum memulai tahap baru dan segera sesudah menyelesaikan tahap tersebut.
+> 3. Setiap awal tahap, jalankan: python3 tools/verify_segitiga.py --context-packet <audit-dir>.
 
 ---
 
-## 6. Aturan Pengisian (hapus bagian ini saat disalin ke proyek)
+## 1. CURSOR AKTIF (MACHINE-READABLE)
 
-- **Cursor Position** — hanya SATU item aktif. `Active Files in Scope` wajib path nyata.
-- **Gate Meter** — status hanya `PENDING`/`PASS`/`FAIL`/`N/A`. `PASS` menuntut bukti, bukan
-  pernyataan; bukti tersimpan di `notes/money-ledger.md` (A), `notes/path-map.md` (B),
-  `05-raw-leads.md` (C), `06`/`07`/`08`/`09` (D), `notes/offchain-*.md` (E), `templates/VERDICT.md` (F).
-- **Guardrail Low** — tiap gate WAJIB mencatat Low yang terlihat (griefing/DoS/kerusakan
-  minor). Low permissionless dengan kerugian terukur DILARANG dibuang diam-diam.
-  Spesies per tahap: A→stuck-funds, B→config-brick, C→griefing/drain-laten.
-- **Working Memory Scratchpad** — maks 10 baris, hanya untuk item aktif. Temuan final pindah
-  ke `05-raw-leads.md`, bukan ditinggal di sini.
-- **Do-Not-Reopen List** — tulis ID saja beserta kelas vonisnya. Alasannya ada di `06`/`08`/`09`.
-- **Write-Ahead Rule** — perbarui file ini SEBELUM memulai item berikutnya.
-- **Strike Count** — wajib terisi (`0/3`,`1/3`,`2/3`,`3/3`) selama Tahap D. Lead DILARANG
-  dipindah ke `06` sebagai `REJECTED_POC_FAILS`/`NEGATIVE_EV`/`DUST` sebelum `3/3`
-  (Strike 1 manual+Victim Seeding, Strike 2 perbaikan urutan+amplifikasi, Strike 3 fuzz)
-  beserta log di `BUKTI_SIMULASI:`.
-- **Cognitive Load** — isi `FATIGUE` setelah ≥2 kegagalan mekanis berturut-turut. Saat
-  `FATIGUE`: DILARANG memulai lead baru; tulis checkpoint lalu lanjut sesi baru.
-- **Lead Sequence Basis** — `EV_DESC` wajib. Aktivitas non-penemuan (setup build, remapping,
-  debug tooling, RPC) **tidak** boleh menggeser lead ber-EV tinggi ke ekor.
+- Target Project / Repo: [ISI_NAMA_PROYEK_ATAU_REPO]
+- Primary Languages & Runtime: [ISI_BAHASA_DAN_RUNTIME, misal: Solidity/EVM, Rust/Solana, Move, Cairo, Go, Off-Chain TS/Py]
+- Total Scope Files Reconciled: 0
+- Active Region: NONE *(Isi NONE saat STAGE-0, R_1..R_N saat loop wilayah, atau CROSS-REGION saat FINAL-SWEEP)*
+- Current Stage: STAGE-0 *(Nilai valid: STAGE-0, STAGE-A, STAGE-B, STAGE-C1, STAGE-C2, STAGE-D, STAGE-E, STAGE-F, FINAL-SWEEP, COMPLETED)*
+- Current Batch: 0 *(Nomor batch siklus D -> E pada wilayah aktif)*
+- Queued Leads Count (Active Region): 0 *(Jumlah kandidat berstatus [QUEUED] di 05-raw-leads.md untuk wilayah aktif)*
+- Active Leads Count (Active Batch): 0 *(Wajib <= 5 saat STAGE-D, dan wajib 0 setelah STAGE-E & saat menutup wilayah)*
+- Last Passed Gate: NONE
+- Next Exact Action: Jalankan inventarisasi 100% berkas scope ke Tabel Rekonsiliasi di path-map.md dan kunci dengan --gate 0.
+
+---
+
+## 2. TABEL ANTREAN WILAYAH UANG (R_1 .. R_N) — URUTAN PRIORITAS EV (SOUL.md §3)
+
+*Diisi pada STAGE-0 setelah 100% berkas sumber direkonsiliasi ke Tier 1/2/3 di path-map.md. Seluruh berkas Tier 1 dan Tier 2 wajib masuk ke salah satu Wilayah R_i.*
+
+| Region ID | Nama Wilayah Uang / Klaster Modul | Peringkat EV (P1`–`P5) | Daftar Berkas Sumber (Path/File.ext) | Status Wilayah ([OPEN] / [ACTIVE] / [CLOSED]) | Ringkasan Hasil (09 Confirmed / 07 Next-Step) |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| R_1 | [Nama Klaster Nilai Tertinggi] | P1 | [Path/File1.ext, Path/File2.ext] | [OPEN] | 0 Confirmed / 0 Next-Step |
+| R_2 | [Nama Klaster Berikutnya] | P2 | [Path/File3.ext] | [OPEN] | 0 Confirmed / 0 Next-Step |
+
+---
+
+## 3. RINGKASAN KALKULASI WADAH KANONIK (04 s/d 09)
+
+| Wadah Kanonik | Jumlah Entri Total Lintas-Wilayah | Keterangan Status |
+| :--- | :--- | :--- |
+| `04-code-guarded.md` | 0 | Jalur/hipotesis yang terbukti sudah dijaga rapat oleh kode pada Tahap C |
+| `05-raw-leads.md` (`[QUEUED]`) | 0 | Antrean kandidat lolos Segitiga di wilayah aktif (wajib 0 saat wilayah ditutup) |
+| `05-raw-leads.md` (`[ACTIVE]`) | 0 | Meja operasi pembuktian batch aktif (maksimal 5 per batch, wajib 0 usai Tahap E) |
+| `06-refuted-invalid.md` | 0 | Kandidat yang patah/gugur saat pembuktian Tahap D/E |
+| `07-needs-next-step.md` | 0 | Kandidat yang membutuhkan verifikasi state live / komponen eksternal |
+| `08-valid-not-eligible.md` | 0 | Perilaku valid teknis tetapi di luar kelayakan klaim (*out-of-scope / known / admin*) |
+| `09-confirmed-findings.md` | 0 | Temuan sahih lulus Bukti Segitiga + dilengkapi *Submission-Ready Report* di Tahap F |
+
+---
+
+## 4. LOG WRITE-AHEAD CHECKPOINT (JEJAK PEMULIHAN ANTI-KOMPRESI)
+
+*Catat setiap pergantian tahap/batch/wilayah secara kronologis. Jangan menghapus baris lama.*
+
+| Checkpoint ID | Wilayah & Tahap (R_i / STAGE) | Status (START / GATE-PASS) | Berkas yang Diubah & Jangkar Utama (Path/File.ext:Lxx-Lyy) | Instruksi Pemulihan Presisi Jika Sesi Terputus |
+| :--- | :--- | :--- | :--- | :--- |
+| CP-001 | GLOBAL / STAGE-0 | START | path-map.md, STATE.md | Lanjutkan pendataan 100% berkas scope ke Tier 1/2/3 di path-map.md lalu jalankan --gate 0. |

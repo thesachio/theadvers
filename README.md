@@ -1,143 +1,149 @@
-# theadvers — Template Workflow Audit Web3 (SEGITIGA + OFFCHAIN)
+# theadvers v2.0 — Mesin Audit Adversarial Berbasis Bukti (Metode Segitiga)
 
-**Repo ini adalah TEMPLATE, bukan proyek audit.** Tidak memuat kode kontrak tertentu dan tidak
-memuat temuan. Tujuannya: dijalankan/di-fork untuk audit baru, lalu diisi — termasuk sebagai
-basis **sc-autopilot (segitiga + offchain)**.
+**Repo ini adalah MESIN/FRAMEWORK, bukan proyek audit.** Tidak memuat kode kontrak target dan tidak
+memuat temuan. Dipakai dengan cara disalin ke folder kerja audit baru, lalu dijalankan tahap demi
+tahap atau otonom lewat `sc-autopilot`.
 
-Metode inti: **Segitiga** — `L-VALUE → L-PATH → L-FLOW` — diperluas dengan **Tahap E (off-chain)**
-dan ditutup **Tahap F (verdict)**. Enam tahap, enam gate.
+Metode inti: **Segitiga** — `L-VALUE` (di mana nilai) → `L-PATH` (jalur sentuh) → `L-PROVE`
+(bukti eksekusi). Tiga titik wajib terhubung; anomali tanpa dampak nilai bukan temuan.
 
-## Berkas konstitusi (mengikat)
+---
+
+## 1. Siklus Eksekusi
+
+```
+STAGE-0   Global Partitioning & Rekonsiliasi 100% Berkas → 3 Tier → Wilayah Uang R_1..R_N
+   │
+   ├── Untuk SETIAP Wilayah R_i (vertikal, tidak menyeberang sebelum bersih):
+   │     STAGE-A   L-VALUE  : kapasitas nilai + fakta verbatim (path-map.md, FACTS.md)
+   │     STAGE-B   L-PATH   : peta 3-edge ([EDGE-ASSET], [EDGE-VALUATION], [EDGE-CONTROL/LATENT])
+   │     STAGE-C1  Gelombang 1 — Blind Adversarial Hunt (dilarang buka plugin)
+   │     STAGE-C2  Gelombang 2 — Inversi FACTS + rantai RADAR + lazy-load _ROUTER → [QUEUED]
+   │     STAGE-D   Prove — Rolling Batch maksimal 5 [ACTIVE]
+   │     STAGE-E   Verdict — 06 / 07 / 08 / 09
+   │     STAGE-F   Disclosure — blok 09 + wadah cases/<FIND-ID>/ → --close-region R_i
+   │
+   └── FINAL-SWEEP  Cross-region chain sweep → --final
+```
+
+Setiap transisi wajib lulus gate mekanis. **Dilarang** mengubah `Current Stage` sebelum gate PASS.
+
+---
+
+## 2. Berkas Konstitusi (mengikat)
 
 | Berkas | Isi | Kapan dibaca |
-|---|---|---|
-| **`SOUL.md`** | identitas persona, sikap adversarial, hukum kognitif | setiap sesi, sebelum apa pun |
-| **`AGENTS.md`** | konstitusi operasional: Langkah −1, anti-truncate, staging, tangga bukti | setiap sesi + tiap `delegate_task` |
-| **`AUTOPILOT-MAPPING.md`** | peta Fase 1-4 lama → Tahap A-F (untuk sc-autopilot) | saat menjalankan mode autopilot |
-| **`CLASSIFICATION.md`** | tiga sumbu klasifikasi: LAPIS (baru) × CLASS (lama) × AF (baru) | saat menulis lead `05` |
+| :--- | :--- | :--- |
+| **`SOUL.md`** | identitas, 7 Hukum Kognitif Besi, prioritas EV P1–P5, pantangan mutlak | setiap sesi, sebelum apa pun |
+| **`AGENTS.md`** | konstitusi operasional: hard bootloader, wadah kanonik, siklus A–F, drop-in plugin, zero-compression, tabel gate | setiap sesi + tiap `delegate_task` |
+| **`methodology/METHODOLOGY-SEGITIGA.md`** | 9 blok `@SLICE` yang disuntik ulang per tahap oleh `--context-packet` | diekstrak otomatis, bukan dibaca penuh |
 
-Ketiganya adalah berkas **kerja**, bukan arsip. Bila mengubah metode, ubah di sini — bukan di
-salinan lain.
+---
 
-## Cara pakai untuk audit baru
+## 3. Struktur
 
-**Template dan hasil audit DIPISAH.** Repo ini hanya berisi metode + alat; hasil audit tinggal di
-repo inbox/privat terpisah agar `ingest.py` dapat membacanya dari root dan agar temuan tidak
-terpublikasi sebelum dilaporkan.
+```
+SOUL.md                     identitas + hukum kognitif + prioritas EV
+AGENTS.md                   konstitusi operasional
+methodology/
+  METHODOLOGY-SEGITIGA.md   mesin alur (@SLICE: STAGE-0, A, B, C1, C2, D, E, F, FINAL-SWEEP)
+  attack-forms/             AF-01..AF-10 — bentuk serangan uji (1 berkas = 1 bentuk)
+  domains/                  DOM-* — heuristik domain (vault, lending, amm, oracle, staking, bridge, governance)
+references/
+  methods/                  M-001..M-010 — metode bedah universal
+  pov/                      POV-* — sudut pandang aktor (unprivileged, liquidator, relayer-mev, griefer, integrator)
+  chains/                   CHAIN-* — pola serangan berantai (reentrancy, desync, oracle, rounding, offchain)
+templates/                  wadah kerja audit + standar laporan
+  STATE.md FACTS.md RADAR.md path-map.md
+  04-code-guarded.md 05-raw-leads.md 06-refuted-invalid.md
+  07-needs-next-step.md 08-valid-not-eligible.md 09-confirmed-findings.md
+  VERDICT.md                hukum acara pengadilan bukti (STAGE-E/F)
+  TECHNICAL-REPORT.md POC-PACKAGE.md SUBMISSION-EMAIL.md SEVERITY-RUBRIC.md
+  case/                     chat.md, laporan-teknis.md, poc.md (standar wadah cases/<ID>/)
+skills/                     sc-a-scope, sc-b-map, sc-c-hunt, sc-d-prove, sc-e-verdict, sc-f-report, sc-autopilot
+tools/
+  verify_segitiga.py        mesin gate + context re-hydrator + router sync
+  deploy_parity.py          rekonsiliasi deployment (LIVE_MATCH / LIVE_IDENTITY)
+verify/
+  SCHEMA.md                 aturan field laporan
+  VERDICT.md                hukum acara lengkap (11 Pernyataan, #11e PAPER_REFUTATION)
+  SEVERITY-RUBRIC.md        matriks severity lintas platform
+  ingest.py                 gerbang submission (MECH-OK)
+```
+
+---
+
+## 4. Cara Pakai untuk Audit Baru
 
 ```bash
-# 1. Salin template ini ke folder kerja audit (tanpa .git)
-rsync -a --exclude .git <path-template>/ ~/audits/<nama-proyek>/
+# 1. Salin mesin ke folder kerja audit (tanpa .git)
+rsync -a --exclude .git --exclude notes/backups <path-repo>/ ~/audits/<nama-proyek>/
 cd ~/audits/<nama-proyek>
 
-# 2. Tandai pin target (commit yang diaudit) — WAJIB
-$EDITOR target/PIN.md
+# 2. Sinkronkan indeks plugin + pasang skill
+python3 tools/verify_segitiga.py --sync
 
-# 3. Siapkan wadah hasil (dibuat lokal, TIDAK masuk repo template)
-mkdir -p audit/notes/backups audit/lab
-cp templates/STATE.md templates/INTEL.md audit/
-cp templates/04-code-guarded.md templates/05-raw-leads.md templates/06-refuted-invalid.md \
-   templates/07-needs-next-step.md templates/08-valid-not-eligible.md \
-   templates/09-confirmed-findings.md templates/FACTS.md templates/RADAR.md audit/
+# 3. Siapkan wadah kerja dari templates/
+mkdir -p audit/notes
+cp templates/STATE.md templates/FACTS.md templates/RADAR.md templates/path-map.md audit/
+cp templates/0*.md audit/
 
-# 4. Mulai dari Tahap A0 sesuai audit/STATE.md
+# 4. Isi identitas proyek pada audit/STATE.md, lalu mulai STAGE-0
+python3 tools/verify_segitiga.py --context-packet audit
 ```
 
-**Jangan** menyalin isi `references/` ke folder audit — folder itu adalah rujukan metode, dipakai
-lintas proyek.
+Hasil audit **tidak** disimpan di repo ini. Repo ini hanya mesin + metode.
 
-## Struktur
+---
 
-```
-SOUL.md               identitas persona (mengikat)
-AGENTS.md             konstitusi operasional (mengikat)
-AUTOPILOT-MAPPING.md  peta Fase 1-4 -> Tahap A-F
-CLASSIFICATION.md     LAPIS x CLASS x AF — tiga sumbu, jangan dicampur
-methodology/          metode: 1 dokumen induk + 6 modul plug-in + flow-diagram
-references/           18 berkas rujukan metode & POV & tooling (dilampirkan, bukan di-link)
-templates/            wadah hasil + 3 template submission
-verify/               SCHEMA.md (aturan MANIFEST.json) + ingest.py + VERDICT + RUBRIK
-tools/                gate checker + verifikasi integritas
-```
+## 5. Perintah Wajib
 
-Hasil audit **dibuat** oleh operator di folder kerja, tidak disimpan di repo ini:
+| Perintah | Kapan | Yang diperiksa |
+| :--- | :--- | :--- |
+| `--sync` | setiap menambah/mengubah berkas plugin | 4 baris header plugin + membangun ulang 5 `_ROUTER.md` + menyalin skill |
+| `--context-packet <dir>` | awal setiap tahap, batch, dan pergantian wilayah | kursor STATE.md, `@SLICE` tahap aktif, fakta R_i, radar R_i, indeks router |
+| `--gate 0` | selesai STAGE-0 | 100% berkas ke Tier 1/2/3, Tier-3 terkunci 1-pass, antrean R_1..R_N |
+| `--gate A` | selesai STAGE-A | fakta R_i berjangkar `:Lxx` + tabel L-VALUE terisi |
+| `--gate B` | selesai STAGE-B | ketiga tag `[EDGE-*]` terpetakan dengan jangkar |
+| `--gate C1` | selesai Gelombang 1 | jalur terjaga / observasi `[WAVE-1-BLIND]` + sinyal `[TOUCHES: ...]` |
+| `--gate C2` | selesai Gelombang 2 | penyilangan `[WAVE-2-CROSS]` nyata + kandidat `[QUEUED]` berpajangan M-xxx & AF-xx |
+| `--gate D` | selesai STAGE-D | `[ACTIVE]` ≤ 5 dan tiga titik bukti terisi |
+| `--gate E` | selesai STAGE-E | seluruh `[ACTIVE]` pindah ke 06/07/08/09 |
+| `--close-region <R_i>` | selesai STAGE-F | `[QUEUED]==0`, `[ACTIVE]==0`, seluruh `cases/<FIND-ID>/` (chat.md, laporan-teknis.md 9 bagian, poc.md 5 bagian + Kontrol Positif) |
+| `--final` | setelah seluruh wilayah `[CLOSED]` | semua wilayah tutup, lead bersih, bebas kompresi, wadah kasus lengkap |
 
-```
-audit/                wadah per proyek (TIDAK di repo template)
-  STATE.md            kursor: TAHAP (A-F) + pot/jahitan aktif + Gate Meter
-  INTEL.md            Tahap A0
-  notes/money-ledger.md, notes/path-map.md, notes/backups/
-  lab/                harness PoC
-  04..09              wadah hasil
-  FACTS.md, RADAR.md
-target/PIN.md         commit, cara reproduce, repo pendukung
-```
+Gerbang bersifat **monoton**: `GATE-C1` hanya sah bila `Last Passed Gate` di `STATE.md` sudah
+mencapai C1 atau lebih tinggi. Setiap gate diuji dua arah — PASS pada kondisi bersih, **FAIL** pada
+pelanggaran yang disuntikkan.
 
-## Submission ke program bounty
+---
 
-Setelah Tahap F, temuan yang layak dikirim ke program memakai **repo inbox terpisah**:
+## 6. Aturan yang Mengikat
 
-```
-<repo-inbox>/
-├── MANIFEST.json          <- diverifikasi tools/ingest.py (WAJIB MECH-OK)
-├── findings/<ID>.md       <- templates/TECHNICAL-REPORT.md
-├── poc/<ID>.<ext>         <- templates/POC-PACKAGE.md
-└── snippets/              <- kutipan kode yang dirujuk field `file`
-```
+1. **Jangkar verbatim.** Setiap fakta dan entri wajib memuat `Path/File.ext:Lxx-Lyy` (rentang), bukan satu baris.
+2. **Zero-compression.** Token `...`, `dll.`, `dst.`, `etc.`, `rest of logic` dilarang di berkas analisis; gerbang menolak otomatis.
+3. **Vertical region.** Dilarang membuka STAGE-A/B/C untuk `R_{i+1}` selama `R_i` masih `[QUEUED] > 0` atau `[ACTIVE] > 0`.
+4. **Rolling batch.** Maksimal 5 kandidat `[ACTIVE]`; kandidat `[QUEUED]` tidak dibuang karena kuota.
+5. **Write-ahead checkpoint.** Perbarui `STATE.md` **sebelum** memulai tahap berikutnya.
+6. **Bukti dari eksekusi nyata.** Blok `BUKTI_SIMULASI:` wajib berisi perintah `$ ...` beserta keluarannya; menulis dari ingatan = `FABRICATED_EVIDENCE`.
+7. **Drop-in plugin.** Tambah metode/serangan/domain/POV/chain cukup dengan 1 berkas baru + `--sync`, tanpa mengedit berkas lain.
+8. **Whitehat.** Dilarang menyiarkan transaksi keluar, dilarang mengedit kode target (read-only 100%).
 
-```bash
-python3 verify/ingest.py <repo-inbox>    # target: N/N MECH-OK
-```
+---
 
-**Gerbang:** temuan yang belum `MECH-OK` DILARANG dikirim, sekalipun laporannya meyakinkan.
-Email pengantar: `templates/SUBMISSION-EMAIL.md`.
+## 7. Menambah Pengetahuan (Drop-in Plugin)
 
-## Alur kerja (6 tahap, 6 gate)
+Format header wajib 4 baris pada setiap berkas plugin:
 
-```
-A. L-VALUE   census nilai live -> EV ledger          GATE-A
-B. L-PATH    peta aliran -> jahitan + EV             GATE-B
-C. L-FLOW    bedah sink -> lead 05 (LAPIS + AF)      GATE-C
-D. SIMULASI  10 metode x POV -> 06/07/08/09          GATE-D
-E. OFFCHAIN  dipicu anomali -> akar kode             GATE-E
-F. VERDICT   11 Pernyataan + rubrik severity         GATE-F
+```markdown
+# [ID-PLUGIN] Judul Metode / Bentuk Serangan / Domain / POV / Chain
+- Classes: [kategori kelas masalah atau domain]
+- Trigger Symptom: [gejala kode spesifik yang memicu pembacaan berkas ini]
+- Paired Items: [ID plugin pasangan yang direkomendasikan]
 ```
 
-## Rujukan (dilampirkan penuh di `references/`)
+Lalu jalankan `python3 tools/verify_segitiga.py --sync`. Tabel `_ROUTER.md` diperbarui otomatis dan
+langsung terbaca oleh `--context-packet` pada STAGE-C2 dan STAGE-D.
 
-Tidak ada yang "di-link saja". Semua berkas ada di dalam repo agar tetap terbaca saat offline
-dan tidak bergantung pada versi skill yang berubah.
-
-| Berkas | Isi |
-|---|---|
-| `ref-method-registry.md` | M-001..M-010 (registry metode bedah) |
-| `ref-attacker-pov.md` | Router POV 8-field + aturan deteksi rantai |
-| `ref-pov-call.md` | POV surface panggilan (callback, reentrancy, delegatecall) |
-| `ref-pov-defi.md` | POV DeFi (self-liquidation, bad debt, valuation vs execution) |
-| `ref-pov-math.md` | POV matematika (indeks akrual, inverse rounding) |
-| `ref-pov-chain.md` | POV lintas-rantai & asinkron |
-| `ref-calls-tokens-reentrancy.md` | Token non-standar, hook, reentrancy |
-| `ref-math-and-vaults.md` | Vault/share accounting, pembulatan |
-| `ref-defi-oracles-liquidation.md` | Oracle, staleness, likuidasi |
-| `ref-chain-evm-tron.md` / `ref-chain-solana.md` / `ref-chain-sui-move.md` / `ref-chain-ton-async.md` | Tooling & batas per rantai |
-| `ref-test-evm-advanced.md` / `ref-test-multichain-advanced.md` | Teknik harness & fuzz |
-| `ref-atomic-write.md` | Aturan tulis atomik (anti-truncate) |
-
-## Aturan yang mengikat
-
-1. **Anti-truncate** — `open("w")` dan `>` DILARANG untuk `audit/*.md`. Pakai `.tmp → fsync → os.replace`.
-2. **Baca UTUH** — kode wajib dibaca dari `function` sampai `}` penyeimbang. `grep` hanya untuk
-   *menemukan*, bukan menyimpulkan.
-3. **No-Code-No-Reject** — gugur tanpa eksekusi test = `PAPER_REFUTATION_DETECTED`.
-4. **3-Stage** sebelum mengunci di `06` — 2 manual + 1 fuzz wajib.
-5. **Write-ahead checkpoint** — geser `STATE.md` SEBELUM mulai item berikutnya.
-6. **Bukti dari log nyata** — blok `BUKTI_SIMULASI`/`PERCOBAAN` tidak boleh disusun dari ingatan.
-7. **Provenance** — tiap lead wajib `[LAPIS: VALUE|PATH|FLOW]` + `[AF-xx]`.
-
-## Validasi
-
-```bash
-python3 tools/verify_segitiga.py --audit-dir audit
-```
-
-Memeriksa G1–G8 (provenance, rentang baris, bukti nyata, batas STATE, file kosong, registry AF).
+Agen **dilarang** membaca seluruh berkas plugin sekaligus: baca `_ROUTER.md` lebih dulu, lalu
+`read_file` hanya pada berkas yang `Trigger Symptom`-nya cocok dengan wilayah aktif.
