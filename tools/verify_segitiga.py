@@ -1241,6 +1241,102 @@ def validate_lead_deploy(audit_dir: Path, active_cards: List[str]) -> List[str]:
     return errors
 
 
+GUARD_ID_RX = re.compile(r"\bGUARD-(?:R\d+-)?\d+\b")
+GUARD_STATUSES = {"TERSANGKAL"} | {f"TEMBUS-J{n}" for n in range(1, 6)}
+JALUR_IDS = ("J1", "J2", "J3", "J4", "J5")
+
+
+def _table_rows(text: str, header_probe: str) -> List[List[str]]:
+    """Ambil baris tabel markdown yang berada setelah baris header memuat header_probe."""
+    rows: List[List[str]] = []
+    inside = False
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("|") and header_probe in s:
+            inside = True
+            continue
+        if inside:
+            if not s.startswith("|"):
+                inside = False
+                continue
+            if ":---" in s:
+                continue
+            rows.append([c.strip() for c in s.strip("|").split("|")])
+    return rows
+
+
+def validate_four(guarded_text: str) -> List[str]:
+    """04-code-guarded.md: status TERSANGKAL wajib didukung 5 baris uji jalur berjangkar.
+
+    Alasan aturan ini ada: sebelumnya agen dapat menulis "dijaga onlyOwner" tanpa pernah
+    menguji 4 jalur permissionless lainnya, lalu mengunci hipotesis yang sebenarnya tembus.
+    """
+    errors: List[str] = []
+    if not guarded_text.strip():
+        return errors
+
+    # 1. Tabel utama: Guard ID + Status
+    guards: Dict[str, str] = {}
+    for cols in _table_rows(guarded_text, "Guard ID"):
+        if len(cols) < 8:
+            continue
+        gid = cols[0].strip("`* ")
+        if not re.fullmatch(r"GUARD-(?:R\d+-)?\d+", gid):
+            continue
+        status = cols[6].strip("`* ").upper()
+        guards[gid] = status
+        if status not in GUARD_STATUSES:
+            errors.append(
+                f"[RULES-04] {gid} berstatus tidak sah '{status}'. Nilai sah: "
+                f"TERSANGKAL atau TEMBUS-J1..TEMBUS-J5."
+            )
+
+    # 2. Tabel uji 5 jalur
+    jalur_rows: Dict[str, Dict[str, List[str]]] = {}
+    for cols in _table_rows(guarded_text, "| Jalur |"):
+        if len(cols) < 4:
+            continue
+        gid, jalur = cols[0].strip("`* "), cols[1].strip("`* ").upper()
+        if not re.fullmatch(r"GUARD-(?:R\d+-)?\d+", gid) or jalur not in JALUR_IDS:
+            continue
+        jalur_rows.setdefault(gid, {}).setdefault(jalur, []).append(cols[2] + " || " + cols[3])
+
+    # 3. Setiap GUARD wajib punya 5 jalur
+    for gid, status in guards.items():
+        rows = jalur_rows.get(gid, {})
+        hilang = [j for j in JALUR_IDS if j not in rows]
+        if hilang:
+            errors.append(
+                f"[RULES-04] {gid} (status {status}) belum menguji jalur {', '.join(hilang)}. "
+                f"Tabel 'Uji 5 Jalur' wajib berisi tepat 5 baris (J1..J5)."
+            )
+            continue
+        for jalur in JALUR_IDS:
+            for cell in rows[jalur]:
+                hasil, _, alasan = cell.partition("||")
+                hasil_u = hasil.strip("`* ").upper()
+                if hasil_u not in ("TERTUTUP", "TEMBUS"):
+                    errors.append(
+                        f"[RULES-04] {gid} jalur {jalur}: hasil '{hasil.strip()}' tidak sah "
+                        f"(TERTUTUP / TEMBUS)."
+                    )
+                if hasil_u == "TEMBUS" and status == "TERSANGKAL":
+                    errors.append(
+                        f"[RULES-04] {gid} berstatus TERSANGKAL padahal jalur {jalur} TEMBUS — "
+                        f"guard ini DILARANG di 04; pindahkan ke 05-raw-leads.md dengan tag [TEMBUS-{jalur}]."
+                    )
+                if hasil_u == "TERTUTUP" and not ANCHOR_REGEX.search(alasan):
+                    # Jangkar Path/File.ext:Lxx WAJIB pada setiap baris, termasuk yang berlabel N/A:
+                    # ketiadaan jalur pun harus dibuktikan di berkas tertentu, bukan diklaim.
+                    errors.append(
+                        f"[RULES-04] {gid} jalur {jalur}: alasan TERTUTUP tanpa jangkar "
+                        f"Path/File.ext:Lxx — alasan tanpa bukti tidak sah. Bila jalurnya memang "
+                        f"tidak ada, tulis 'N/A' DAN sebut lokasi pembuktian ketiadaannya."
+                    )
+
+    return errors
+
+
 def validate_wadah_rules(audit_dir: Path) -> List[str]:
     """Jalankan seluruh aturan 06/07/08/09 + jejak lead."""
     errors: List[str] = []
@@ -1252,6 +1348,9 @@ def validate_wadah_rules(audit_dir: Path) -> List[str]:
     errors.extend(validate_seven(texts["07-needs-next-step.md"]))
     errors.extend(validate_eight(texts["08-valid-not-eligible.md"]))
     errors.extend(validate_nine(texts["09-confirmed-findings.md"]))
+    guarded_path = audit_dir / "04-code-guarded.md"
+    if guarded_path.exists():
+        errors.extend(validate_four(guarded_path.read_text(encoding="utf-8")))
     errors.extend(validate_nine_fork(audit_dir, texts["09-confirmed-findings.md"]))
     errors.extend(validate_eight_fork(texts["08-valid-not-eligible.md"]))
 

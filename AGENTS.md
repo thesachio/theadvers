@@ -185,6 +185,7 @@ Setiap wadah menuntut **jenis bukti yang berbeda**. Wadah yang diisi tanpa bukti
 
 | Wadah | Menuntut bukti | Gerbang penolak |
 | :--- | :--- | :--- |
+| `04-code-guarded.md` | Bukti **penutupan jalur**: status `TERSANGKAL` hanya sah bila tabel §3 memuat **tepat 5 baris** (J1–J5) berisi `TERTUTUP`/`TEMBUS` + alasan + jangkar `Path/File.ext:Lxx-Lyy` | `RULES-04` (guard TEMBUS yang tetap di `04`, atau jalur yang belum diuji) |
 | `06-refuted-invalid.md` | Bukti **kegagalan**: kelas `REJECTED_*`, `TANGGA_BUKTI`, `DEPLOYMENT_MATCH`, jangkar `:Lxx`; kelas `POC_FAILS`/`NEGATIVE_EV`/`DUST` wajib `BUKTI_SIMULASI:` berisi `$ ...` + log + Strike 3 Fuzz | `PAPER_REFUTATION_DETECTED` (kecuali KS-1..KS-4) |
 | `07-needs-next-step.md` | Bukti **usaha**: `Disposition:` (tepat satu) + `PERCOBAAN:` berisi perintah + log nyata; `TANGGA_BUKTI` A/A-HEAD dilarang | `LAZY_BAILOUT_DETECTED` |
 | `08-valid-not-eligible.md` | Bukti **mekanisme**: `LOW_CLASS` (PRE_LIVE_SCOPE / ADMIN_ONLY / LOW_NUISANCE) + `POC_STATUS: PASS` + dampak kuantitatif | Pelarian wadah (#11b) |
@@ -209,6 +210,6 @@ Setiap wadah menuntut **jenis bukti yang berbeda**. Wadah yang diisi tanpa bukti
 | python3 tools/verify_segitiga.py --gate C2 <dir> | Selesai Tahap C Gelombang 2 (Cross-Pollination) di R_i. | Hasil penyilangan tercatat, kandidat gugur awal masuk ke 04-code-guarded.md, dan setiap kandidat [QUEUED] di 05-raw-leads.md memiliki pasangan valid M-xxx & AF-xx serta urutan EV. |
 | python3 tools/verify_segitiga.py --gate D <dir> | Selesai Tahap D pada satu Batch di R_i. | Kandidat [ACTIVE] di 05-raw-leads.md berjumlah <= 5 dan semuanya memiliki 3 komponen Bukti Segitiga lengkap tanpa token kompresi. |
 | python3 tools/verify_segitiga.py --gate E <dir> | Selesai Tahap E pada satu Batch di R_i. | Active Leads == 0, **plus** seluruh aturan wadah 06/07/08/09 (kelas + bukti) dan jejak lead: setiap lead yang keluar dari 05 wajib muncul di tepat satu wadah. |
-| python3 tools/verify_segitiga.py --rules <dir> | Sebelum/di luar gate, khusus memeriksa wadah | Aturan 06 (`REJECTED_*` + `BUKTI_SIMULASI`/KS-n), 07 (`Disposition` + `PERCOBAAN`), 08 (`LOW_CLASS` + `POC_STATUS: PASS`), 09 (`TANGGA_BUKTI`/`LIVE_IDENTITY`/`POC_STATUS`), dan jejak lead (#11d). |
+| `python3 tools/verify_segitiga.py --rules <dir>` | Sebelum/di luar gate, khusus memeriksa wadah | Aturan 04 (`TERSANGKAL` wajib 5 baris jalur J1–J5 berjangkar, `RULES-04`), 06 (`REJECTED_*` + `BUKTI_SIMULASI`/KS-n), 07 (`Disposition` + `PERCOBAAN`), 08 (`LOW_CLASS` + `POC_STATUS: PASS`), 09 (`TANGGA_BUKTI`/`LIVE_IDENTITY`/`POC_STATUS`), dan jejak lead (#11d). |
 | python3 tools/verify_segitiga.py --close-region <R_i> <dir> | Selesai Tahap F pada Wilayah R_i. | Di 05-raw-leads.md baik [ACTIVE] == 0 maupun [QUEUED] == 0 untuk R_i, dan seluruh temuan R_i di 09-confirmed-findings.md telah memiliki blok *Submission-Ready Disclosure*. |
 | python3 tools/verify_segitiga.py --final <dir> | Selesai seluruh wilayah & *Cross-Region Final Sweep*. | Seluruh wilayah R_1..R_N berstatus [CLOSED], 05-raw-leads.md bersih (0), bebas token kompresi, dan seluruh temuan di 09-confirmed-findings.md siap kirim. |
