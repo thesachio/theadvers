@@ -58,10 +58,10 @@ Salam,
 ## 3. JEJAK PENALARAN & RINGKASAN RIWAYAT UJI (`lead-<ID>.md`)
 
 - **Asal Lead & Klasifikasi**: `<LEAD-ID> | [LAPIS: VALUE|PATH|FLOW] | [CLASS-A|B|C] | [AF-xx] | Metode: <M-xxx>`
-- **Hipotesis Satu Baris**: `<Hipotesis awal saat ditemukan di STAGE-C1/C2>`
-- **Jejak Pengujian & Eskalasi di STAGE-D**:
+- **Hipotesis Satu Baris**: `<Hipotesis awal saat ditemukan di Tahap C>`
+- **Jejak Pengujian & Eskalasi di Tahap D**:
   - **Berkas & Fungsi Test**: `<Path/TestFile.ext — namaFungsiTest>`
   - **Kontrol Positif**: `<Nama fungsi kontrol positif yang membuktikan jalur normal berhasil [PASS]>`
   - **Ringkasan Perintah & Hasil**: `$ <perintah eksak>` $\rightarrow$ `[PASS]` (`Delta Nilai: <angka eksak>`)
-- **Putusan Hakim STAGE-E/F (`VERDICT.md`)**:
+- **Putusan Hakim Tahap E/F (`VERDICT.md`)**:
   - `VERDICT: VALID_ELIGIBLE | TANGGA_BUKTI: <A|B> | DEPLOYMENT_MATCH: LIVE_MATCH | LIVE_IDENTITY: <identitas terukur>`

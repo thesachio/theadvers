@@ -66,7 +66,7 @@ tools/
   deploy_parity.py          rekonsiliasi deployment (LIVE_MATCH / LIVE_IDENTITY)
 verify/
   SCHEMA.md                 aturan field laporan
-  VERDICT.md                hukum acara (10 Pernyataan Keras + Integritas #11/#11b/#11c/#11d/#11e)
+  VERDICT.md                hukum acara lengkap (11 Pernyataan, #11e PAPER_REFUTATION)
   SEVERITY-RUBRIC.md        matriks severity lintas platform
   ingest.py                 gerbang submission (MECH-OK)
 ```
@@ -108,8 +108,7 @@ Hasil audit **tidak** disimpan di repo ini. Repo ini hanya mesin + metode.
 | `--gate C1` | selesai Gelombang 1 | jalur terjaga / observasi `[WAVE-1-BLIND]` + sinyal `[TOUCHES: ...]` |
 | `--gate C2` | selesai Gelombang 2 | penyilangan `[WAVE-2-CROSS]` nyata + kandidat `[QUEUED]` berpajangan M-xxx & AF-xx |
 | `--gate D` | selesai STAGE-D | `[ACTIVE]` ≤ 5 dan tiga titik bukti terisi |
-| `--gate E` | selesai STAGE-E | `[ACTIVE]==0` + aturan bukti 06/07/08/09 + jejak lead (#11d) |
-| `--rules` | kapan saja | khusus aturan wadah 06/07/08/09 + jejak lead, tanpa gate tahap |
+| `--gate E` | selesai STAGE-E | seluruh `[ACTIVE]` pindah ke 06/07/08/09 |
 | `--close-region <R_i>` | selesai STAGE-F | `[QUEUED]==0`, `[ACTIVE]==0`, seluruh `cases/<FIND-ID>/` (chat.md, laporan-teknis.md 9 bagian, poc.md 5 bagian + Kontrol Positif) |
 | `--final` | setelah seluruh wilayah `[CLOSED]` | semua wilayah tutup, lead bersih, bebas kompresi, wadah kasus lengkap |
 
@@ -119,24 +118,7 @@ pelanggaran yang disuntikkan.
 
 ---
 
-## 6. Aturan Bukti per Wadah (06 / 07 / 08 / 09)
-
-Setiap wadah menuntut **jenis bukti yang berbeda**; wadah yang diisi tanpa bukti jenisnya = laporan DITOLAK.
-Hukum acara lengkap: `templates/VERDICT.md` §4–§9.
-
-| Wadah | Menuntut | Gerbang penolak |
-| :--- | :--- | :--- |
-| `06-refuted-invalid.md` | Bukti **kegagalan**: kelas `REJECTED_*`, `TANGGA_BUKTI`, `DEPLOYMENT_MATCH`; `POC_FAILS`/`NEGATIVE_EV`/`DUST` wajib `BUKTI_SIMULASI:` + Strike 3 Fuzz | `PAPER_REFUTATION_DETECTED` (kecuali KS-1..KS-4) |
-| `07-needs-next-step.md` | Bukti **usaha**: `Disposition:` (NEXT_EXPLORE / NEXT_MAINNET / TOOL_BLOCKED / ENV_ERROR) + `PERCOBAAN:` berisi `$ ...` + log nyata | `LAZY_BAILOUT_DETECTED` |
-| `08-valid-not-eligible.md` | Bukti **mekanisme**: `LOW_CLASS` (PRE_LIVE_SCOPE / ADMIN_ONLY / LOW_NUISANCE) + `POC_STATUS: PASS` + dampak terukur | pelarian wadah (#11b) |
-| `09-confirmed-findings.md` | 3 Titik Bukti + Sepuluh Pernyataan Keras + Integritas #11 + `LIVE_IDENTITY` terukur; `A-HEAD` & siklus pre-deploy dilarang | ditolak ke `08`/`06` |
-
-**Jejak lead (#11d):** setiap lead yang keluar dari `05-raw-leads.md` wajib muncul di **tepat satu** wadah.
-**Target akhir `07` = 0 entri.**
-
----
-
-## 7. Aturan yang Mengikat
+## 6. Aturan yang Mengikat
 
 1. **Jangkar verbatim.** Setiap fakta dan entri wajib memuat `Path/File.ext:Lxx-Lyy` (rentang), bukan satu baris.
 2. **Zero-compression.** Token `...`, `dll.`, `dst.`, `etc.`, `rest of logic` dilarang di berkas analisis; gerbang menolak otomatis.
@@ -149,7 +131,7 @@ Hukum acara lengkap: `templates/VERDICT.md` §4–§9.
 
 ---
 
-## 8. Menambah Pengetahuan (Drop-in Plugin)
+## 7. Menambah Pengetahuan (Drop-in Plugin)
 
 Format header wajib 4 baris pada setiap berkas plugin:
 

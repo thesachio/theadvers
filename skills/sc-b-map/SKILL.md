@@ -5,7 +5,7 @@ description: Eksekusi STAGE-B (Pemetaan Jalur L-PATH dengan Tiga Kategori Edge W
 
 # Skill sc-b-map — Pemetaan Jalur 3-Edge Wilayah Aktif (STAGE-B / L-PATH)
 
-Anda menjalankan STAGE-B (`L-PATH`) khusus untuk berkas-berkas di dalam Wilayah Aktif R_i.
+Anda menjalankan Tahap B (`L-PATH`) khusus untuk berkas-berkas di dalam Wilayah Aktif R_i.
 
 ---
 
@@ -37,7 +37,7 @@ Baca berkas sumber Wilayah Aktif R_i dan lengkapi bagian L-PATH untuk Wilayah R_
 
 ---
 
-## 3. Verifikasi Gate B & Transisi ke STAGE-C1
+## 3. Verifikasi Gate B & Transisi ke Tahap C1
 
 1. Pastikan seluruh entri di path-map.md memiliki jangkar baris kode (Path/File.ext:Lxx-Lyy) dan bebas dari token kompresi (..., dll., dst., etc., rest of logic).
 2. Jalankan gerbang verifikasi:

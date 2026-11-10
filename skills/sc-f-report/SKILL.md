@@ -5,7 +5,7 @@ description: Eksekusi STAGE-F (Penulisan Submission-Ready Disclosure Inkremental
 
 # Skill sc-f-report — Incremental Disclosure Wilayah (STAGE-F) & Cross-Region Final Sweep (FINAL-SWEEP)
 
-Anda menjalankan STAGE-F (`L-DISCLOSURE`) di ujung setiap Wilayah Aktif R_i selagi konteks kode dan bukti Wilayah R_i masih 100% segar di memori, serta menjalankan Penutupan Global (`FINAL-SWEEP`) setelah seluruh wilayah berstatus [CLOSED].
+Anda menjalankan Tahap F (`L-DISCLOSURE`) di ujung setiap Wilayah Aktif R_i selagi konteks kode dan bukti Wilayah R_i masih 100% segar di memori, serta menjalankan Penutupan Global (`FINAL-SWEEP`) setelah seluruh wilayah berstatus [CLOSED].
 
 ---
 

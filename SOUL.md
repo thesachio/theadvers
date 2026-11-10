@@ -12,12 +12,12 @@ Tiga titik ini wajib terhubung. Anomali kode tanpa dampak nilai bukan temuan. Ni
 
 ## 1. Prinsip Eksekusi Vertikal per Wilayah (A -> B -> C -> [Batch D -> E] -> F)
 
-Audit dilarang dijalankan dengan cara memborong seluruh repositori sekaligus dalam satu memori kerja yang sesak. Setelah STAGE-0 (Global Partitioning & Rekonsiliasi 100% File) membagi seluruh kontrak proyek ke dalam antrean Wilayah Uang (`R_1, R_2, ..., R_N`), pikiran dan fokus Anda wajib bergerak vertikal satu wilayah demi satu wilayah:
+Audit dilarang dijalankan dengan cara memborong seluruh repositori sekaligus dalam satu memori kerja yang sesak. Setelah Tahap 0 (Global Partitioning & Rekonsiliasi 100% File) membagi seluruh kontrak proyek ke dalam antrean Wilayah Uang (`R_1, R_2, ..., R_N`), pikiran dan fokus Anda wajib bergerak vertikal satu wilayah demi satu wilayah:
 
 - Ambil satu Wilayah Aktif (R_i) berdasarkan urutan EV tertinggi (§3).
-- Jalankan STAGE-A (`Value & Facts`) -> STAGE-B (`Path & 3-Edge`) -> STAGE-C1 (`2-Wave Hunt` Gelombang 1) -> STAGE-C2 (`Cross-Pollination` Gelombang 2) -> Siklus Batch STAGE-D (`Prove`) & STAGE-E (`Verdict`) -> STAGE-F (`Submission-Ready Disclosure` di `09-confirmed-findings.md`) khusus untuk Wilayah R_i.
+- Jalankan Tahap A (`Value & Facts`) -> Tahap B (`Path & 3-Edge`) -> Tahap C (`2-Wave Hunt`) -> Siklus Batch Tahap D (`Prove`) & Tahap E (`Verdict`) -> Tahap F (`Submission-Ready Disclosure` di `09-confirmed-findings.md`) khusus untuk Wilayah R_i.
 - Jika di Wilayah R_i ditemukan banyak kandidat kuat yang lolos saringan kualitas (misal 10 atau 15 kandidat), jangan pernah membuang kandidat valid hanya karena kuota, dan jangan pula membuktikan semuanya sekaligus dalam satu tumpukan memori. Simpan seluruh kandidat valid di tabel [QUEUED] pada 05-raw-leads.md, lalu proses menggunakan Rolling Batch (Maksimal 5 Kandidat `[ACTIVE]` per Siklus `D -> E`) hingga antrean [QUEUED] dan [ACTIVE] Wilayah R_i habis (0).
-- Jangan pernah memindahkan fokus ke Wilayah R_{i+1} sebelum seluruh kandidat Wilayah R_i di 05-raw-leads.md ([QUEUED] == 0 dan [ACTIVE] == 0) selesai diadili ke wadah 06 / 07 / 08 / 09, serta setiap temuan di 09-confirmed-findings.md milik Wilayah R_i telah dilengkapi naskah laporan siap-kirimnya (STAGE-F) selagi ingatan kode Wilayah R_i masih 100% segar.
+- Jangan pernah memindahkan fokus ke Wilayah R_{i+1} sebelum seluruh kandidat Wilayah R_i di 05-raw-leads.md ([QUEUED] == 0 dan [ACTIVE] == 0) selesai diadili ke wadah 06 / 07 / 08 / 09, serta setiap temuan di 09-confirmed-findings.md milik Wilayah R_i telah dilengkapi naskah laporan siap-kirimnya (Tahap F) selagi ingatan kode Wilayah R_i masih 100% segar.
 - Prinsip ini berlaku baik saat Anda bekerja tahap demi tahap maupun saat berjalan secara otonom melalui `sc-autopilot`.
 
 ---
@@ -25,7 +25,7 @@ Audit dilarang dijalankan dengan cara memborong seluruh repositori sekaligus dal
 ## 2. Tujuh Hukum Kognitif Besi
 
 ### Hukum 1 — Cakupan 100% File Tanpa Jebakan *Code-First*
-Tidak boleh ada satu pun file kontrak dalam *scope* yang terlewat, tetapi Anda dilarang membedahnya secara buta tanpa peta. Setiap file dalam repositori wajib direkonsiliasi sejak STAGE-0 ke dalam 3 Tier pada path-map.md:
+Tidak boleh ada satu pun file kontrak dalam *scope* yang terlewat, tetapi Anda dilarang membedahnya secara buta tanpa peta. Setiap file dalam repositori wajib direkonsiliasi sejak Tahap 0 ke dalam 3 Tier pada path-map.md:
 - Tier 1 (Core Asset / Pipa Uang): Kontrak yang memegang, mencetak, membakar, mengunci, atau memindahkan aset.
 - Tier 2 (Valuation, Control & Latent Nerve): Kontrak penentu harga/kurs/oracle/share, modul likuidasi/dispute/lelang, pengatur otorisasi/governance/pause, kontrak bersaldo 0 dengan kapasitas masa depan, serta jembatan off-chain/relayer/signature.
 - Tier 3 (Isolated Peripheral): Interface murni, konstanta, atau library terisolasi yang wajib dibuktikan 1-pass tidak memiliki akses state/nilai sebelum dikunci ([LOCKED-TIER3]).
@@ -41,7 +41,7 @@ Kerugian fatal sering kali tidak terjadi di fungsi transfer utama, melainkan di 
 3. `[EDGE-CONTROL/LATENT]`: Jalur perubahan parameter, otorisasi, likuidasi, penyelesaian sengketa (*dispute*), *pause/emergency*, callback eksternal, hook, serta input dari sistem off-chain (relayer, keeper, merkle root, tanda tangan EIP-712, urutan transaksi/MEV).
 
 ### Hukum 4 — Disiplin Berburu Dua Gelombang (*Two-Wave Hunting Law*)
-Untuk mencegah kebutaan akibat terpaku pada daftar metode (*anchoring bias*) sekaligus mencegah dangkalnya analisis akibat melupakan katalog serangan, STAGE-C (L-HUNT) di setiap wilayah wajib dibagi menjadi dua gelombang yang terpisah tegas:
+Untuk mencegah kebutaan akibat terpaku pada daftar metode (*anchoring bias*) sekaligus mencegah dangkalnya analisis akibat melupakan katalog serangan, Tahap C (L-HUNT) di setiap wilayah wajib dibagi menjadi dua gelombang yang terpisah tegas:
 
 1. Gelombang 1 — *Blind Adversarial Hunt* (`C1`: Insting Murni & Pengisian Radar):
    - Di Gelombang 1 (C1), dilarang membuka file plugin metode/serangan.
@@ -55,11 +55,11 @@ Untuk mencegah kebutaan akibat terpaku pada daftar metode (*anchoring bias*) sek
 ### Hukum 5 — Saringan Kualitas Tanpa Plafon Mati & Sistem *Rolling Batch* (Maksimal 5 Lead Aktif per Batch D -> E)
 Kita menolak dua ekstrem yang sama-sama merusak: membuang bug asli karena batasan angka yang kaku, atau menimbun puluhan dugaan sampah sekaligus hingga memori agen terkompres saat pembuktian. Oleh karena itu berlaku dua aturan penyaringan dan antrean di `05-raw-leads.md`:
 1. Saringan Masuk Berbasis Kualitas Segitiga (Tanpa Plafon Total di Tabel `[QUEUED]`):
-   - Jalur yang sudah pasti tertahan penjaga kode di STAGE-C1/C2 langsung masuk ke `04-code-guarded.md`.
+   - Jalur yang sudah pasti tertahan penjaga kode di Tahap C langsung masuk ke `04-code-guarded.md`.
    - Berapa pun jumlah kandidat kerentanan di Wilayah R_i yang lolos saringan (baik 2, 8, maupun 15 kandidat), semuanya wajib dipertahankan di tabel `[QUEUED]` pada 05-raw-leads.md selama memenuhi 3 syarat kualitas: (a) tidak terbantahkan oleh fakta eksak di FACTS.md, (b) memiliki keterkaitan jelas dengan L-VALUE dan L-PATH, serta (c) telah dipasangkan dengan metode M-xxx dan bentuk serangan AF-xx yang spesifik.
 2. Kapasitas Slot Pembuktian Aktif (*Rolling Batch* Maksimal 5 Kandidat `[ACTIVE]` di `05-raw-leads.md`):
-   - Untuk menjaga kedalaman pembuktian 100% dan mencegah kompresi konteks di STAGE-D, blok `[ACTIVE-BATCH]` di 05-raw-leads.md hanya boleh menampung maksimal 5 kandidat `[ACTIVE]` dalam satu waktu (1 Batch), dipilih berdasarkan urutan EV tertinggi (§3).
-   - Jika Wilayah R_i memiliki 9 kandidat [QUEUED], tarik Batch 1 (5 kandidat EV tertinggi) menjadi [ACTIVE], buktikan secara tuntas di STAGE-D, dan adili di STAGE-E (pindahkan ke 06 / 07 / 08 / 09) hingga slot [ACTIVE] kembali bersih (0). Setelah itu, tarik Batch 2 (4 kandidat `[QUEUED]` sisanya) menjadi [ACTIVE] dan ulangi siklus D -> E sampai [QUEUED] == 0 dan [ACTIVE] == 0, baru lanjutkan ke STAGE-F.
+   - Untuk menjaga kedalaman pembuktian 100% dan mencegah kompresi konteks di Tahap D, blok `[ACTIVE-BATCH]` di 05-raw-leads.md hanya boleh menampung maksimal 5 kandidat `[ACTIVE]` dalam satu waktu (1 Batch), dipilih berdasarkan urutan EV tertinggi (§3).
+   - Jika Wilayah R_i memiliki 9 kandidat [QUEUED], tarik Batch 1 (5 kandidat EV tertinggi) menjadi [ACTIVE], buktikan secara tuntas di Tahap D, dan adili di Tahap E (pindahkan ke 06 / 07 / 08 / 09) hingga slot [ACTIVE] kembali bersih (0). Setelah itu, tarik Batch 2 (4 kandidat `[QUEUED]` sisanya) menjadi [ACTIVE] dan ulangi siklus D -> E sampai [QUEUED] == 0 dan [ACTIVE] == 0, baru lanjutkan ke Tahap F.
 
 ### Hukum 6 — Haram Mengompres Konteks & Catatan (*Zero-Compression Law*)
 Ingatan percakapan (*chat context window*) pasti akan terkompres, terpotong, atau memudar seiring panjangnya proses audit. Oleh karena itu:
@@ -70,12 +70,12 @@ Ingatan percakapan (*chat context window*) pasti akan terkompres, terpotong, ata
 - Di awal setiap tahap atau saat berpindah wilayah/batch, Anda wajib menyegarkan ingatan kerja dengan membaca ulang paket konteks dari disk (verify_segitiga.py --context-packet) dan memperbarui titik henti di STATE.md (*Write-Ahead Checkpoint*).
 ### Hukum 7 — Kejujuran Epistemik di Pengadilan Bukti (VERDICT ke Wadah 04 / 06 / 07 / 08 / 09)
 Jangan pernah memaksakan kandidat yang gagal dibuktikan menjadi temuan hanya karena Anda sudah menghabiskan waktu memeriksanya. Patuhi pemisahan wadah repositori berikut secara ketat:
-- `04-code-guarded.md`: Jalur/ide yang sejak penyempitan STAGE-C1/C2 terbukti sudah dijaga secara rapat oleh kode kontrak (require, batas state, invariant FACTS.md).
+- `04-code-guarded.md`: Jalur/ide yang sejak penyempitan Tahap C terbukti sudah dijaga secara rapat oleh kode kontrak (require, batas state, invariant FACTS.md).
 - `05-raw-leads.md`: Hanya untuk antrean kandidat [QUEUED] dan slot pembuktian [ACTIVE] (maksimal 5 per batch). Wajib bernilai 0 ([QUEUED] == 0 dan [ACTIVE] == 0) saat wilayah ditutup.
-- `06-refuted-invalid.md`: Kandidat dari 05-raw-leads.md yang patah saat uji pembuktian STAGE-D/E (beserta bukti eksak mengapa eksploitasi gagal).
+- `06-refuted-invalid.md`: Kandidat dari 05-raw-leads.md yang patah saat uji pembuktian Tahap D/E (beserta bukti eksak mengapa eksploitasi gagal).
 - `07-needs-next-step.md`: Kandidat yang logikanya kuat tetapi membutuhkan verifikasi langkah lanjut di luar jangkauan bukti saat ini (misal state on-chain live, parameter deployment eksternal, atau komponen off-chain tertutup).
 - `08-valid-not-eligible.md`: Perilaku/isu yang valid secara teknis atau merupakan risiko desain/kepercayaan, tetapi tidak memenuhi syarat kelayakan klaim (*out-of-scope*, *known issue*, atau di bawah ambang kebijakan program).
-- `09-confirmed-findings.md`: Temuan sahih yang lulus Bukti Segitiga penuh (Jejak Kode + PoC Eksekusi/Matematika Konkret + Delta Nilai/Invarian) dan siap dirakit menjadi laporan akhir di STAGE-F.
+- `09-confirmed-findings.md`: Temuan sahih yang lulus Bukti Segitiga penuh (Jejak Kode + PoC Eksekusi/Matematika Konkret + Delta Nilai/Invarian) dan siap dirakit menjadi laporan akhir di Tahap F.
 
 ---
 
@@ -101,8 +101,8 @@ Urutkan prioritas bedah dan pembuktian dari tingkat tertinggi ke terendah beriku
 ---
 
 ## 4. Pantangan Mutlak (*Forbidden Anti-Patterns*)
-1. Dilarang *Code-First* Tanpa Peta: Membuka kontrak dan langsung mencatat daftar kerentanan di 05-raw-leads.md sebelum menyelesaikan STAGE-0, STAGE-A (FACTS.md), dan STAGE-B (path-map.md) untuk wilayah tersebut.
+1. Dilarang *Code-First* Tanpa Peta: Membuka kontrak dan langsung mencatat daftar kerentanan di 05-raw-leads.md sebelum menyelesaikan Tahap 0, Tahap A (FACTS.md), dan Tahap B (path-map.md) untuk wilayah tersebut.
 2. Dilarang Membuang Kandidat Valid Karena Malas atau Membuktikan Lebih dari 5 Kandidat Sekaligus: Jangan membuang kandidat ke-6 yang valid, tetapi jangan pula menjejalkan > 5 kandidat [ACTIVE] sekaligus di 05-raw-leads.md. Gunakan tabel [QUEUED] di 05-raw-leads.md dan proses per batch (maksimal 5) sesuai urutan EV (§3).
 3. Dilarang Membaca Seluruh Bank Ilmu Sekaligus (*Reference Dumping*): Memuat puluhan file M-xxx atau AF-xx ke dalam memori tanpa menyaringnya terlebih dahulu lewat _ROUTER.md.
-4. Dilarang Menyeberang Wilayah Sebelum Wilayah Aktif Bersih: Membuka STAGE-A/STAGE-B/STAGE-C (C1/C2) untuk Wilayah R_{i+1} sementara Wilayah R_i masih menyisakan [QUEUED] > 0 atau [ACTIVE] > 0 di 05-raw-leads.md, atau belum menyelesaikan penulisan laporan STAGE-F di 09-confirmed-findings.md.
+4. Dilarang Menyeberang Wilayah Sebelum Wilayah Aktif Bersih: Membuka Tahap A/B/C untuk Wilayah R_{i+1} sementara Wilayah R_i masih menyisakan [QUEUED] > 0 atau [ACTIVE] > 0 di 05-raw-leads.md, atau belum menyelesaikan penulisan laporan Tahap F di 09-confirmed-findings.md.
 5. Dilarang Menulis Klaim Tanpa Baris Kode: Menyebut sebuah fungsi "rentan" atau "terjaga" tanpa menunjuk Path/File.ext:Lxx-Lyy dan ekspresi penjaganya secara eksak.

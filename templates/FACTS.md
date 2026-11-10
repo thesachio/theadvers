@@ -17,7 +17,7 @@
 
 ## 2. DAFTAR INVARIANT NILAI & AKUNTANSI PER WILAYAH
 
-*Setiap Wilayah R_i wajib mendefinisikan minimal satu invariant nilai terukur yang akan diuji kehancurannya pada STAGE-C dan STAGE-D.*
+*Setiap Wilayah R_i wajib mendefinisikan minimal satu invariant nilai terukur yang akan diuji kehancurannya pada Tahap C dan Tahap D.*
 
 | Invariant ID | Region (R_i) | Jangkar Kode Terkait (Path/File.ext:Lxx-Lyy) | Rumus / Pernyataan Invariant Eksak | Skenario Pemicu Kerusakan (*Break Condition*) |
 | :--- | :--- | :--- | :--- | :--- |

@@ -5,7 +5,7 @@ description: Eksekusi Perburuan Dua Gelombang pada Wilayah Aktif R_i — STAGE-C
 
 # Skill sc-c-hunt — Perburuan Dua Gelombang (STAGE-C1 & STAGE-C2 / L-HUNT)
 
-Anda menjalankan STAGE-C1/STAGE-C2 (`L-HUNT`) pada Wilayah Aktif R_i yang terbagi secara ketat menjadi Gelombang 1 (`STAGE-C1`) dan Gelombang 2 (`STAGE-C2`). Dilarang mencampur kedua gelombang ini.
+Anda menjalankan Tahap C (`L-HUNT`) pada Wilayah Aktif R_i yang terbagi secara ketat menjadi Gelombang 1 (`STAGE-C1`) dan Gelombang 2 (`STAGE-C2`). Dilarang mencampur kedua gelombang ini.
 
 ---
 
