@@ -26,7 +26,7 @@ ID               : FIND-001 (Eks LEAD-R1-01 | Region: R_1)
 Severity         : CRITICAL | HIGH | MEDIUM | LOW (Samakan dengan 09-confirmed-findings.md; Setara S1|S2|S3|S4)
 Impact           : theft | drain | grief | dos | freeze | fund-lock | insolvency | bad-debt | manipulation | privilege-escalation | desync
 Likelihood       : High | Medium | Low — [Siapa yang bisa memicu & butuh kondisi apa]
-Rujukan Severity : [Platform + URL, atau "Matriks Universal (verify/SEVERITY-RUBRIC.md Bagian 4)"]
+Rujukan Severity : [Platform + URL, atau "Matriks Universal (templates/SEVERITY-RUBRIC.md Bagian 4)"]
 Asumsi Severity  : [Jika platform lain dipakai, sebutkan perbedaan tier severity-nya secara jujur]
 Actor            : unprivileged | external | attacker | user | borrower | liquidator | keeper | relayer | solver | router | validator | oracle
 Victim           : sponsor | user | users | protocol | pool | vault | lp | lender | borrower | staker | solver | integrator | third-party

@@ -5,7 +5,7 @@ description: Eksekusi STAGE-0 (Global Partitioning & Rekonsiliasi 100% Berkas Su
 
 # Skill sc-a-scope — Global Partitioning (STAGE-0) & Region Value/Facts (STAGE-A)
 
-Anda menjalankan Tahap 0 (`L-PART`) (jika audit baru dimulai) dan Tahap A (`L-VALUE`) untuk Wilayah Aktif R_i. Patuhi seluruh hukum di SOUL.md, AGENTS.md, dan methodology/METHODOLOGY-SEGITIGA.md.
+Anda menjalankan STAGE-0 (`L-PART`) (jika audit baru dimulai) dan STAGE-A (`L-VALUE`) untuk Wilayah Aktif R_i. Patuhi seluruh hukum di SOUL.md, AGENTS.md, dan methodology/METHODOLOGY-SEGITIGA.md.
 
 ---
 

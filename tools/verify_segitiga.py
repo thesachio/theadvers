@@ -105,6 +105,13 @@ TANGGA_RX = re.compile(r"TANGGA_BUKTI\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Za-z\-
 CYCLE_RX = re.compile(r"CYCLE\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Za-z0-9_]+)`?")
 CMD_RX = re.compile(r"^\s*\$\s+\S+")
 FENCE_RX = re.compile(r"^\s*```")
+# Status baris antrean 05 yang sah setelah STAGE-E memindahkan lead ke wadah
+LEAD_STATUS_MOVED = (
+    "[MOVED-TO-06]", "[MOVED-TO-07]", "[MOVED-TO-08]", "[MOVED-TO-09]",
+    "[MOVED-06]", "[MOVED-07]", "[MOVED-08]", "[MOVED-09]",
+)
+LEAD_STATUS_OPEN = ("[QUEUED]", "[ACTIVE]")
+LEAD_STATUS_RX = re.compile(r"\[(?:QUEUED|ACTIVE|MOVED(?:-TO)?-0[6-9])\]")
 
 PLUGIN_SPECS = [
     {
@@ -838,6 +845,32 @@ def validate_lead_traceability(leads_text: str, wadah_texts: Dict[str, str]) -> 
     return errors
 
 
+def validate_lead_status(raw_leads_text: str) -> List[str]:
+    """Status baris antrean 05 wajib salah satu: [QUEUED], [ACTIVE], [MOVED-TO-06..09]."""
+    errors: List[str] = []
+    in_tbl = False
+    for line in raw_leads_text.splitlines():
+        s = line.strip()
+        if s.startswith("| Lead ID"):
+            in_tbl = True
+            continue
+        if in_tbl:
+            if not s.startswith("|"):
+                in_tbl = False
+                continue
+            if ":---" in s or "[Path/File" in s or "[Jelaskan" in s:
+                continue
+            cols = [c.strip().strip("`") for c in s.strip("|").split("|")]
+            if len(cols) >= 10 and LEAD_STATUS_RX.search(cols[0]) is None:
+                status = cols[-1]
+                if not any(st in status for st in LEAD_STATUS_OPEN + LEAD_STATUS_MOVED):
+                    errors.append(
+                        f"[05 STATUS] Lead {cols[0]} memakai status tidak sah: '{status}' "
+                        f"(sah: [QUEUED], [ACTIVE], atau [MOVED-TO-06..09])."
+                    )
+    return errors
+
+
 def validate_wadah_rules(audit_dir: Path) -> List[str]:
     """Jalankan seluruh aturan 06/07/08/09 + jejak lead."""
     errors: List[str] = []
@@ -850,6 +883,7 @@ def validate_wadah_rules(audit_dir: Path) -> List[str]:
     errors.extend(validate_eight(texts["08-valid-not-eligible.md"]))
     errors.extend(validate_nine(texts["09-confirmed-findings.md"]))
     leads_text = (audit_dir / "05-raw-leads.md").read_text(encoding="utf-8") if (audit_dir / "05-raw-leads.md").exists() else ""
+    errors.extend(validate_lead_status(leads_text))
     errors.extend(validate_lead_traceability(leads_text, texts))
     return errors
 

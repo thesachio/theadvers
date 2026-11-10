@@ -5,7 +5,7 @@ description: Eksekusi STAGE-D (Pembuktian Tiga Titik Segitiga dengan Sistem Roll
 
 # Skill sc-d-prove — Pembuktian Segitiga Rolling Batch (STAGE-D / L-PROVE)
 
-Anda menjalankan Tahap D (`L-PROVE`) untuk Wilayah Aktif R_i menggunakan mekanisme Rolling Batch (Maksimal 5 Kandidat `[ACTIVE]` sekaligus di `05-raw-leads.md`) agar kedalaman pembuktian mencapai 100% tanpa kompresi konteks.
+Anda menjalankan STAGE-D (`L-PROVE`) untuk Wilayah Aktif R_i menggunakan mekanisme Rolling Batch (Maksimal 5 Kandidat `[ACTIVE]` sekaligus di `05-raw-leads.md`) agar kedalaman pembuktian mencapai 100% tanpa kompresi konteks.
 
 ---
 
@@ -41,7 +41,7 @@ Untuk masing-masing kandidat [ACTIVE] di meja operasi (maksimal 5 kandidat):
 
 ---
 
-## 3. Verifikasi Gate D & Transisi ke Tahap E
+## 3. Verifikasi Gate D & Transisi ke STAGE-E
 
 1. Pastikan seluruh kartu [ACTIVE] di 05-raw-leads.md bebas dari token kompresi terlarang (..., dll., dst., etc., rest of logic).
 2. Jalankan gerbang verifikasi:

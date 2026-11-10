@@ -1,10 +1,10 @@
 # 09 — Confirmed Findings (Bounty-Ready / Live Production Only)
 
 > **Penerapan Segitiga & Wadah Kasus (`cases/<ID>/`)**:
-> 1. Wadah murni untuk temuan berstatus `VALID_ELIGIBLE` yang lolos **kesebelas** Pernyataan di `verify/VERDICT.md`, terbukti lewat eksekusi simulasi PoC tanpa curang (`POC_STATUS: PASS`), membuktikan bahaya finansial nyata (`CRITICAL` / `HIGH` / `MEDIUM`, atau `LOW` dengan pemicu *permissionless*), **DAN** terbukti eksis pada bytecode/kontrak produksi aktif (`DEPLOYMENT_MATCH: LIVE_MATCH`).
-> 2. **Gerbang Pemisahan `09` (LIVE) vs `08` (HEAD-ONLY / PRE-LIVE) di Tahap F**:
+> 1. Wadah murni untuk temuan berstatus `VALID_ELIGIBLE` yang lolos **Sepuluh Pernyataan Keras (§8) + Integritas #11 (§9)** di `templates/VERDICT.md`, terbukti lewat eksekusi simulasi PoC tanpa curang (`POC_STATUS: PASS`), membuktikan bahaya finansial nyata (`CRITICAL` / `HIGH` / `MEDIUM`, atau `LOW` dengan pemicu *permissionless*), **DAN** terbukti eksis pada bytecode/kontrak produksi aktif (`DEPLOYMENT_MATCH: LIVE_MATCH`).
+> 2. **Gerbang Pemisahan `09` (LIVE) vs `08` (HEAD-ONLY / PRE-LIVE) di STAGE-F**:
 >    - **Masuk ke `09` ini**: PoC `[PASS]` pada state produksi nyata (`Mode Uji: FORK_LIVE`, atau `FORK_DEPLOYED_HEAD` yang entrypoint-nya terverifikasi eksis & berperilaku identik pada objek live melalui `deploy_parity.py` -> `LIVE_MATCH`).
->    - **Pindahkan ke `08-valid-not-eligible.md`** (`LOW_CLASS: PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`): Apabila PoC terbukti `[PASS]` di atas kode repositori (`FORK_DEPLOYED_HEAD` / `LOKAL`), namun pada Rekonsiliasi Langkah 0 Tahap F terbukti bahwa kontrak/fungsi tersebut belum di-deploy ke mainnet (`HEAD-only` / `P1_PRE_DEPLOY`) atau belum masuk daftar alamat bounty aktif (`[REPO_STAGED]`).
+>    - **Pindahkan ke `08-valid-not-eligible.md`** (`LOW_CLASS: PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN)`): Apabila PoC terbukti `[PASS]` di atas kode repositori (`FORK_DEPLOYED_HEAD` / `LOKAL`), namun pada Rekonsiliasi Langkah 0 STAGE-F terbukti bahwa kontrak/fungsi tersebut belum di-deploy ke mainnet (`HEAD-only` / `P1_PRE_DEPLOY`) atau belum masuk daftar alamat bounty aktif (`[REPO_STAGED]`).
 > 3. **Pemisahan Indeks `09` dan Wadah Kasus `cases/<ID>/`**:
 >    - Berkas `09-confirmed-findings.md` ini menyimpan **Tabel Indeks** dan **Blok Metadata + Tiga Titik Bukti Segitiga** untuk setiap temuan `VALID_ELIGIBLE`.
 >    - Seluruh detail naratif 9-bagian, paket PoC berkontrol positif, dan naskah komunikasi/pengantar disimpan di dalam satu folder per temuan pada **`cases/<ID>/`** yang wajib berisi 3 berkas:
@@ -33,8 +33,8 @@
 - **ID**: `FIND-001`
 - **Asal Lead & Provenance**: `LEAD-R1-01 | [LAPIS: VALUE|PATH|FLOW] | [CLASS-A|B|C] | [AF-xx]`
 - **Region & EV Rank**: `R_1 | [P1..P5]`
-- **SEVERITY**: `[CRITICAL | HIGH | MEDIUM | LOW]` *(dari IMPACT sesuai `verify/SEVERITY-RUBRIC.md`, bukan dari siklus deploy)*
-- **Rujukan Severity**: `[Platform + URL atau Matriks Universal (verify/SEVERITY-RUBRIC.md Bagian 4)]`
+- **SEVERITY**: `[CRITICAL | HIGH | MEDIUM | LOW]` *(dari IMPACT sesuai `templates/SEVERITY-RUBRIC.md`, bukan dari siklus deploy)*
+- **Rujukan Severity**: `[Platform + URL atau Matriks Universal (templates/SEVERITY-RUBRIC.md Bagian 4)]`
 - **VERDICT**: `VALID_ELIGIBLE`
 - **TARGET_FILE**: `09-confirmed-findings.md`
 - **TANGGA_BUKTI**: `[A | B]` *(`A-HEAD` dilarang di `09`)*

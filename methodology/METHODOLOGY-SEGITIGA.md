@@ -13,14 +13,14 @@ Seluruh proses audit hanya menggunakan berkas kerja kanonik berikut:
 2. `FACTS.md`: Bank fakta verbatim (Path/File.ext:Lxx-Lyy) beserta kolom Prerequisite Inversion Hint (cara mematahkan prasyarat di Gelombang 2).
 3. `RADAR.md`: Radar sinyal lintas-kontrak/lintas-modul dengan tag wajib `[TOUCHES: KontrakAtauModul.variabelAtauFungsi]`.
 4. `path-map.md`: Tabel Rekonsiliasi 100% File Kode Sumber dalam *Scope* (Tier 1/2/3), pembagian Wilayah Uang (R_1 .. R_N), tabel kapasitas nilai (Current Balance + Intended Capacity), dan peta 3-Edge ([EDGE-ASSET], [EDGE-VALUATION], [EDGE-CONTROL/LATENT]).
-5. `04-code-guarded.md`: Wadah jalur/hipotesis yang gugur di Tahap C (C1/C2) karena sudah dijaga rapat oleh kode (require, assert!, ensure!, modifier, pengecekan *signer/account constraint*, batas state, atau fakta di FACTS.md).
+5. `04-code-guarded.md`: Wadah jalur/hipotesis yang gugur di STAGE-C1/STAGE-C2 karena sudah dijaga rapat oleh kode (require, assert!, ensure!, modifier, pengecekan *signer/account constraint*, batas state, atau fakta di FACTS.md).
 6. `05-raw-leads.md`: Wadah kerja Wilayah Aktif R_i yang terbagi menjadi:
-   - Tabel `[QUEUED]`: Menampung seluruh kandidat kuat hasil saringan Tahap C tanpa batas plafon jumlah, diurutkan menurut Prioritas EV (`SOUL.md §3`).
+   - Tabel `[QUEUED]`: Menampung seluruh kandidat kuat hasil saringan STAGE-C2 tanpa batas plafon jumlah, diurutkan menurut Prioritas EV (`SOUL.md §3`).
    - Blok `[ACTIVE-BATCH]`: Menampung maksimal 5 kandidat `[ACTIVE]` yang ditarik dari [QUEUED] untuk dibuktikan dan diadili dalam satu putaran Batch D -> E.
-7. `06-refuted-invalid.md`: Wadah kandidat dari 05-raw-leads.md yang patah/terbantahkan saat pembuktian Tahap D/E beserta bukti eksak penyebab kegagalannya.
+7. `06-refuted-invalid.md`: Wadah kandidat dari 05-raw-leads.md yang patah/terbantahkan saat pembuktian STAGE-D/E beserta bukti eksak penyebab kegagalannya.
 8. `07-needs-next-step.md`: Wadah kandidat yang logikanya belum patah tetapi membutuhkan verifikasi lanjutan (state on-chain live, parameter deployment eksternal, atau komponen off-chain tertutup).
 9. `08-valid-not-eligible.md`: Wadah perilaku/risiko yang secara teknis valid tetapi tidak memenuhi syarat kelayakan klaim (*out-of-scope*, *known issue*, asumsi kepercayaan admin resmi, atau di bawah ambang kebijakan).
-10. `09-confirmed-findings.md`: Wadah temuan sahih yang lulus Bukti Segitiga penuh di Tahap E, dan langsung dilengkapi naskah Submission-Ready Disclosure pada Tahap F di akhir setiap wilayah.
+10. `09-confirmed-findings.md`: Wadah temuan sahih yang lulus Bukti Segitiga penuh di STAGE-E, dan langsung dilengkapi naskah Submission-Ready Disclosure pada STAGE-F di akhir setiap wilayah.
 
 ---
 
@@ -29,7 +29,7 @@ Seluruh proses audit hanya menggunakan berkas kerja kanonik berikut:
 Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secara otomatis oleh verify_segitiga.py --context-packet.
 
 <!-- @SLICE:STAGE-0:START -->
-### TAHAP 0 — Global Partitioning & Rekonsiliasi 100% Berkas Sumber (STAGE-0)
+### STAGE-0 — Global Partitioning & Rekonsiliasi 100% Berkas Sumber
 - Tujuan: Mencegah ada satu pun berkas kode sumber dalam *scope* (baik kontrak on-chain, modul runtime, sirkuit, maupun komponen off-chain) yang terlewat, sekaligus mencegah agen membedah seluruh repositori secara acak (*code-first*).
 - Input Wajib: Daftar seluruh berkas kode sumber dalam *scope* proyek target pada bahasa apa pun (.sol, .vy, .rs, .move, .cairo, .go, .ts, .py, .circom, .nr, .fc, dll.).
 - Prosedur Eksekusi:
@@ -49,7 +49,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
 ---
 
 <!-- @SLICE:STAGE-A:START -->
-### TAHAP A — Region Value & Verbatim Facts (STAGE-A pada Wilayah Aktif R_i)
+### STAGE-A — Region Value & Verbatim Facts
 
 - Tujuan: Mengunci peta nilai (L-VALUE) dan fakta aturan teknis verbatim (FACTS.md) khusus untuk kontrak/modul di Wilayah Aktif R_i.
 - Input Wajib: Daftar berkas Wilayah R_i dari STATE.md / path-map.md.
@@ -70,7 +70,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
 ---
 
 <!-- @SLICE:STAGE-B:START -->
-### TAHAP B — Region Path & 3-Edge Mapping (STAGE-B pada Wilayah Aktif R_i)
+### STAGE-B — Region Path & 3-Edge Mapping
 - Tujuan: Memetakan seluruh jalur masuk, perpindahan, dan titik potong fungsi/instruksi di Wilayah R_i (L-PATH) sebelum berburu celah.
 - Input Wajib: Kode sumber Wilayah R_i dan entri L-VALUE / FACTS.md Wilayah R_i.
 - Prosedur Eksekusi:
@@ -86,7 +86,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
 ---
 
 <!-- @SLICE:STAGE-C1:START -->
-### TAHAP C1 — Gelombang 1: Blind Adversarial Hunt & Pengisian Radar (STAGE-C1 pada Wilayah Aktif R_i)
+### STAGE-C1 — Gelombang 1: Blind Adversarial Hunt & Pengisian Radar
 
 - Tujuan: Menemukan anomali murni berdasarkan insting adversarial pada L-VALUE dan L-PATH Wilayah R_i tanpa bias katalog metode, sekaligus memanen sinyal lintas-kontrak/lintas-modul ke RADAR.md.
 - Aturan Besi `STAGE-C1`: DILARANG KERAS membuka _ROUTER.md atau membaca file plugin M-xxx, AF-xx, DOM-xx, POV-xx, maupun CHAIN-xx pada tahap ini.
@@ -103,7 +103,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
 ---
 
 <!-- @SLICE:STAGE-C2:START -->
-### TAHAP C2 — Gelombang 2: Cross-Pollination, Lazy-Load _ROUTER.md, & Antrean [QUEUED] (STAGE-C2 pada Wilayah Aktif R_i)
+### STAGE-C2 — Gelombang 2: Cross-Pollination, Lazy-Load _ROUTER.md, & Antrean [QUEUED]
 - Tujuan: Mempertajam perburuan di Wilayah R_i dengan mengadu observasi Gelombang 1 terhadap Inversi FACTS.md, Rantai RADAR.md, dan Bank Ilmu (_ROUTER.md), lalu menyusun antrean kandidat berkualitas ([QUEUED]) berdasarkan urutan EV (SOUL.md §3).
 - Input Konteks Otomatis (`--context-packet`): Fakta Wilayah R_i dari FACTS.md, sinyal [TOUCHES: ...] yang beririsan dari RADAR.md, dan tabel indeks _ROUTER.md.
 - Prosedur Eksekusi:
@@ -125,7 +125,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
 ---
 
 <!-- @SLICE:STAGE-D:START -->
-### TAHAP D — Prove: Pembuktian Segitiga per Rolling Batch Maksimal 5 Kandidat (STAGE-D pada Wilayah Aktif R_i)
+### STAGE-D — Prove: Pembuktian Segitiga per Rolling Batch Maksimal 5 Kandidat
 - Tujuan: Membuktikan kandidat secara mendalam tanpa membuat memori agen penuh/terkompres.
 - Aturan Kapasitas Batch (`Rolling Batch <= 5`):
   - Tarik maksimal 5 kandidat `[QUEUED]` dengan EV tertinggi dari tabel antrean Wilayah R_i ke dalam blok `[ACTIVE-BATCH]` di 05-raw-leads.md, dan ubah statusnya menjadi `[ACTIVE]`.
@@ -144,18 +144,18 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
 ---
 
 <!-- @SLICE:STAGE-E:START -->
-### TAHAP E — Verdict: Pengadilan Bukti Batch Aktif (STAGE-E pada Wilayah Aktif R_i)
+### STAGE-E — Verdict: Pengadilan Bukti Batch Aktif
 
 - Tujuan: Mengadili seluruh kandidat [ACTIVE] pada batch saat ini menggunakan standar templates/VERDICT.md dan mengosongkan kembali meja operasi 05-raw-leads.md.
 - Prosedur Eksekusi:
-  1. Evaluasi bukti Tahap D untuk setiap kandidat [ACTIVE] dan pindahkan kandidat tersebut dari 05-raw-leads.md ke salah satu dari 4 wadah keputusan akhir:
+  1. Evaluasi bukti STAGE-D untuk setiap kandidat [ACTIVE] dan pindahkan kandidat tersebut dari 05-raw-leads.md ke salah satu dari 4 wadah keputusan akhir:
      - `06-refuted-invalid.md`: Jika PoC gagal, perhitungan membuktikan tidak ada keuntungan/kerugian, atau tertahan oleh penjaga kode yang baru terlihat saat eksekusi. Wajib catat alasan teknis dan baris kode (Path/File.ext:Lxx-Lyy) yang menggagalkannya.
      - `07-needs-next-step.md`: Jika logika serangan solid tetapi membutuhkan verifikasi tambahan di luar kode lokal (misal state on-chain live atau konfigurasi relayer eksternal).
      - `08-valid-not-eligible.md`: Jika perilaku/risiko benar terjadi tetapi tidak memenuhi syarat kelayakan program (*out-of-scope*, *known issue*, asumsi admin terpercaya).
      - `09-confirmed-findings.md`: Jika dan hanya jika ketiga titik Bukti Segitiga terbukti utuh tanpa asumsi palsu.
   2. Setelah seluruh kandidat batch ini dipindahkan ([ACTIVE] == 0), periksa tabel `[QUEUED]` Wilayah R_i di 05-raw-leads.md:
-     - Jika masih ada `[QUEUED] > 0`: Kembali ke Tahap D (`STAGE-D`), tarik batch berikutnya (maksimal 5 kandidat [QUEUED] dengan EV tertinggi menjadi [ACTIVE]), dan ulangi siklus D -> E.
-     - Jika `[ACTIVE] == 0` DAN `[QUEUED] == 0`: Lanjutkan ke Tahap F (`STAGE-F`).
+     - Jika masih ada `[QUEUED] > 0`: Kembali ke STAGE-D (`STAGE-D`), tarik batch berikutnya (maksimal 5 kandidat [QUEUED] dengan EV tertinggi menjadi [ACTIVE]), dan ulangi siklus D -> E.
+     - Jika `[ACTIVE] == 0` DAN `[QUEUED] == 0`: Lanjutkan ke STAGE-F (`STAGE-F`).
 - Syarat Lulus Gate (`python3 tools/verify_segitiga.py --gate E <audit-dir>`):
   - Jumlah kandidat berstatus [ACTIVE] di 05-raw-leads.md == `0`.
   - Setiap kandidat yang keluar dari 05-raw-leads.md telah tercatat secara verbatim di 06-refuted-invalid.md, 07-needs-next-step.md, 08-valid-not-eligible.md, atau 09-confirmed-findings.md.
@@ -164,7 +164,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
 ---
 
 <!-- @SLICE:STAGE-F:START -->
-### TAHAP F — Incremental Disclosure & Penutupan Wilayah (STAGE-F pada Wilayah Aktif R_i)
+### STAGE-F — Incremental Disclosure & Penutupan Wilayah
 - Tujuan: Menulis naskah laporan siap-kirim (*Submission-Ready Report*) untuk setiap temuan Wilayah R_i di 09-confirmed-findings.md selagi konteks kode dan PoC Wilayah R_i masih 100% segar di memori, lalu menutup Wilayah R_i.
 - Prosedur Eksekusi:
   1. Pastikan untuk Wilayah R_i di 05-raw-leads.md: `[ACTIVE] == 0` dan `[QUEUED] == 0`.
@@ -179,7 +179,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
          python3 tools/verify_segitiga.py --close-region <R_i> <audit-dir>
 
   4. Ubah status Wilayah R_i di STATE.md menjadi `[CLOSED]`.
-  5. Lakukan Hard Context Flush: lepaskan beban ingatan internal Wilayah R_i, ambil Wilayah [OPEN] berikutnya (R_{i+1}) di STATE.md, ubah menjadi [ACTIVE], dan mulai kembali dari Tahap A (`STAGE-A`).
+  5. Lakukan Hard Context Flush: lepaskan beban ingatan internal Wilayah R_i, ambil Wilayah [OPEN] berikutnya (R_{i+1}) di STATE.md, ubah menjadi [ACTIVE], dan mulai kembali dari STAGE-A (`STAGE-A`).
 - Syarat Lulus Gate (`python3 tools/verify_segitiga.py --close-region <R_i> <audit-dir>`):
   - Wilayah R_i tidak menyisakan kandidat [QUEUED] maupun [ACTIVE] di 05-raw-leads.md.
   - Seluruh entri Wilayah R_i di 09-confirmed-findings.md telah memiliki blok *Submission-Ready Disclosure* lengkap tanpa token kompresi.
@@ -196,7 +196,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
   2. Periksa apakah ada sinyal [TOUCHES: ...] yang baru ditemukan pada wilayah-wilayah akhir (R_N) yang memengaruhi state atau mematahkan invariant di wilayah-wilayah awal (R_1).
   3. Jika ditemukan kombinasi lintas-wilayah baru yang belum pernah diuji:
      - Masukkan ke 05-raw-leads.md dengan label wilayah CROSS-REGION,
-     - Jalankan siklus Tahap D -> Tahap E -> Tahap F (maksimal 5 kandidat per batch) hingga kembali bersih (0).
+     - Jalankan siklus STAGE-D -> STAGE-E -> STAGE-F (maksimal 5 kandidat per batch) hingga kembali bersih (0).
   4. Jalankan verifikasi final seluruh repositori audit:
 
          python3 tools/verify_segitiga.py --final <audit-dir>
@@ -220,10 +220,10 @@ Agar penambahan metode baru (misal M-011) atau bentuk serangan baru (misal AF-11
 
        # [ID-PLUGIN] Nama Metode / Bentuk Serangan / Domain / POV / Chain
        - Classes: [Daftar kelas masalah atau domain]
-       - Trigger Symptom: [Gejala kode spesifik kapan file ini wajib di-load pada Tahap C2/D]
+       - Trigger Symptom: [Gejala kode spesifik kapan file ini wajib di-load pada STAGE-C2/D]
        - Paired Items: [ID pasangan plugin yang direkomendasikan]
 
 3. Alur Kerja Sinkronisasi (`--sync`):
    - Tambahkan atau revisi 1 file plugin di foldernya.
    - Jalankan python3 tools/verify_segitiga.py --sync.
-   - Skrip otomatis memperbarui tabel _ROUTER.md terkait dan langsung terbaca oleh --context-packet pada Tahap C2 dan Tahap D.
+   - Skrip otomatis memperbarui tabel _ROUTER.md terkait dan langsung terbaca oleh --context-packet pada STAGE-C2 dan STAGE-D.

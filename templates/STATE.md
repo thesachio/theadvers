@@ -37,13 +37,13 @@
 
 | Wadah Kanonik | Jumlah Entri Total Lintas-Wilayah | Keterangan Status |
 | :--- | :--- | :--- |
-| `04-code-guarded.md` | 0 | Jalur/hipotesis yang terbukti sudah dijaga rapat oleh kode pada Tahap C |
+| `04-code-guarded.md` | 0 | Jalur/hipotesis yang terbukti sudah dijaga rapat oleh kode pada STAGE-C1/C2 |
 | `05-raw-leads.md` (`[QUEUED]`) | 0 | Antrean kandidat lolos Segitiga di wilayah aktif (wajib 0 saat wilayah ditutup) |
-| `05-raw-leads.md` (`[ACTIVE]`) | 0 | Meja operasi pembuktian batch aktif (maksimal 5 per batch, wajib 0 usai Tahap E) |
-| `06-refuted-invalid.md` | 0 | Kandidat yang patah/gugur saat pembuktian Tahap D/E |
+| `05-raw-leads.md` (`[ACTIVE]`) | 0 | Meja operasi pembuktian batch aktif (maksimal 5 per batch, wajib 0 usai STAGE-E) |
+| `06-refuted-invalid.md` | 0 | Kandidat yang patah/gugur saat pembuktian STAGE-D/E |
 | `07-needs-next-step.md` | 0 | Kandidat yang membutuhkan verifikasi state live / komponen eksternal |
 | `08-valid-not-eligible.md` | 0 | Perilaku valid teknis tetapi di luar kelayakan klaim (*out-of-scope / known / admin*) |
-| `09-confirmed-findings.md` | 0 | Temuan sahih lulus Bukti Segitiga + dilengkapi *Submission-Ready Report* di Tahap F |
+| `09-confirmed-findings.md` | 0 | Temuan sahih lulus Bukti Segitiga + dilengkapi *Submission-Ready Report* di STAGE-F |
 
 ---
 

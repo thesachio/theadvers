@@ -5,7 +5,7 @@ description: Eksekusi STAGE-E (Pengadilan Bukti Batch Aktif berdasarkan template
 
 # Skill sc-e-verdict — Pengadilan Bukti Batch Aktif & Kontrol Rolling Batch (STAGE-E / L-VERDICT)
 
-Anda menjalankan Tahap E (`L-VERDICT`) untuk mengadili seluruh kandidat [ACTIVE] pada batch saat ini di Wilayah Aktif R_i menggunakan hukum acara di templates/VERDICT.md.
+Anda menjalankan STAGE-E (`L-VERDICT`) untuk mengadili seluruh kandidat [ACTIVE] pada batch saat ini di Wilayah Aktif R_i menggunakan hukum acara di templates/VERDICT.md.
 
 ---
 
@@ -62,6 +62,6 @@ Setelah seluruh kandidat batch ini dipindahkan:
 
 2. Hitung sisa kandidat berstatus `[QUEUED]` untuk Wilayah Aktif R_i di Bagian 2 05-raw-leads.md:
    - CABANG 1 — Jika masih ada `[QUEUED] > 0` untuk Wilayah `R_i`:
-     Jangan pindah ke Tahap F! Perbarui STATE.md (Current Stage: STAGE-D, naikkan Current Batch +1, perbarui Queued Leads Count, set Active Leads Count: 0), lalu kembali jalankan `sc-d-prove` untuk menarik batch berikutnya (maksimal 5 kandidat [QUEUED]).
+     Jangan pindah ke STAGE-F! Perbarui STATE.md (Current Stage: STAGE-D, naikkan Current Batch +1, perbarui Queued Leads Count, set Active Leads Count: 0), lalu kembali jalankan `sc-d-prove` untuk menarik batch berikutnya (maksimal 5 kandidat [QUEUED]).
    - CABANG 2 — Jika `[ACTIVE] == 0` DAN `[QUEUED] == 0` untuk Wilayah `R_i`:
      Seluruh kandidat di Wilayah R_i telah tuntas diadili. Perbarui STATE.md (Current Stage: STAGE-F, Queued Leads Count: 0, Active Leads Count: 0, Last Passed Gate: GATE-E), lalu lanjutkan ke `sc-f-report`.

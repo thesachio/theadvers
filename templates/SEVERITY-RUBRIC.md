@@ -7,8 +7,8 @@
 > Severity ditentukan oleh **IMPACT**, bukan oleh siklus deployment.
 
 > **Berlaku untuk seluruh audit, semua project.**
-> Lokasi: `verify/SEVERITY-RUBRIC.md` — **satu folder dengan `VERDICT.md`**, dirujuk oleh
-> `VERDICT.md` Langkah 0.3b. Hakim Tahap F memuat berkas ini, bukan menebak.
+> Lokasi kanonik: `templates/SEVERITY-RUBRIC.md` — **satu folder dengan `VERDICT.md` v2**, dirujuk oleh
+> `templates/VERDICT.md` §7 dan oleh `cases/<ID>/laporan-teknis.md`. Penentu `SEVERITY` di `STAGE-E` memuat berkas ini, bukan menebak.
 > Terakhir diverifikasi: 2026-11-05 dari dokumentasi resmi masing-masing platform.
 
 ---

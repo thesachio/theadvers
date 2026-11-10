@@ -41,7 +41,7 @@
 - LOW_CLASS: [PRE_LIVE_SCOPE (HEAD_ONLY_PROVEN) | ADMIN_ONLY | LOW_NUISANCE]
 - TARGET_FILE: 08-valid-not-eligible.md
 - SEVERITY: [CRITICAL | HIGH | MEDIUM | LOW] *(dari IMPACT sesuai rubrik severity)*
-- Rujukan Severity: [Platform + URL, atau Matriks Universal `verify/SEVERITY-RUBRIC.md`]
+- Rujukan Severity: [Platform + URL, atau Matriks Universal `templates/SEVERITY-RUBRIC.md`]
 - POC_STATUS: PASS
 - TANGGA_BUKTI: [A-HEAD | B] *(A yang sudah `LIVE_MATCH` seharusnya masuk `09`)*
 - DEPLOYMENT_MATCH: [HEAD-only (PROVEN_ON_REPO_HEAD) | UNVERIFIED (<sumber yang gagal>)]

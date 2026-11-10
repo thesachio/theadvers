@@ -19,7 +19,7 @@ Untuk kelas `REJECTED_POC_FAILS`, `REJECTED_NEGATIVE_EV`, dan `REJECTED_DUST`, e
 
 Entri tanpa log eksekusi test dan fuzz di atas adalah pelanggaran **PAPER_REFUTATION_DETECTED** → laporan DITOLAK di STAGE-F dan lead dikembalikan ke `STAGE-D`.
 
-**Empat Kemustahilan Statis Sempit** — satu-satunya kondisi yang boleh gugur **tanpa** kode test (`verify/VERDICT.md` §4):
+**Empat Kemustahilan Statis Sempit** — satu-satunya kondisi yang boleh gugur **tanpa** kode test (`templates/VERDICT.md` §4):
 
 | # | Kelas | Syarat (semua harus terpenuhi) |
 | :--- | :--- | :--- |
