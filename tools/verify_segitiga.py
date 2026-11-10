@@ -1024,7 +1024,7 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
             print(f"  * {r['id']} ({r['ev']}) [{marker}] : {r['name']} | Berkas: {r['files']}")
 
     print("\n" + "=" * 88)
-    print(f"ATURAN WAJIB TAHAP AKTIF ({current_stage}) DARI METHODOLOGY-SEGITIGA.md")
+    print(f"ATURAN WAJIB STAGE AKTIF ({current_stage}) DARI METHODOLOGY-SEGITIGA.md")
     print("=" * 88)
     print(extract_methodology_slice(current_stage))
 
@@ -1055,7 +1055,7 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
     if current_stage.upper() == "STAGE-C1":
         print("\n" + "!" * 88)
         print("PERINGATAN KERAS STAGE-C1 (BLIND ADVERSARIAL HUNT):")
-        print("DILARANG MEMBUKA _ROUTER.md ATAU MEMBACA FILE PLUGIN M-xxx / AF-xx PADA TAHAP INI!")
+        print("DILARANG MEMBUKA _ROUTER.md ATAU MEMBACA FILE PLUGIN M-xxx / AF-xx PADA STAGE INI!")
         print("Gunakan murni L-VALUE dan L-PATH Wilayah Aktif serta catat sinyal [TOUCHES: ...] ke RADAR.md.")
         print("!" * 88)
 
@@ -1124,7 +1124,7 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
 
 
 # ============================================================================
-# 4. PENEGAK GERBANG TAHAP (--gate 0|A|B|C1|C2|D|E, --close-region, --final)
+# 4. PENEGAK GERBANG STAGE (--gate 0|A|B|C1|C2|D|E, --close-region, --final)
 # ============================================================================
 
 def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = None) -> int:
@@ -1327,7 +1327,7 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
         if not gate_passed_before("GATE-D", state_text):
             errors.append(
                 "[GATE-E] Prasyarat GATE-D belum tercatat PASS di STATE.md (field 'Last Passed Gate'). "
-                "Tahap E tidak boleh disahkan bila Tahap D belum pernah dijalankan."
+                "STAGE-E tidak boleh disahkan bila STAGE-D belum pernah dijalankan."
             )
         q_rows, active_cards = parse_leads_table_and_cards(
             raw_leads_text, None if active_region in ("NONE", "CROSS-REGION") else active_region
@@ -1441,7 +1441,7 @@ def main() -> int:
     parser.add_argument("--sync", action="store_true", help="Sinkronkan seluruh _ROUTER.md dan instal skill ke profil Hermes.")
     parser.add_argument("--context-packet", action="store_true", help="Cetak paket pemulihan konteks segar dari disk & @SLICE.")
     parser.add_argument("--gate", type=str, help="Validasi gerbang tahap: 0, A, B, C1, C2, D, atau E.")
-    parser.add_argument("--close-region", type=str, metavar="R_i", help="Validasi penutupan Wilayah R_i (usai Tahap F).")
+    parser.add_argument("--close-region", type=str, metavar="R_i", help="Validasi penutupan Wilayah R_i (usai STAGE-F).")
     parser.add_argument("--final", action="store_true", help="Validasi penutupan akhir seluruh wilayah & Cross-Region Final Sweep.")
     parser.add_argument("--region", type=str, help="Override ID wilayah aktif (opsional, misal R_1).")
     parser.add_argument("--audit-dir", dest="audit_dir_flag", type=str, help="Path ke direktori kerja audit (flag --audit-dir).")
