@@ -70,6 +70,42 @@ CHAT_SECTIONS = [
     "## 3. JEJAK PENALARAN & RINGKASAN RIWAYAT UJI",
 ]
 
+# ============================================================================
+# ATURAN WADAH 06 / 07 / 08 / 09 (preferensi v1 yang ditegakkan mekanis)
+# ============================================================================
+SIX_EVIDENCE_CLASSES = (
+    "REJECTED_POC_FAILS",
+    "REJECTED_NEGATIVE_EV",
+    "REJECTED_DUST",
+)
+SIX_STATIC_IMPOSSIBILITY = ("KS-1", "KS-2", "KS-3", "KS-4")
+SIX_ALL_CLASSES = SIX_EVIDENCE_CLASSES + (
+    "REJECTED_NO_VICTIM",
+    "REJECTED_FANTASY_MOCK",
+    "REJECTED_CHEATCODE",
+    "REJECTED_PRIVILEGED_FANTASY",
+    "REJECTED_GENESIS_MIRAGE",
+    "REJECTED_NON_LIVE_INIT",
+    "REJECTED_BY_DESIGN",
+    "REJECTED_MISMATCH",
+    "REJECTED_UNPROVEN_DEPLOYMENT",
+)
+DISPOSITIONS = ("NEXT_EXPLORE", "NEXT_MAINNET", "TOOL_BLOCKED", "ENV_ERROR")
+EIGHT_LOW_CLASSES = ("PRE_LIVE_SCOPE", "ADMIN_ONLY", "LOW_NUISANCE")
+NINE_FORBIDDEN_TANGGA = ("A-HEAD",)
+NINE_FORBIDDEN_CYCLE = ("P1_PRE_DEPLOY", "P2_TESTNET_ONLY")
+
+BUKTI_SIMULASI_RX = re.compile(r"BUKTI[ _]SIMULASI\s*:", re.IGNORECASE)
+PERCOBAAN_RX = re.compile(r"PERCOBAAN\s*:", re.IGNORECASE)
+DISPOSITION_RX = re.compile(r"Disposition\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Z_]+)`?")
+LOW_CLASS_RX = re.compile(r"LOW_CLASS\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?(PRE_LIVE_SCOPE|ADMIN_ONLY|LOW_NUISANCE)")
+POC_STATUS_RX = re.compile(r"POC_STATUS\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Za-z_]+)`?")
+VERDICT_RX = re.compile(r"VERDICT\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Z_]+)`?")
+TANGGA_RX = re.compile(r"TANGGA_BUKTI\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Za-z\-]+)`?")
+CYCLE_RX = re.compile(r"CYCLE\s*(?:\*\*)?\s*:\s*(?:\*\*)?\s*`?([A-Za-z0-9_]+)`?")
+CMD_RX = re.compile(r"^\s*\$\s+\S+")
+FENCE_RX = re.compile(r"^\s*```")
+
 PLUGIN_SPECS = [
     {
         "name": "Metode Bedah Universal",
@@ -550,6 +586,274 @@ def validate_case_folders(audit_dir: Path, findings: List[Dict[str, str]]) -> Li
     return errors
 
 
+
+# ============================================================================
+# PENEGAK ATURAN 06 / 07 / 08 / 09
+# ============================================================================
+
+
+def split_entries(text: str, id_prefixes: Tuple[str, ...]) -> List[Tuple[str, List[str]]]:
+    """Pecah berkas wadah menjadi entri. Entri dimulai oleh heading level 2/3 yang memuat ID berprefix.
+
+    Heading di dalam blok kode (fence ```) diabaikan agar contoh template tidak dihitung sebagai entri.
+    """
+    entries: List[Tuple[str, List[str]]] = []
+    current: Optional[Tuple[str, List[str]]] = None
+    in_fence = False
+    for line in text.splitlines():
+        if FENCE_RX.match(line):
+            in_fence = not in_fence
+            if current is not None:
+                current[1].append(line)
+            continue
+        if not in_fence and re.match(r"^#{2,3}\s+", line):
+            title = line.strip()
+            # Heading entri: memuat '[' sebelum ID, mis. "[NEXT-...]", "### VNE-... (Eks [LEAD-..])",
+            # "### REF-..." — yang penting ID berprefix muncul SEBELUM kemunculan pertama ']'
+            # (mencegah heading tabel seperti "(07-NEEDS-NEXT-STEP)" ikut dianggap entri).
+            # Entri sah: ID berprefix berada di dalam tanda kurung siku, ATAU heading diawali ID itu sendiri.
+            # Heading tabel seperti "## 1. TABEL ... (07-NEEDS-NEXT-STEP)" tidak memenuhi keduanya.
+            body_after_hash = re.sub(r"^#{2,3}\s+", "", title)
+            is_entry = False
+            for pfx in id_prefixes:
+                pat = re.escape(pfx) + r"-[A-Za-z0-9_\-]+"
+                if re.search(r"\[\s*`?" + pat, body_after_hash):
+                    is_entry = True
+                    break
+                if re.match(r"^`?" + pat, body_after_hash):
+                    is_entry = True
+                    break
+            if is_entry:
+                if current is not None:
+                    entries.append(current)
+                current = (title, [line])
+                continue
+        if current is not None:
+            current[1].append(line)
+    if current is not None:
+        entries.append(current)
+    return entries
+
+
+def has_real_command_output(lines: List[str]) -> bool:
+    """True bila ada baris perintah '$ ...' DI DALAM blok kode/luar fence, diikuti minimal satu baris
+    keluaran nyata (bukan placeholder, bukan baris kosong, bukan komentar contoh)."""
+    in_fence = False
+    cmd_seen_at = -1
+    for idx, line in enumerate(lines):
+        if FENCE_RX.match(line):
+            in_fence = not in_fence
+            continue
+        s = line.strip()
+        if CMD_RX.match(s):
+            cmd_seen_at = idx
+            continue
+        if cmd_seen_at >= 0 and idx > cmd_seen_at and s:
+            if s.startswith("```") or s.startswith("#"):
+                continue
+            if re.search(r"\[(tempelkan|perintah eksak|log )", s, re.IGNORECASE):
+                continue
+            if s.startswith("[") and s.endswith("]"):
+                continue
+            return True
+    return False
+
+
+def validate_six(text: str) -> List[str]:
+    """Aturan 06: kelas REJECTED_* + PAPER_REFUTATION guard (BUKTI_SIMULASI atau KS-n)."""
+    errors: List[str] = []
+    for title, body in split_entries(text, ("REF",)):
+        joined = "\n".join(body)
+        m_cls = re.search(r"\b(REJECTED_[A-Z_]+)\b", joined)
+        if not m_cls:
+            continue
+        cls = m_cls.group(1)
+        if cls not in SIX_ALL_CLASSES:
+            errors.append(f"[06 KELAS] Entri '{title[:60]}' memakai kelas tidak dikenal: {cls}.")
+            continue
+        if cls in SIX_EVIDENCE_CLASSES:
+            if not BUKTI_SIMULASI_RX.search(joined):
+                errors.append(
+                    f"[06 PAPER_REFUTATION] Entri '{title[:60]}' berkelas {cls} tanpa blok BUKTI_SIMULASI: — "
+                    f"PAPER_REFUTATION_DETECTED (Pernyataan #11e). Wajib log test + Strike 3 Fuzz."
+                )
+            elif not has_real_command_output(body):
+                errors.append(
+                    f"[06 PAPER_REFUTATION] Entri '{title[:60]}' punya BUKTI_SIMULASI: tetapi tidak memuat "
+                    f"perintah '$ ...' beserta keluarannya — PAPER_REFUTATION_DETECTED."
+                )
+        else:
+            if not (BUKTI_SIMULASI_RX.search(joined) or any(k in joined for k in SIX_STATIC_IMPOSSIBILITY)):
+                errors.append(
+                    f"[06 BUKTI] Entri '{title[:60]}' berkelas {cls} wajib BUKTI_SIMULASI: (kelas ini bukan "
+                    f"kemustahilan statis KS-1..KS-4)."
+                )
+    return errors
+
+
+def validate_seven(text: str) -> List[str]:
+    """Aturan 07: Disposition + PERCOBAAN berisi log nyata (LAZY_BAILOUT guard)."""
+    errors: List[str] = []
+    for title, body in split_entries(text, ("NEXT",)):
+        joined = "\n".join(body)
+        m_disp = DISPOSITION_RX.search(joined)
+        if not m_disp:
+            errors.append(
+                f"[07 LAZY_BAILOUT] Entri '{title[:60]}' tanpa Disposition: — LAZY_BAILOUT_DETECTED "
+                f"(wajib tepat satu dari {', '.join(DISPOSITIONS)})."
+            )
+        elif m_disp.group(1) not in DISPOSITIONS:
+            errors.append(
+                f"[07 DISPOSITION] Entri '{title[:60]}' memakai Disposition tidak sah: {m_disp.group(1)} "
+                f"(sah: {', '.join(DISPOSITIONS)})."
+            )
+        if not PERCOBAAN_RX.search(joined):
+            errors.append(
+                f"[07 LAZY_BAILOUT] Entri '{title[:60]}' tanpa blok PERCOBAAN: — LAZY_BAILOUT_DETECTED "
+                f"(PERCOBAAN bukan rencana; wajib perintah + log)."
+            )
+        elif not has_real_command_output(body):
+            errors.append(
+                f"[07 LAZY_BAILOUT] Entri '{title[:60]}' punya PERCOBAAN: tetapi tanpa perintah '$ ...' "
+                f"beserta keluarannya — LAZY_BAILOUT_DETECTED."
+            )
+        m_tangga = TANGGA_RX.search(joined)
+        if m_tangga and m_tangga.group(1).upper() in ("A", "A-HEAD"):
+            errors.append(
+                f"[07 TANGGA] Entri '{title[:60]}' memakai TANGGA_BUKTI {m_tangga.group(1)} — bukti yang sudah "
+                f"PASS wajib ke 09 atau 08, bukan diparkir di 07."
+            )
+    return errors
+
+
+def validate_eight(text: str) -> List[str]:
+    """Aturan 08: LOW_CLASS tepat satu + POC_STATUS PASS + bukti mekanisme."""
+    errors: List[str] = []
+    for title, body in split_entries(text, ("VNE",)):
+        joined = "\n".join(body)
+        m_lc = LOW_CLASS_RX.search(joined)
+        if not m_lc:
+            errors.append(
+                f"[08 LOW_CLASS] Entri '{title[:60]}' tanpa LOW_CLASS sah "
+                f"(PRE_LIVE_SCOPE | ADMIN_ONLY | LOW_NUISANCE)."
+            )
+        m_poc = POC_STATUS_RX.search(joined)
+        if not m_poc or m_poc.group(1).upper() != "PASS":
+            errors.append(
+                f"[08 MEKANISME] Entri '{title[:60]}' wajib POC_STATUS: PASS — 08 hanya untuk mekanisme yang "
+                f"sudah terbukti; lead belum teruji milik 07 dengan PERCOBAAN:."
+            )
+        if not BUKTI_SIMULASI_RX.search(joined) or not has_real_command_output(body):
+            errors.append(
+                f"[08 BUKTI] Entri '{title[:60]}' wajib BUKTI_SIMULASI: berisi perintah '$ ...' + keluaran nyata."
+            )
+        if m_lc and m_lc.group(1) == "PRE_LIVE_SCOPE" and "KONTROL" not in joined.upper() and "poc" not in joined.lower():
+            errors.append(
+                f"[08 PRE_LIVE] Entri '{title[:60]}' berkelas PRE_LIVE_SCOPE wajib menyertakan rujukan kode PoC utuh."
+            )
+    return errors
+
+
+def validate_nine(text: str) -> List[str]:
+    """Aturan 09: TANGGA_BUKTI, DEPLOYMENT_MATCH, LIVE_IDENTITY, POC_STATUS; tolak A-HEAD & siklus pre-deploy."""
+    errors: List[str] = []
+    for title, body in split_entries(text, ("FIND",)):
+        joined = "\n".join(body)
+        m_t = TANGGA_RX.search(joined)
+        if not m_t:
+            errors.append(f"[09 TANGGA] Entri '{title[:60]}' tanpa TANGGA_BUKTI.")
+        elif m_t.group(1).upper() in NINE_FORBIDDEN_TANGGA:
+            errors.append(
+                f"[09 TANGGA] Entri '{title[:60]}' memakai TANGGA_BUKTI A-HEAD — dilarang di 09 "
+                f"(itu milik 08 PRE_LIVE_SCOPE)."
+            )
+        if "DEPLOYMENT_MATCH" not in joined or "LIVE_MATCH" not in joined:
+            errors.append(f"[09 DEPLOYMENT] Entri '{title[:60]}' wajib DEPLOYMENT_MATCH: LIVE_MATCH.")
+        if "LIVE_IDENTITY" not in joined:
+            errors.append(f"[09 IDENTITY] Entri '{title[:60]}' wajib LIVE_IDENTITY terukur.")
+        m_c = CYCLE_RX.search(joined)
+        if m_c and m_c.group(1) in NINE_FORBIDDEN_CYCLE:
+            errors.append(
+                f"[09 CYCLE] Entri '{title[:60]}' memakai CYCLE: {m_c.group(1)} — dilarang di 09."
+            )
+        m_p = POC_STATUS_RX.search(joined)
+        if not m_p or m_p.group(1).upper() != "PASS":
+            errors.append(f"[09 POC] Entri '{title[:60]}' wajib POC_STATUS: PASS.")
+        if not BUKTI_SIMULASI_RX.search(joined) or not has_real_command_output(body):
+            errors.append(
+                f"[09 BUKTI] Entri '{title[:60]}' wajib BUKTI_SIMULASI: berisi perintah '$ ...' + keluaran nyata."
+            )
+    return errors
+
+
+def extract_lead_ids(text: str) -> List[str]:
+    """Ambil seluruh ID lead (LEAD-...) yang muncul di tabel maupun kartu 05-raw-leads.md."""
+    return sorted(set(re.findall(r"\bLEAD-[A-Za-z0-9_\-]+", text)))
+
+
+def lead_ids_in_wadah(text: str, id_prefixes: Tuple[str, ...] = ()) -> List[str]:
+    """Ambil ID lead yang menjadi SUBJEK entri wadah.
+
+    Sumber otoritatif = heading entri sah (yang memuat ID berprefix). Rujukan "(Eks LEAD-...)" di
+    badan entri atau di tabel indeks tidak dihitung, agar satu lead tidak tampak berada di dua wadah.
+    """
+    ids = set()
+    for title, body in split_entries(text, id_prefixes):
+        joined = title + "\n" + "\n".join(body[:40])
+        m_subject = re.search(r"Eks\s+`?(LEAD-[A-Za-z0-9_\-]+)", title)
+        if m_subject:
+            ids.add(m_subject.group(1))
+            continue
+        for lid in re.findall(r"\bLEAD-[A-Za-z0-9_\-]+", title):
+            ids.add(lid)
+    return sorted(ids)
+
+
+def validate_lead_traceability(leads_text: str, wadah_texts: Dict[str, str]) -> List[str]:
+    """#11d: setiap lead di 05 wajib muncul di tepat satu wadah 06/07/08/09 (tidak boleh menguap)."""
+    errors: List[str] = []
+    leads = extract_lead_ids(leads_text)
+    prefix_map = {
+        "06-refuted-invalid.md": ("REF",),
+        "07-needs-next-step.md": ("NEXT",),
+        "08-valid-not-eligible.md": ("VNE",),
+        "09-confirmed-findings.md": ("FIND",),
+    }
+    seen: Dict[str, List[str]] = {}
+    for name, text in wadah_texts.items():
+        for lid in lead_ids_in_wadah(text, prefix_map.get(name, ())):
+            seen.setdefault(lid, []).append(name)
+    for lid in leads:
+        holders = seen.get(lid, [])
+        if not holders:
+            errors.append(
+                f"[TRACE #11d] Lead {lid} hilang dari 05-raw-leads.md tetapi tidak tercatat di "
+                f"06/07/08/09 mana pun — jejak lead wajib lengkap."
+            )
+        elif len(holders) > 1:
+            errors.append(
+                f"[TRACE #11d] Lead {lid} tercatat di lebih dari satu wadah: {', '.join(holders)} "
+                f"(satu lead = satu putusan)."
+            )
+    return errors
+
+
+def validate_wadah_rules(audit_dir: Path) -> List[str]:
+    """Jalankan seluruh aturan 06/07/08/09 + jejak lead."""
+    errors: List[str] = []
+    texts = {}
+    for name in ("06-refuted-invalid.md", "07-needs-next-step.md", "08-valid-not-eligible.md", "09-confirmed-findings.md"):
+        path = audit_dir / name
+        texts[name] = path.read_text(encoding="utf-8") if path.exists() else ""
+    errors.extend(validate_six(texts["06-refuted-invalid.md"]))
+    errors.extend(validate_seven(texts["07-needs-next-step.md"]))
+    errors.extend(validate_eight(texts["08-valid-not-eligible.md"]))
+    errors.extend(validate_nine(texts["09-confirmed-findings.md"]))
+    leads_text = (audit_dir / "05-raw-leads.md").read_text(encoding="utf-8") if (audit_dir / "05-raw-leads.md").exists() else ""
+    errors.extend(validate_lead_traceability(leads_text, texts))
+    return errors
+
+
 def extract_methodology_slice(stage: str) -> str:
     text = read_text(METHODOLOGY_FILE)
     if not text:
@@ -999,6 +1303,7 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
             errors.append(
                 f"[GATE-E] Meja operasi 05-raw-leads.md belum bersih! Masih ada {len(active_cards)} kartu [ACTIVE] dan {len(active_in_table)} baris tabel berstatus [ACTIVE]. Pindahkan semuanya ke wadah 06/07/08/09."
             )
+        errors.extend(validate_wadah_rules(audit_dir))
 
     else:
         errors.append(f"Nama gate tidak dikenal: '{gate}'. Gunakan 0, A, B, C1, C2, D, atau E.")
@@ -1034,6 +1339,7 @@ def validate_close_region(region: str, audit_dir: Path) -> int:
     confirmed_text = read_text(audit_dir / "09-confirmed-findings.md")
     region_findings = parse_confirmed_findings(confirmed_text, region)
     errors.extend(validate_case_folders(audit_dir, region_findings))
+    errors.extend(validate_wadah_rules(audit_dir))
 
     if errors:
         print(f"\n[CLOSE-REGION {region} FAIL] Ditemukan {len(errors)} penghalang penutupan wilayah:", file=sys.stderr)
@@ -1078,6 +1384,7 @@ def validate_final(audit_dir: Path) -> int:
     confirmed_text = read_text(audit_dir / "09-confirmed-findings.md")
     all_findings = parse_confirmed_findings(confirmed_text, None)
     errors.extend(validate_case_folders(audit_dir, all_findings))
+    errors.extend(validate_wadah_rules(audit_dir))
 
     if errors:
         print(f"\n[FINAL VERIFICATION FAIL] Ditemukan {len(errors)} masalah:", file=sys.stderr)
@@ -1096,6 +1403,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Penegak Mekanis & Context Injector Metode Segitiga (theadvers v2.0)"
     )
+    parser.add_argument("--rules", action="store_true", help="Audit khusus aturan wadah 06/07/08/09 + jejak lead (tanpa gate tahap).")
     parser.add_argument("--sync", action="store_true", help="Sinkronkan seluruh _ROUTER.md dan instal skill ke profil Hermes.")
     parser.add_argument("--context-packet", action="store_true", help="Cetak paket pemulihan konteks segar dari disk & @SLICE.")
     parser.add_argument("--gate", type=str, help="Validasi gerbang tahap: 0, A, B, C1, C2, D, atau E.")
@@ -1109,6 +1417,21 @@ def main() -> int:
 
     if args.sync:
         return sync_all_routers()
+
+    if args.rules:
+        target_rules = args.audit_dir_flag or args.audit_dir_pos
+        if not target_rules:
+            parser.print_help()
+            return 1
+        rules_dir = Path(target_rules).resolve()
+        rule_errors = validate_wadah_rules(rules_dir)
+        if rule_errors:
+            print(f"\n[RULES FAIL] Ditemukan {len(rule_errors)} pelanggaran aturan wadah 06/07/08/09:", file=sys.stderr)
+            for e in rule_errors:
+                print(f"  - {e}", file=sys.stderr)
+            return 1
+        print("[RULES PASS] Aturan 06/07/08/09 + jejak lead terpenuhi.")
+        return 0
 
     target_dir = args.audit_dir_flag or args.audit_dir_pos
     if not target_dir:
