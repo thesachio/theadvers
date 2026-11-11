@@ -1522,6 +1522,63 @@ def parse_leads_table_and_cards(raw_leads_text: str, region: Optional[str] = Non
 # 3. FITUR --context-packet: SUNTIKAN PAKET KONTEKS SEGAR KE TERMINAL AGEN
 # ============================================================================
 
+
+def resolve_plugin_path(token: str) -> Optional[str]:
+    """Petakan ID plugin (M-001 / AF-01 / POV-unprivileged / CHAIN-evm-tron / DOM-vault)
+    ke PATH BERKAS ASLI di repo — bukan nama samaran."""
+    for spec in PLUGIN_SPECS:
+        if token.startswith(spec["prefix"]):
+            slug = token[len(spec["prefix"]):]
+            matches = sorted(spec["dir"].glob(f"{spec['prefix']}{slug}*.md"))
+            if matches:
+                return str(matches[0])
+    return None
+
+
+def extract_bekal_lines(card: str) -> List[str]:
+    """Baris blok 'Bekal Uji' pada kartu [ACTIVE] (sampai baris top-level berikutnya)."""
+    lines = card.splitlines()
+    out: List[str] = []
+    inside = False
+    for ln in lines:
+        s = ln.strip()
+        if s.startswith("- Bekal Uji"):
+            inside = True
+            continue
+        if inside:
+            if s.startswith("- ") and not ln.startswith(" "):
+                break
+            out.append(s)
+    return out
+
+
+def card_field(card: str, key: str) -> str:
+    m = re.search(rf"^\s*-\s*{re.escape(key)}\s*:\s*(.+)$", card, re.MULTILINE)
+    return m.group(1).strip() if m else ""
+
+
+def resolve_facts_lines(facts_text: str, card: str, limit: int = 5) -> List[str]:
+    ids = set(re.findall(r"\bF-R\d+-\d+\b", card))
+    if not ids:
+        return []
+    hits = []
+    for ln in facts_text.splitlines():
+        if any(fid in ln for fid in ids) and ln.strip():
+            hits.append(ln.strip())
+    return hits[:limit]
+
+
+def resolve_radar_lines(radar_text: str, card: str, limit: int = 5) -> List[str]:
+    ids = set(re.findall(r"\bCPAIR-\d+\b", card))
+    if not ids:
+        return []
+    hits = []
+    for ln in radar_text.splitlines():
+        if any(cid in ln for cid in ids) and ln.strip():
+            hits.append(ln.strip())
+    return hits[:limit]
+
+
 def print_context_packet(audit_dir: Path, override_region: Optional[str] = None) -> int:
     state_path = audit_dir / "STATE.md"
     if not state_path.exists():
@@ -1547,9 +1604,9 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
     print(f"- Audit Directory           : {audit_dir}")
     print(f"- Active Region             : {active_region}")
     print(f"- Current Stage             : {current_stage}")
-    print(f"- Current Batch             : {cursor.get('Current Batch', '0')}")
+    print(f"- Current Batch ID          : {cursor.get('Current Batch ID') or cursor.get('Current Batch', 'NONE')}")
     print(f"- Queued Leads (Disk Count) : {len(queued_now)}")
-    print(f"- Active Leads (Disk Count) : {len(active_cards)} (Batas Maksimal: 5 per Batch)")
+    print(f"- Active Leads (Disk Count) : {len(active_cards)} (Batas Maksimal: 3 per Batch, satu Batch ID)")
     print(f"- Last Passed Gate          : {cursor.get('Last Passed Gate', 'NONE')}")
     print(f"- Next Exact Action         : {cursor.get('Next Exact Action', '-')}")
 
@@ -1593,6 +1650,7 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
         print("PERINGATAN KERAS STAGE-C1 (BLIND ADVERSARIAL HUNT):")
         print("DILARANG MEMBUKA _ROUTER.md ATAU MEMBACA FILE PLUGIN M-xxx / AF-xx PADA STAGE INI!")
         print("Gunakan murni L-VALUE dan L-PATH Wilayah Aktif serta catat sinyal [TOUCHES: ...] ke RADAR.md.")
+        print("Catatan: kolom Inversi Prasyarat pada FACTS.md adalah bahan STAGE-C2 — JANGAN dipakai dulu.")
         print("!" * 88)
 
     elif current_stage.upper() in ("STAGE-C2", "FINAL-SWEEP"):
@@ -1609,20 +1667,62 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
 
     elif current_stage.upper() == "STAGE-D":
         print("\n" + "=" * 88)
-        print("KANDIDAT [ACTIVE] DI MEJA OPERASI & PLUGIN YANG WAJIB DI-LOAD (STAGE-D)")
+        print("SUNTIKAN BEKAL UJI STAGE-D — KARTU [ACTIVE] + BERKAS PLUGIN ASLI + PAGAR FAKTA/RADAR")
         print("=" * 88)
         if not active_cards and not queued_now:
             print(f"  [INFO] Wilayah {active_region} memiliki 0 [QUEUED] dan 0 [ACTIVE] (Zero-Batch Clean Pass).")
             print("  -> Jalankan langsung: python3 tools/verify_segitiga.py --gate D <audit-dir> untuk lanjut ke STAGE-E.")
-        assigned_ids = set()
-        for r in q_rows:
-            if "[ACTIVE]" in r["status"]:
-                print(f"  * {r['id']} ({r['ev']}) | {r['anchor']} | Method: {r['method']} | AF: {r['af']}")
-                for tok in re.findall(r"\b(?:M-\d+|AF-\d+|DOM-[a-z0-9\-]+|POV-[a-z0-9\-]+|CHAIN-[a-z0-9\-]+)\b",
-                                      f"{r['method']} {r['af']} {r['extra']}"):
-                    assigned_ids.add(tok)
-        if assigned_ids:
-            print(f"\n  -> Baca berkas plugin berikut untuk membuktikan batch ini: {', '.join(sorted(assigned_ids))}")
+        elif not active_cards and queued_now:
+            print(f"  [!] {len(queued_now)} kandidat [QUEUED] belum ditarik. Tarik maksimal 3 ke meja operasi agar bekal ujinya tersuntik.")
+        for idx, card in enumerate(active_cards, 1):
+            heading = card.splitlines()[0].strip().lstrip("#").strip() if card else "(kartu kosong)"
+            m_lid = LEAD_ID_RX.search(card)
+            if m_lid:
+                lid = m_lid.group(1)
+            else:
+                m_head = re.search(r"^#{2,3}\s+`?(LEAD-[A-Za-z0-9_\-]+)", card, re.MULTILINE)
+                lid = m_head.group(1) if m_head else "(tanpa Lead ID)"
+            print(f"\n--- KARTU AKTIF #{idx}: {lid} | {heading} ---")
+            for key in ("Batch ID", "TARGET_OBJEK", "SIKLUS", "MODE_UJI_POC"):
+                val = card_field(card, key)
+                if val:
+                    print(f"    {key:14}: {val}")
+            fp = card_field(card, "Fork PoC")
+            if fp:
+                print(f"    {'Fork PoC':14}: {fp}")
+            bekal = extract_bekal_lines(card)
+            if bekal:
+                print("    BEKAL UJI (disuntik utuh dari hasil C2):")
+                for b in bekal:
+                    print(f"      {b}")
+            else:
+                print("    [PERINGATAN] Kartu TANPA blok 'Bekal Uji' — bekal C2 TIDAK tersuntik. Lengkapi kartu agar uji terarah.")
+            ids = sorted(set(tok for tok in re.findall(
+                r"\b(?:M-\d{3}|AF-\d{2}|DOM-[a-z0-9\-]+|POV-[a-z0-9\-]+|CHAIN-[a-z0-9\-]+)\b",
+                " ".join(bekal) + " " + card)
+                if not re.fullmatch(r"(?:M|AF|POV|CHAIN|DOM)-xx", tok)))
+            real_paths = {}
+            for tok in ids:
+                path = resolve_plugin_path(tok)
+                if path:
+                    real_paths[tok] = path
+            if real_paths:
+                print("    BERKAS PLUGIN YANG WAJIB DIBACA (path asli, lazy-load):")
+                for tok in sorted(real_paths):
+                    print(f"      * {tok:22} -> {real_paths[tok]}")
+            for tok in ids:
+                if tok not in real_paths:
+                    print(f"      * {tok:22} -> [TIDAK DITEMUKAN — isi ID asli di kartu]")
+            facts_hits = resolve_facts_lines(facts_text, card)
+            if facts_hits:
+                print("    PAGAR FAKTA (FACTS.md) untuk uji ini:")
+                for fh in facts_hits:
+                    print(f"      {fh[:150]}")
+            radar_hits = resolve_radar_lines(radar_text, card)
+            if radar_hits:
+                print("    RANTAI RADAR ([TOUCHES]) untuk uji ini:")
+                for rh in radar_hits:
+                    print(f"      {rh[:150]}")
 
     elif current_stage.upper() == "STAGE-E":
         print("\n" + "=" * 88)
