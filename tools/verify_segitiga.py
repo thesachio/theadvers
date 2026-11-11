@@ -1644,6 +1644,9 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
         print("-" * 88)
         for rf in region_facts[:25]:
             print(f"  {rf}")
+        if len(region_facts) > 25:
+            print(f"  [DIPOTONG] menampilkan 25 dari {len(region_facts)} baris fakta — "
+                  f"sisa wajib dibaca dari FACTS.md (bukan diabaikan).")
 
     radar_text = read_text(audit_dir / "RADAR.md")
     radar_rows, touches_map = extract_radar_signals(radar_text)
@@ -1652,12 +1655,19 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
     print(f"SINYAL RADAR LINTAS-MODUL ({len(radar_rows)} sinyal total, {len(collisions)} tabrakan [TOUCHES])")
     print("-" * 88)
     if collisions:
-        print("  [!] TABRAKAN [TOUCHES] TERDETEKSI (WAJIB UJI RANTAI DI C2 / FINAL-SWEEP):")
+        print("  [!] TABRAKAN [TOUCHES] TERDETEKSI (BAHAN CPAIR — WAJIB DIRAKIT DI C2):")
         for sym, lines in collisions.items():
-            print(f"      * [TOUCHES: {sym}] disentuh oleh {len(lines)} entri radar.")
+            print(f"      * [TOUCHES: {sym}] disentuh oleh {len(lines)} entri radar:")
+            for ln in lines[:3]:
+                print(f"          {ln[:160]}")
+            if len(lines) > 3:
+                print(f"          [DIPOTONG] {len(lines)-3} entri lagi ada di RADAR.md.")
     else:
         for rr in radar_rows[:10]:
             print(f"  {rr}")
+        if len(radar_rows) > 10:
+            print(f"  [DIPOTONG] menampilkan 10 dari {len(radar_rows)} sinyal — "
+                  f"sisa wajib dibaca dari RADAR.md.")
 
     # Injeksi khusus per tahap
     if current_stage.upper() == "STAGE-C1":
@@ -1679,6 +1689,14 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
                 for ln in router_file.read_text(encoding="utf-8").splitlines():
                     if ln.startswith("|"):
                         print(ln)
+        print("\n" + "-" * 88)
+        print("INSTRUKSI PERAKITAN C2 -> D (agar wawasan tersuntik, bukan menguap):")
+        print("-" * 88)
+        print("  1. Setiap fakta F-R*: catat hasil inversinya (lolos / gugur). Gugur HANYA bila")
+        print("     terbantah kontradiksi fakta atau penjaga kode eksak — bukan karena tak cocok katalog.")
+        print("  2. Setiap tabrakan [TOUCHES]: rakit CPAIR-xx dan catat barisnya di RADAR.md.")
+        print("  3. Saat menulis baris [QUEUED]: isi Method/AF (ID cocok ATAU [NO-CATALOG]) dan")
+        print("     Plugin Tambahan (POV/CHAIN/DOM) — baris inilah bahan Bekal Uji STAGE-D.")
 
     elif current_stage.upper() == "STAGE-D":
         print("\n" + "=" * 88)
@@ -1728,6 +1746,23 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
             for tok in ids:
                 if tok not in real_paths:
                     print(f"      * {tok:22} -> [TIDAK DITEMUKAN — isi ID asli di kartu]")
+            # Jejak C2: tampilkan baris [QUEUED] yang menjadi asal kartu ini, agar
+            # penyimpangan (mis. POV dari C2 hilang di bekal) TERLIHAT, bukan senyap.
+            qrow = next((r for r in q_rows if r["id"] == lid), None)
+            if qrow:
+                print(f"    JEJAK C2 (baris [QUEUED]): EV={qrow['ev']} | Method={qrow['method']} "
+                      f"| AF={qrow['af']} | Plugin={qrow['extra']}")
+                c2_toks = set(re.findall(
+                    r"\b(?:POV-[a-z0-9\-]+|CHAIN-[a-z0-9\-]+|DOM-[a-z0-9\-]+)\b",
+                    f"{qrow['method']} {qrow['af']} {qrow['extra']}"))
+                c2_toks = {t for t in c2_toks if not re.fullmatch(r"(?:POV|CHAIN|DOM)-xx", t)}
+                bekal_toks = set(re.findall(
+                    r"\b(?:POV-[a-z0-9\-]+|CHAIN-[a-z0-9\-]+|DOM-[a-z0-9\-]+)\b",
+                    " ".join(bekal)))
+                hilang = sorted(c2_toks - bekal_toks)
+                if hilang:
+                    print(f"    [!] Token C2 tidak muncul di Bekal Uji: {', '.join(hilang)} — "
+                          f"sebutkan alasan jika sengaja diganti.")
             facts_hits = resolve_facts_lines(facts_text, card)
             if facts_hits:
                 print("    PAGAR FAKTA (FACTS.md) untuk uji ini:")
