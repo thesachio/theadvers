@@ -19,6 +19,7 @@ Memori percakapan (*chat history*) Anda dapat terkompres sewaktu-waktu, dan berk
    - Potongan aturan spesifik tahap aktif (@SLICE:STAGE-*) langsung dari methodology/METHODOLOGY-SEGITIGA.md.
    - Daftar kontrak/modul Wilayah R_i yang wajib dibaca ulang.
    - Entri FACTS.md, sinyal RADAR.md ([TOUCHES: ...]), dan indeks _ROUTER.md yang relevan untuk tahap tersebut.
+   - Di STAGE-D: blok **Bekal Uji** tiap kartu `[ACTIVE]`, **path berkas plugin asli**, baris fakta `F-R*`, dan baris radar `CPAIR*` — bukan sekadar nama ID. Kontrak lengkap: `methodology/INJECTION-CONTRACT.md`.
 3. Lakukan *Write-Ahead Checkpoint* di `STATE.md`:
    Sebelum memulai pekerjaan tahap baru dan segera sesudah menyelesaikan tahap tersebut, perbarui baris status di STATE.md terlebih dahulu.
 
@@ -200,6 +201,16 @@ Setiap wadah menuntut **jenis bukti yang berbeda**. Wadah yang diisi tanpa bukti
 
 ---
 
+## 5c. Kontrak Injeksi Konteks (Anti-Masking)
+
+`--context-packet` wajib menyuntik **isi nyata**, bukan sekadar menyebut nama. Kontrak lengkap per tahap: `methodology/INJECTION-CONTRACT.md`. Tiga aturan yang ditegakkan mekanis:
+
+1. **Bekal wajib ada di kartu `[ACTIVE]`** — tanpa blok `Bekal Uji`, `--gate D` FAIL, karena paket konteks tidak punya apa pun untuk disuntikkan.
+2. **Label wajib menunjuk berkas nyata** — `M-xxx`/`AF-xx`/`POV-*`/`CHAIN-*`/`DOM-*` di-resolusi ke path asli; label palsu (mis. `M-999`) FAIL di `--gate C2` dan `--gate D`. `[NO-CATALOG]` dikecualikan.
+3. **Paket mencetak ringkasan suntikan** — di STAGE-D: kartu aktif, bekal tersuntik, plugin path ter-resolve, baris fakta, baris radar, dan `STATUS: OK` / `GAGAL (masking terdeteksi)`.
+
+---
+
 ## 6. Tabel Ringkasan Gerbang Penegak (tools/verify_segitiga.py)
 
 | Perintah CLI | Kapan Wajib Dijalankan | Apa yang Diverifikasi oleh Skrip |
@@ -210,8 +221,8 @@ Setiap wadah menuntut **jenis bukti yang berbeda**. Wadah yang diisi tanpa bukti
 | python3 tools/verify_segitiga.py --gate A <dir> | Selesai Tahap A pada Wilayah R_i. | Kontrak/modul R_i memiliki Current Balance + Intended Capacity dan fakta verbatim (:Lxx) + inversi di FACTS.md. |
 | python3 tools/verify_segitiga.py --gate B <dir> | Selesai Tahap B pada Wilayah R_i. | Wilayah R_i memiliki pemetaan [EDGE-ASSET], [EDGE-VALUATION], dan [EDGE-CONTROL/LATENT] di path-map.md. |
 | python3 tools/verify_segitiga.py --gate C1 <dir> | Selesai Tahap C Gelombang 1 (Blind Hunt) di R_i. | Jalur terjaga masuk ke 04-code-guarded.md, observasi awal masuk ke 05-raw-leads.md, dan sinyal lintas-kontrak tercatat dengan [TOUCHES: ...] di RADAR.md. |
-| python3 tools/verify_segitiga.py --gate C2 <dir> | Selesai Tahap C Gelombang 2 (Cross-Pollination) di R_i. | Hasil penyilangan tercatat, kandidat gugur awal (HANYA oleh kontradiksi fakta) masuk ke 04-code-guarded.md, dan setiap kandidat [QUEUED] di 05-raw-leads.md memiliki hasil konsultasi katalog pada kolom Method/AF (ID valid M-xxx/AF-xx ATAU penanda [NO-CATALOG]) serta urutan EV. |
-| python3 tools/verify_segitiga.py --gate D <dir> | Selesai Tahap D pada satu Batch di R_i. | Kandidat [ACTIVE] di 05-raw-leads.md berjumlah 1..3, semuanya satu `Batch ID` berprefiks wilayah aktif (`R1-B01`), setiap kartu memilih label uji M-xxx + AF-xx, dan semuanya memiliki 3 komponen Bukti Segitiga lengkap tanpa token kompresi. |
+| python3 tools/verify_segitiga.py --gate C2 <dir> | Selesai Tahap C Gelombang 2 (Cross-Pollination) di R_i. | Hasil penyilangan tercatat, kandidat gugur awal (HANYA oleh kontradiksi fakta) masuk ke 04-code-guarded.md, dan setiap kandidat [QUEUED] di 05-raw-leads.md memiliki hasil konsultasi katalog pada kolom Method/AF (ID valid M-xxx/AF-xx **yang menunjuk berkas nyata** ATAU penanda [NO-CATALOG]) serta urutan EV. |
+| python3 tools/verify_segitiga.py --gate D <dir> | Selesai Tahap D pada satu Batch di R_i. | Kandidat [ACTIVE] di 05-raw-leads.md berjumlah 1..3, semuanya satu `Batch ID` berprefiks wilayah aktif (`R1-B01`), setiap kartu memuat blok `Bekal Uji` dan label uji M-xxx + AF-xx **yang menunjuk berkas plugin nyata**, serta 3 komponen Bukti Segitiga lengkap tanpa token kompresi. |
 | python3 tools/verify_segitiga.py --gate E <dir> | Selesai Tahap E pada satu Batch di R_i. | Active Leads == 0, **plus** seluruh aturan wadah 06/07/08/09 (kelas + bukti) dan jejak lead: setiap lead yang keluar dari 05 wajib muncul di tepat satu wadah. |
 | `python3 tools/verify_segitiga.py --rules <dir>` | Sebelum/di luar gate, khusus memeriksa wadah | Aturan 04 (`TERSANGKAL` wajib 5 baris jalur J1–J5 berjangkar, `RULES-04`), 06 (`REJECTED_*` + `BUKTI_SIMULASI`/KS-n), 07 (`Disposition` + `PERCOBAAN`), 08 (`LOW_CLASS` + `POC_STATUS: PASS`), 09 (`TANGGA_BUKTI`/`LIVE_IDENTITY`/`POC_STATUS`), dan jejak lead (#11d). |
 | python3 tools/verify_segitiga.py --close-region <R_i> <dir> | Selesai Tahap F pada Wilayah R_i. | Di 05-raw-leads.md baik [ACTIVE] == 0 maupun [QUEUED] == 0 untuk R_i, dan seluruh temuan R_i di 09-confirmed-findings.md telah memiliki blok *Submission-Ready Disclosure*. |

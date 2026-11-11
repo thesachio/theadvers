@@ -1535,6 +1535,21 @@ def resolve_plugin_path(token: str) -> Optional[str]:
     return None
 
 
+def plugin_ref_errors(text: str, label: str) -> List[str]:
+    """Setiap ID plugin yang ditulis wajib menunjuk berkas NYATA (anti masking).
+
+    Label palsu (mis. M-999) lolos regex tetapi tidak punya berkas — gate menolaknya.
+    """
+    errs: List[str] = []
+    toks = set(re.findall(
+        r"\b(?:M-\d{3}|AF-\d{2}|DOM-[a-z0-9\-]+|POV-[a-z0-9\-]+|CHAIN-[a-z0-9\-]+)\b", text))
+    toks = {t for t in toks if not re.fullmatch(r"(?:M|AF|POV|CHAIN|DOM)-xx", t)}
+    for t in sorted(toks):
+        if resolve_plugin_path(t) is None:
+            errs.append(f"[{label}] ID plugin '{t}' tidak menunjuk berkas nyata di folder plugin — label palsu/masking.")
+    return errs
+
+
 def extract_bekal_lines(card: str) -> List[str]:
     """Baris blok 'Bekal Uji' pada kartu [ACTIVE] (sampai baris top-level berikutnya)."""
     lines = card.splitlines()
@@ -1723,6 +1738,30 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
                 print("    RANTAI RADAR ([TOUCHES]) untuk uji ini:")
                 for rh in radar_hits:
                     print(f"      {rh[:150]}")
+
+        if active_cards:
+            n_cards = len(active_cards)
+            n_bekal = sum(1 for c in active_cards if "- Bekal Uji" in c)
+            resolved = set()
+            unresolved = set()
+            n_facts = n_radar = 0
+            for c in active_cards:
+                toks = set(re.findall(
+                    r"\b(?:M-\d{3}|AF-\d{2}|DOM-[a-z0-9\-]+|POV-[a-z0-9\-]+|CHAIN-[a-z0-9\-]+)\b",
+                    c))
+                toks = {t for t in toks if not re.fullmatch(r"(?:M|AF|POV|CHAIN|DOM)-xx", t)}
+                for t in toks:
+                    (resolved if resolve_plugin_path(t) else unresolved).add(t)
+                n_facts += len(resolve_facts_lines(facts_text, c))
+                n_radar += len(resolve_radar_lines(radar_text, c))
+            status = "OK" if (n_bekal == n_cards and not unresolved) else "GAGAL (masking terdeteksi)"
+            print("\n--- RINGKASAN KONTRAK INJEKSI (STAGE-D) ---")
+            print(f"  Kartu aktif         : {n_cards}")
+            print(f"  Bekal tersuntik     : {n_bekal}/{n_cards}")
+            print(f"  Plugin path resolve : {len(resolved)} token" + (f" | GAGAL: {', '.join(sorted(unresolved))}" if unresolved else ""))
+            print(f"  Pagar fakta         : {n_facts} baris")
+            print(f"  Rantai radar        : {n_radar} baris")
+            print(f"  STATUS              : {status}")
 
     elif current_stage.upper() == "STAGE-E":
         print("\n" + "=" * 88)
@@ -1940,6 +1979,9 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
                     f"[GATE-C2] Kandidat {r['id']}: kolom Assigned Attack Form wajib berisi ID "
                     f"plugin yang cocok (AF-xx) ATAU penanda [NO-CATALOG], ditemukan: '{r['af']}'."
                 )
+            # Anti-masking: label yang ditulis wajib menunjuk berkas plugin nyata.
+            errors.extend(plugin_ref_errors(
+                " ".join([r["method"], r["af"], r["extra"]]), f"GATE-C2 {r['id']}"))
 
     elif gate == "D":
         if not gate_passed_before("GATE-C2", state_text):
@@ -2015,6 +2057,15 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
                     "[GATE-D] Kartu [ACTIVE] belum memilih ID Attack Form (AF-xx) yang akan "
                     "diuji. Label dipilih saat STAGE-D sebagai cara menyerang."
                 )
+            # Kontrak injeksi: tanpa blok Bekal Uji, paket konteks tidak punya apa pun
+            # untuk disuntikkan ke STAGE-D (masking).
+            if "- Bekal Uji" not in card:
+                errors.append(
+                    "[GATE-D] Kartu [ACTIVE] tanpa blok 'Bekal Uji' — bekal hasil C2 TIDAK akan "
+                    "tersuntik ke konteks STAGE-D. Tambahkan blok itu (M/AF wajib; POV/CHAIN/"
+                    "F-R/CPAIR sesuai hasil C2)."
+                )
+            errors.extend(plugin_ref_errors(card, "GATE-D"))
             for titik in ("Titik 1", "Titik 2", "Titik 3"):
                 if titik not in card:
                     errors.append(f"[GATE-D] Kartu [ACTIVE] kehilangan komponen '{titik}' pada Bukti Segitiga.")
