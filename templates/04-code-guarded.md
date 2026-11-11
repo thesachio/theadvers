@@ -44,7 +44,7 @@ Setiap GUARD berstatus `TERSANGKAL` di §2 **wajib** punya tepat **5 baris** di 
 | GUARD-R1-01 | J2 | TERTUTUP | [Pemegang izin adalah EOA tunggal, bukan kontrak hulu — Path/File.ext:L31] | M-008 |
 | GUARD-R1-01 | J3 | TERTUTUP | [Fungsi berizin tidak membaca state yang bisa ditulis publik — Path/File.ext:L88-L94] | M-005, M-009 |
 | GUARD-R1-01 | J4 | TERTUTUP | [Tidak ada panggilan keluar; `whenNotPaused` tidak menutup fungsi penyelamatan — Path/File.ext:L52] | POV-CALL-01 |
-| GUARD-R1-01 | J5 | TERTUTUP | [Tidak ada callback/whitelist di jalur ini] | M-008 |
+| GUARD-R1-01 | J5 | TERTUTUP | [N/A: tidak ada callback/whitelist di jalur ini — terbukti tanpa panggilan keluar pada Path/File.ext:L1-L200] | M-008 |
 
 Aturan tabel ini:
 - `TERTUTUP` wajib menyebut **alasan + jangkar `Path/File.ext:Lxx-Lyy`**. Alasan tanpa jangkar = tidak sah.

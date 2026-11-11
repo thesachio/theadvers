@@ -147,7 +147,7 @@ Jalankan loop mesin status berikut secara terus-menerus hingga Current Stage == 
    - Lakukan Lazy-Loading `_ROUTER.md`: panggil read_file hanya pada berkas plugin (M-xxx, AF-xx, DOM-xx, POV-xx, CHAIN-xx) yang Trigger Symptom-nya cocok dengan Wilayah R_i.
 3. Saringan Kualitas Segitiga & Pengisian Tabel `[QUEUED]` Tanpa Plafon Total:
    - Pindahkan hipotesis yang patah oleh FACTS.md atau penjaga kode ke `04-code-guarded.md`.
-   - Masukkan seluruh kandidat yang lolos 3 syarat kualitas Segitiga ke Tabel Antrean `[QUEUED]` di 05-raw-leads.md (tanpa batas plafon total), urutkan menurut Prioritas EV (`P1` -> `P5`), dan pasangkan masing-masing dengan Assigned M-xxx serta Assigned AF-xx.
+   - Masukkan seluruh kandidat yang lolos 3 syarat kualitas Segitiga ke Tabel Antrean `[QUEUED]` di 05-raw-leads.md (tanpa batas plafon total), urutkan menurut Prioritas EV (`P1` -> `P5`), Kolom Method/AF memuat hasil konsultasi katalog (ID cocok) ATAU `[NO-CATALOG]`; kandidat DILARANG gugur hanya karena tidak cocok katalog. Label M-xxx + AF-xx untuk uji dipilih di STAGE-D.
 4. Verifikasi Gate C2:
 
        python3 tools/verify_segitiga.py --gate C2 <audit-dir>

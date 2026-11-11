@@ -52,6 +52,8 @@ Anda menjalankan Tahap D (`L-PROVE`) untuk Wilayah Aktif R_i menggunakan mekanis
 ## 2. Prosedur Pembuktian Tiga Titik Segitiga untuk Setiap Kandidat [ACTIVE]
 
 Untuk masing-masing kandidat [ACTIVE] di meja operasi (maksimal 3 kandidat):
+   - Pilih label uji WAJIB: M-xxx (metode bedah) + AF-xx (bentuk serangan yang diuji) — `--gate D` menagih keduanya. Di sinilah katalog menjadi alat, bukan di C2.
+   - Muat bekal dari hasil C2: POV-xx, CHAIN-xx (harness/mode fork), fakta FACTS.md (tipe data/desimal/sentinel), dan rantai [TOUCHES] RADAR.md — pagar terarah agar uji tidak membabi-buta.
 
 1. Lazy-Load Plugin Spesifik Kandidat:
    Baca berkas references/methods/M-xxx-*.md dan methodology/attack-forms/AF-xx-*.md (serta DOM-*/POV-*/CHAIN-* bila ada) yang ditugaskan pada kandidat tersebut.

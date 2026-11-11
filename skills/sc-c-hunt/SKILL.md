@@ -44,7 +44,8 @@ Anda menjalankan Tahap C (`L-HUNT`) pada Wilayah Aktif R_i yang terbagi secara k
 3. Saringan Kualitas Segitiga & Pengisian Tabel `[QUEUED]` Tanpa Plafon Total:
    - Pindahkan hipotesis yang patah oleh FACTS.md atau penjaga kode ke `04-code-guarded.md`.
    - Seluruh kandidat yang lolos 3 syarat kualitas Segitiga (memiliki dampak L-VALUE, jalur L-PATH, dan tidak patah oleh FACTS.md) wajib dimasukkan ke Bagian 2 (Tabel Antrean `[QUEUED]`) di 05-raw-leads.md tanpa batas plafon total (jangan pernah membuang kandidat valid).
-   - Urutkan seluruh kandidat [QUEUED] berdasarkan Prioritas EV (`SOUL.md §3`: `P1` s/d `P5`) dan pasangkan masing-masing dengan minimal satu Assigned M-xxx dan satu Assigned AF-xx.
+   - Urutkan seluruh kandidat [QUEUED] berdasarkan Prioritas EV (`SOUL.md §3`: `P1` s/d `P5`).
+   - **Katalog = sinyal wawasan, BUKAN gerbang.** Isi kolom Assigned Method / Assigned Attack Form dengan HASIL konsultasi katalog (ID yang gejalanya cocok) ATAU penanda `[NO-CATALOG]`. Kandidat DILARANG gugur hanya karena tidak cocok katalog — pola tanpa kategori adalah temuan orisinal reasoning Anda sendiri. Pilihan M-xxx + AF-xx untuk pelaksanaan uji dikukuhkan di STAGE-D.
 4. Kunci Gate C2:
 python3 tools/verify_segitiga.py --gate C2 <audit-dir>
 

@@ -1824,10 +1824,22 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
                 errors.append(f"[GATE-C2] Kandidat {r['id']} tidak memiliki jangkar Path/File.ext:Lxx pada kolom Verbatim Anchor.")
             if not re.match(r"^P[1-5]$", r["ev"]):
                 errors.append(f"[GATE-C2] Kandidat {r['id']} wajib memiliki EV Rank P1..P5 (SOUL.md §3), ditemukan: '{r['ev']}'.")
-            if not re.search(r"\bM-\d{3}\b", r["method"]):
-                errors.append(f"[GATE-C2] Kandidat {r['id']} wajib dipasangi ID Metode valid (M-xxx), ditemukan: '{r['method']}'.")
-            if not re.search(r"\bAF-\d{2}\b", r["af"]):
-                errors.append(f"[GATE-C2] Kandidat {r['id']} wajib dipasangi ID Attack Form valid (AF-xx), ditemukan: '{r['af']}'.")
+            # Katalog = sinyal wawasan, BUKAN gerbang kelangsungan hidup kandidat.
+            # Kolom Method/AF wajib memuat HASIL konsultasi katalog: ID plugin yang cocok,
+            # ATAU penanda [NO-CATALOG] bila tidak ada gejala yang cocok (pola baru hasil
+            # reasoning agen sendiri). Memaksa label pada pola tanpa kategori akan
+            # memalsukan taksonomi atau membunuh temuan orisinal.
+            if not (re.search(r"\bM-\d{3}\b", r["method"]) or "[NO-CATALOG]" in r["method"]):
+                errors.append(
+                    f"[GATE-C2] Kandidat {r['id']}: kolom Assigned Method wajib berisi ID plugin "
+                    f"yang cocok dari konsultasi katalog (M-xxx) ATAU penanda [NO-CATALOG] bila "
+                    f"tidak ada gejala yang cocok, ditemukan: '{r['method']}'."
+                )
+            if not (re.search(r"\bAF-\d{2}\b", r["af"]) or "[NO-CATALOG]" in r["af"]):
+                errors.append(
+                    f"[GATE-C2] Kandidat {r['id']}: kolom Assigned Attack Form wajib berisi ID "
+                    f"plugin yang cocok (AF-xx) ATAU penanda [NO-CATALOG], ditemukan: '{r['af']}'."
+                )
 
     elif gate == "D":
         if not gate_passed_before("GATE-C2", state_text):
@@ -1892,6 +1904,17 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
                         f"[GATE-D] {lid} berasal dari wilayah {m_pfx.group(1)} tetapi masuk batch "
                         f"wilayah aktif {active_region}. Satu batch = satu wilayah."
                     )
+            if not re.search(r"\bM-\d{3}\b", card):
+                errors.append(
+                    "[GATE-D] Kartu [ACTIVE] belum memilih ID Metode bedah (M-xxx) untuk "
+                    "membangun uji. Label dipilih saat STAGE-D — di sinilah katalog menjadi "
+                    "alat, bukan di C2."
+                )
+            if not re.search(r"\bAF-\d{2}\b", card):
+                errors.append(
+                    "[GATE-D] Kartu [ACTIVE] belum memilih ID Attack Form (AF-xx) yang akan "
+                    "diuji. Label dipilih saat STAGE-D sebagai cara menyerang."
+                )
             for titik in ("Titik 1", "Titik 2", "Titik 3"):
                 if titik not in card:
                     errors.append(f"[GATE-D] Kartu [ACTIVE] kehilangan komponen '{titik}' pada Bukti Segitiga.")

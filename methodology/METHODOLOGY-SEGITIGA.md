@@ -117,10 +117,11 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
   4. Penyaringan Kualitas Segitiga & Pengisian Tabel `[QUEUED]` di `05-raw-leads.md`:
      - Setiap ide/observasi yang ternyata patah oleh fakta di FACTS.md atau penjaga kode wajib dipindahkan ke `04-code-guarded.md`.
      - Seluruh kandidat yang lolos 3 syarat kualitas Segitiga (memiliki dampak L-VALUE, jalur L-PATH yang dapat dijangkau, dan tidak patah oleh FACTS.md) dimasukkan ke Tabel Antrean `[QUEUED]` di 05-raw-leads.md (tanpa batas plafon total**—tidak boleh ada kandidat valid yang dibuang).
-     - Wajib urutkan kandidat `[QUEUED]` berdasarkan **Prioritas EV (`SOUL.md §3`: P1 s/d P5) dan pasangkan masing-masing dengan minimal satu Assigned M-xxx dan satu Assigned AF-xx.
+     - Wajib urutkan kandidat `[QUEUED]` berdasarkan **Prioritas EV (`SOUL.md §3`: P1 s/d P5) dan catat hasil konsultasi katalog sebagai sinyal wawasan.
+     - **Katalog adalah sinyal wawasan, bukan gerbang kelangsungan hidup.** Kolom Assigned Method / Assigned Attack Form memuat hasil konsultasi katalog: ID plugin yang gejalanya cocok, ATAU penanda `[NO-CATALOG]` bila tidak ada yang cocok. Kandidat DILARANG gugur hanya karena tidak cocok katalog — pola tanpa kategori adalah temuan orisinal reasoning agen. Pilihan M-xxx + AF-xx untuk pelaksanaan uji dikukuhkan di STAGE-D.
 - Syarat Lulus Gate (`python3 tools/verify_segitiga.py --gate C2 <audit-dir>`):
   - Dokumentasi penyilangan [WAVE-2-CROSS] Wilayah R_i tercatat.
-  - Seluruh kandidat berstatus [QUEUED] di 05-raw-leads.md memiliki jangkar :Lxx, peringkat EV (P1`–`P5), serta ID plugin valid M-xxx dan AF-xx.
+  - Seluruh kandidat berstatus [QUEUED] di 05-raw-leads.md memiliki jangkar :Lxx, peringkat EV (P1`–`P5), serta kolom Method/AF terisi hasil konsultasi katalog (ID plugin valid M-xxx/AF-xx ATAU penanda [NO-CATALOG]).
 <!-- @SLICE:STAGE-C2:END -->
 
 ---
@@ -136,7 +137,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
   - Batch terakhir boleh berisi 1–2 kartu bila sisa `[QUEUED]` wilayah itu < 3 (contoh 7 lead → `B01`:3, `B02`:3, `B03`:1).
   - **Dilarang pindah wilayah** selama `[QUEUED]` wilayah R_i masih > 0. Nomor batch di-reset ke `B01` saat wilayah berganti.
 - Prosedur Eksekusi untuk Setiap Kandidat `[ACTIVE]`:
-  1. Baca file plugin spesifik references/methods/M-xxx-*.md dan methodology/attack-forms/AF-xx-*.md yang ditugaskan pada kandidat tersebut.
+  1. Pilih dan kukuhkan label uji — **M-xxx** (metode bedah) dan **AF-xx** (bentuk serangan yang diuji) — lalu baca berkasnya. Muat juga bekal dari hasil C2: POV-xx, CHAIN-xx, fakta FACTS.md (F-R1-xx) dan rantai [TOUCHES] RADAR.md yang relevan — ini pagar terarah bentuk uji (tipe data, desimal, sentinel, mode fork), bukan pembatas ide.
   2. Eksekusi dan tuliskan Tiga Titik Bukti Segitiga secara lengkap di 05-raw-leads.md:
      - Titik 1 — Jejak Kode Eksak (*Exact Code Trace*): Rangkaian pemanggilan dari entry point publik hingga baris mutasi state/aset (Path/File.ext:Lxx-Lyy) beserta kondisi penjaga yang dilewati.
      - Titik 2 — Bukti Eksekusi / Jejak Matematika Konkret (*Concrete Execution / Math Proof*): Uji PoC menggunakan *test runner* ekosistem terkait (forge test, cargo test, sui move test, aptos move test, snforge test, pytest, go test, dll.) atau perhitungan langkah demi langkah menggunakan angka konkret (saldo awal, input transaksi, hasil pembagian/pembulatan, saldo akhir). Dilarang menggunakan klaim naratif tanpa angka/eksekusi.
