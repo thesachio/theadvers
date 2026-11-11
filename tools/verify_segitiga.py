@@ -1386,6 +1386,49 @@ def validate_four(guarded_text: str) -> List[str]:
     return errors
 
 
+
+def parse_match_rows(text: str) -> Dict[Tuple[str, str], Dict[str, str]]:
+    """Baris §1.3 'Jejak Pembacaan Plugin': (lead_id, plugin) -> {trigger, quote, path}."""
+    out: Dict[Tuple[str, str], Dict[str, str]] = {}
+    inside = False
+    for line in text.splitlines():
+        s = line.strip()
+        if s.startswith("|") and "Kutipan Verbatim" in s:
+            inside = True
+            continue
+        if inside:
+            if not s.startswith("|"):
+                inside = False
+                continue
+            if ":---" in s:
+                continue
+            cols = [c.strip().strip("`") for c in s.strip("|").split("|")]
+            if len(cols) < 5:
+                continue
+            lead, plugin = cols[0].strip("[] "), cols[1].strip("[] ")
+            if not re.fullmatch(r"LEAD-[A-Za-z0-9_\-]+", lead): continue
+            if not re.fullmatch(r"(?:M-\d{3}|AF-\d{2}|DOM-[a-z0-9\-]+|POV-[a-z0-9\-]+|CHAIN-[a-z0-9\-]+)", plugin):
+                continue
+            out[(lead, plugin)] = {"trigger": cols[2], "quote": cols[3], "path": cols[4]}
+    return out
+
+
+def normalize_ws(s: str) -> str:
+    return re.sub(r"\s+", " ", s).strip().lower()
+
+
+def quote_in_plugin(plugin: str, quote: str) -> Tuple[bool, str]:
+    """True bila kutipan ditemukan verbatim (setelah normalisasi spasi) di berkas plugin."""
+    path = resolve_plugin_path(plugin)
+    if path is None:
+        return False, "berkas plugin tidak ditemukan"
+    q = normalize_ws(quote.strip("[]` "))
+    if len(q) < 12 or q.startswith("[") or "salin satu kalimat" in q:
+        return False, "kutipan terlalu pendek/placeholder"
+    body = normalize_ws(Path(path).read_text(encoding="utf-8", errors="ignore"))
+    return (q in body), path
+
+
 def validate_wadah_rules(audit_dir: Path) -> List[str]:
     """Jalankan seluruh aturan 06/07/08/09 + jejak lead."""
     errors: List[str] = []
@@ -1697,6 +1740,8 @@ def print_context_packet(audit_dir: Path, override_region: Optional[str] = None)
         print("  2. Setiap tabrakan [TOUCHES]: rakit CPAIR-xx dan catat barisnya di RADAR.md.")
         print("  3. Saat menulis baris [QUEUED]: isi Method/AF (ID cocok ATAU [NO-CATALOG]) dan")
         print("     Plugin Tambahan (POV/CHAIN/DOM) — baris inilah bahan Bekal Uji STAGE-D.")
+        print("  4. Untuk SETIAP plugin yang dipakai: tulis baris MATCH di §1.3 dengan kutipan")
+        print("     VERBATIM dari berkas plugin — --gate C2 mencocokkan kutipan ke isi berkas.")
 
     elif current_stage.upper() == "STAGE-D":
         print("\n" + "=" * 88)
@@ -1983,6 +2028,7 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
                 f"[GATE-C2] Dokumentasi penyilangan [WAVE-2-CROSS] untuk Wilayah {active_region} belum tercatat sebagai baris data nyata di 05-raw-leads.md."
             )
         q_rows, _ = parse_leads_table_and_cards(raw_leads_text, None if active_region == "NONE" else active_region)
+        match_rows = parse_match_rows(raw_leads_text)
         if not q_rows:
             real_guarded_c2 = [
                 ln for ln in strip_template_boilerplate(guarded_text).splitlines()
@@ -2017,6 +2063,26 @@ def validate_gate(gate: str, audit_dir: Path, override_region: Optional[str] = N
             # Anti-masking: label yang ditulis wajib menunjuk berkas plugin nyata.
             errors.extend(plugin_ref_errors(
                 " ".join([r["method"], r["af"], r["extra"]]), f"GATE-C2 {r['id']}"))
+            # Anti-masking tingkat baca: setiap plugin yang dipakai wajib punya baris
+            # MATCH dengan kutipan verbatim dari berkas — bukti berkas benar-benar dibuka.
+            row_toks = set(re.findall(
+                r"\b(?:M-\d{3}|AF-\d{2}|DOM-[a-z0-9\-]+|POV-[a-z0-9\-]+|CHAIN-[a-z0-9\-]+)\b",
+                " ".join([r["method"], r["af"], r["extra"]])))
+            row_toks = {tk for tk in row_toks if not re.fullmatch(r"(?:M|AF|POV|CHAIN|DOM)-xx", tk)}
+            for tk in sorted(row_toks):
+                rec = match_rows.get((r["id"], tk))
+                if not rec:
+                    errors.append(
+                        f"[GATE-C2] Kandidat {r['id']} memakai plugin {tk} tetapi tidak ada baris "
+                        f"MATCH di §1.3 — bukti berkas benar-benar dibaca belum ada (masking)."
+                    )
+                else:
+                    okq, detail = quote_in_plugin(tk, rec.get("quote", ""))
+                    if not okq:
+                        errors.append(
+                            f"[GATE-C2] MATCH {tk} ({r['id']}): kutipan tidak ditemukan verbatim "
+                            f"di berkas plugin ({detail}) — kutipan palsu/berasal dari ingatan."
+                        )
 
     elif gate == "D":
         if not gate_passed_before("GATE-C2", state_text):

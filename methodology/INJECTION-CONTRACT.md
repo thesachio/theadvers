@@ -42,6 +42,7 @@
 4. **C1 tetap buta katalog.** Paket `STAGE-C1` tidak boleh memuat tabel `_ROUTER`; kolom Inversi Prasyarat ditandai sebagai bahan `STAGE-C2`.
 5. **Pemotongan harus terlihat.** Bila fakta/radar melebihi batas tampil, paket mencetak `[DIPOTONG] menampilkan X dari Y` — bukan memotong diam-diam.
 6. **Drift C2→D harus terlihat.** Kartu `[ACTIVE]` mencetak `JEJAK C2` dari baris `[QUEUED]` asalnya; token POV/CHAIN/DOM yang tercatat di C2 tetapi hilang dari Bekal Uji memicu peringatan (bukan kegagalan otomatis — agen boleh mengganti dengan alasan).
+7. **Bukti baca plugin (MATCH).** Plugin yang dipakai di `[QUEUED]` wajib punya baris `MATCH` dengan kutipan verbatim; `--gate C2` mencocokkan kutipan ke isi berkas. Tanpa baris MATCH atau dengan kutipan palsu = FAIL — inilah yang membedakan "indeks ditampilkan" dari "berkas benar-benar dibaca".
 
 ---
 

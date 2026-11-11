@@ -29,6 +29,14 @@
 - `[WAVE-2-CROSS] [CROSS-R1-01]` | Sumber Pemicu: [Fact ID F-R1-xx / Radar Pair CPAIR-xx / Observasi OBS-R1-xx] | Plugin Cocok dari `_ROUTER.md`: [M-xxx, AF-xx, DOM-xx, POV-xx, CHAIN-xx / [NO-CATALOG]] | Keputusan C2: [MASUK [QUEUED] sebagai LEAD-R1-01 / GUGUR ke 04-code-guarded.md sebagai GUARD-R1-xx HANYA karena terbantahkan fakta FACTS.md atau penjaga kode eksak]
 *Aturan C2: kandidat DILARANG gugur karena tidak cocok katalog. Pola tanpa kategori adalah temuan orisinal reasoning agen — antrekan dengan [NO-CATALOG].*
 
+### 1.3 Jejak Pembacaan Plugin (MATCH) — bukti berkas BENAR-BENAR dibaca
+
+*Untuk setiap ID plugin yang dipakai di kolom Method / AF / Plugin pada tabel `[QUEUED]`, tulis satu baris MATCH di sini. Kutipan wajib disalin **verbatim** dari berkas plugin — `--gate C2` mencocokkannya ke isi berkas. Kutipan palsu atau dari ingatan = FAIL (`MATCH` tanpa bukti = masking).*
+
+| Lead ID | Plugin | Trigger Symptom yang Cocok (dari `_ROUTER`) | Kutipan Verbatim dari Berkas Plugin | Path:Baris |
+| :--- | :--- | :--- | :--- | :--- |
+| [LEAD-R1-01] | [M-001] | [gejala kode yang cocok dengan baris router] | [salin satu kalimat persis dari berkas plugin, minimal 12 karakter] | [references/methods/M-001-*.md:Lxx] |
+
 ---
 
 ## 2. TABEL ANTREAN KANDIDAT BERKUALITAS ([QUEUED]) — TANPA PLAFON TOTAL

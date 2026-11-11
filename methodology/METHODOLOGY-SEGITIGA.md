@@ -118,6 +118,7 @@ Setiap blok di bawah ini dibatasi oleh penanda @SLICE agar dapat diekstrak secar
      - Setiap ide/observasi yang ternyata patah oleh fakta di FACTS.md atau penjaga kode wajib dipindahkan ke `04-code-guarded.md`.
      - Seluruh kandidat yang lolos 3 syarat kualitas Segitiga (memiliki dampak L-VALUE, jalur L-PATH yang dapat dijangkau, dan tidak patah oleh FACTS.md) dimasukkan ke Tabel Antrean `[QUEUED]` di 05-raw-leads.md (tanpa batas plafon total**—tidak boleh ada kandidat valid yang dibuang).
      - Wajib urutkan kandidat `[QUEUED]` berdasarkan **Prioritas EV (`SOUL.md §3`: P1 s/d P5) dan catat hasil konsultasi katalog sebagai sinyal wawasan.
+     - **Bukti baca (MATCH).** Setiap plugin yang dipakai di kolom Method/AF/Plugin wajib punya baris MATCH di §1.3 `05-raw-leads.md` dengan kutipan verbatim dari berkas plugin; gate C2 memverifikasi kutipan itu ke isi berkas.
      - **Katalog adalah sinyal wawasan, bukan gerbang kelangsungan hidup.** Kolom Assigned Method / Assigned Attack Form memuat hasil konsultasi katalog: ID plugin yang gejalanya cocok, ATAU penanda `[NO-CATALOG]` bila tidak ada yang cocok. Kandidat DILARANG gugur hanya karena tidak cocok katalog — pola tanpa kategori adalah temuan orisinal reasoning agen. Pilihan M-xxx + AF-xx untuk pelaksanaan uji dikukuhkan di STAGE-D.
 - Syarat Lulus Gate (`python3 tools/verify_segitiga.py --gate C2 <audit-dir>`):
   - Dokumentasi penyilangan [WAVE-2-CROSS] Wilayah R_i tercatat.
